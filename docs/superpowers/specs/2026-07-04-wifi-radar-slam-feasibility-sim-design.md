@@ -79,8 +79,10 @@ debug independently. Pipeline order: `config → scene → channel → sensing �
 ### 3.4 SLAM back-end (multipath / virtual-anchor SLAM)
 - **Purpose:** jointly estimate the vehicle trajectory and the map from the detections.
 - **Does:** treat specular reflections as **virtual anchors** (mirror images of APs — the Channel-SLAM /
-  Leitinger formulation); run a Bayesian estimator (particle filter or factor-graph belief propagation)
-  to estimate vehicle pose over time and landmark/reflector positions → map.
+  Leitinger formulation); run a Bayesian estimator to estimate vehicle pose over time and
+  landmark/reflector positions → map. **v1 uses a Rao-Blackwellized particle filter** (the original
+  Channel-SLAM estimator, conceptually simplest to get working); factor-graph belief propagation
+  (Leitinger/Li) is a documented fallback to try only if the particle filter degenerates.
 - **Interface:** `run_slam(detections_per_frame, ap_positions) -> {est_trajectory, est_map}`
 - **Data association:** v1 starts with ground-truth-aided association to isolate estimator behavior,
   then relaxes to blind association as a robustness step.
@@ -136,7 +138,7 @@ Intermediate artifacts are cached on disk; a stage can be re-run without recompu
 |------|-----------|
 | Per-step ray tracing is slow | Keep the scene modest; batch time steps; cache CIRs; GPU. |
 | Super-resolution under-resolves at low bandwidth | Expected — it's part of the Phase-B story; ensure enough antennas/subcarriers for the nominal case. |
-| Outdoor SLAM data association is hard | Start ground-truth-aided; relax to blind association as a explicit robustness experiment. |
+| Outdoor SLAM data association is hard | Start ground-truth-aided; relax to blind association as an explicit robustness experiment. |
 | Ego-Doppler vs target-Doppler separation | Use known vehicle motion (from trajectory model) to compensate; validate on a single-target sanity scene first. |
 | Sionna RT API / mobility learning curve | Build a minimal one-AP, one-target "hello-world" channel before the full scene. |
 
