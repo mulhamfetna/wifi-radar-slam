@@ -4,6 +4,13 @@
 Sionna RT 2.0.1, built-in `simple_street_canyon_with_cars` scene, full quality
 (`WRS_NUM_SAMPLES=1_000_000`). Phase A ≈ 30–55 s; Phase B (16 sweep points) ≈ 16 min.
 
+## Visuals
+
+- `docs/assets/scene_paths.png` — Sionna RT render of the street scene (buildings, a car) with the
+  **WiFi multipath rays** from the AP to the vehicle antenna. Reproduce: `python experiments/render_scene.py`.
+- `docs/assets/phase_a_map.png` — Phase-A estimated vs ground-truth trajectory + map (trajectory tracks
+  well; map still diffuse — see limitations).
+
 ## Headline
 
 **Ambient WiFi received on a moving vehicle localizes the vehicle to sub-metre — down to a few
