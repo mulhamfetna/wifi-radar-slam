@@ -48,11 +48,26 @@ class RunConfig:
 def load_config(path: str) -> RunConfig:
     with open(path, "r") as f:
         raw = yaml.safe_load(f)
-    rf = RFConfig(**raw["rf"])
-    traj = TrajectoryConfig(**raw["trajectory"])
+    # PyYAML (YAML 1.1) parses unsigned-exponent scientific notation like
+    # "5.2e9" as a string, so coerce numeric fields explicitly.
+    r = raw["rf"]
+    rf = RFConfig(
+        carrier_hz=float(r["carrier_hz"]),
+        bandwidth_hz=float(r["bandwidth_hz"]),
+        n_subcarriers=int(r["n_subcarriers"]),
+        n_rx_antennas=int(r["n_rx_antennas"]),
+        antenna_spacing_frac=float(r["antenna_spacing_frac"]),
+    )
+    t = raw["trajectory"]
+    traj = TrajectoryConfig(
+        length_m=float(t["length_m"]),
+        speed_mps=float(t["speed_mps"]),
+        timestep_s=float(t["timestep_s"]),
+        shape=str(t["shape"]),
+    )
     scene = SceneConfig(
         name=raw["scene"]["name"],
-        ap_positions=[tuple(p) for p in raw["scene"]["ap_positions"]],
+        ap_positions=[tuple(float(c) for c in p) for p in raw["scene"]["ap_positions"]],
         targets=list(raw["scene"]["targets"]),
     )
     return RunConfig(
