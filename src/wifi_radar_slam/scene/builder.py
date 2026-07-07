@@ -4,12 +4,10 @@ import numpy as np
 from ..config import RunConfig
 from ..geometry import straight_trajectory, targets_to_pointmap
 
-import sionna.rt as rt   # heavy import isolated to this module (GPU stage)
-
 
 @dataclass
 class BuiltScene:
-    scene: "rt.Scene"
+    scene: object          # sionna.rt.Scene (lazy import; kept untyped here)
     trajectory: np.ndarray
     ap_positions: list
     ground_truth_map: np.ndarray
@@ -23,6 +21,8 @@ def build_scene(cfg: RunConfig) -> BuiltScene:
     BuiltScene fields identical so downstream stages are unaffected.
     Verify with: python -c "import sionna.rt as rt; help(rt)".
     """
+    import sionna.rt as rt   # lazy: GPU stage, only imported when actually building
+
     scene = rt.load_scene()                       # empty scene
     scene.frequency = cfg.rf.carrier_hz
 

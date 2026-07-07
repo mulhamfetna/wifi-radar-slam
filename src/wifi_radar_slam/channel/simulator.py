@@ -4,8 +4,6 @@ from ..config import RFConfig
 from ..scene.builder import BuiltScene
 from ..geometry import RX_HEIGHT_M
 
-import sionna.rt as rt   # heavy import isolated to this module (GPU stage)
-
 
 def _subcarrier_freqs(rf: RFConfig) -> np.ndarray:
     return np.linspace(-rf.bandwidth_hz / 2, rf.bandwidth_hz / 2, rf.n_subcarriers)
@@ -21,6 +19,8 @@ def simulate_csi(built: BuiltScene, rf: RFConfig, snr_db: float, rng) -> np.ndar
     this file and keep the returned shape identical. On first bring-up, print
     `h_freq.shape` once to confirm the squeeze/transpose, then remove the print.
     """
+    import sionna.rt as rt   # lazy: GPU stage, only imported when actually simulating
+
     scene = built.scene
     n_frames = built.trajectory.shape[0]
     n_ap = len(built.ap_positions)
