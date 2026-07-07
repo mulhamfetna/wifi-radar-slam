@@ -1,5 +1,8 @@
 # WiFi-Radar-for-SLAM
 
+[![DOI](https://zenodo.org/badge/1292636094.svg)](https://zenodo.org/badge/latestdoi/1292636094)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
+
 **Ambient WiFi as a radar replacement for automotive SLAM.**
 
 Using existing WiFi signals in the environment, plus an on-vehicle WiFi antenna, to build a 3D scan of
