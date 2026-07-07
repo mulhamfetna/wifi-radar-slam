@@ -46,26 +46,27 @@ def run_phase_b(base_cfg: RunConfig, sweep: dict, rng) -> list[dict]:
     results = []
     for param, values in sweep.items():
         for v in values:
+            fv = float(v)          # YAML may parse "20.0e6" as a string; coerce
             if param == "bandwidth_hz":
-                rf = dataclasses.replace(base_cfg.rf, bandwidth_hz=float(v))
+                rf = dataclasses.replace(base_cfg.rf, bandwidth_hz=fv)
                 cfg = dataclasses.replace(base_cfg, rf=rf,
-                                          run_name=f"sweep_{param}_{v:.0f}")
+                                          run_name=f"sweep_{param}_{fv:.0f}")
             elif param == "snr_db":
-                cfg = dataclasses.replace(base_cfg, snr_db=float(v),
-                                          run_name=f"sweep_{param}_{v:.0f}")
+                cfg = dataclasses.replace(base_cfg, snr_db=fv,
+                                          run_name=f"sweep_{param}_{fv:.0f}")
             elif param == "speed_mps":
-                traj = dataclasses.replace(base_cfg.trajectory, speed_mps=float(v))
+                traj = dataclasses.replace(base_cfg.trajectory, speed_mps=fv)
                 cfg = dataclasses.replace(base_cfg, trajectory=traj,
-                                          run_name=f"sweep_{param}_{v:.0f}")
+                                          run_name=f"sweep_{param}_{fv:.0f}")
             elif param == "n_aps":
                 sc = dataclasses.replace(
                     base_cfg.scene,
-                    ap_positions=base_cfg.scene.ap_positions[: int(v)])
+                    ap_positions=base_cfg.scene.ap_positions[: int(fv)])
                 cfg = dataclasses.replace(base_cfg, scene=sc,
-                                          run_name=f"sweep_{param}_{int(v)}")
+                                          run_name=f"sweep_{param}_{int(fv)}")
             else:
                 raise ValueError(f"unknown sweep parameter: {param}")
             m = run_phase_a(cfg, rng)
-            results.append({"swept_param": param, "value": float(v), **m})
+            results.append({"swept_param": param, "value": fv, **m})
     io.save_json("sweep", "eval", "summary", {"results": results})
     return results

@@ -37,7 +37,9 @@ def test_phase_b_grid(monkeypatch, tmp_path):
                         lambda cfg, rng, force=False: {"ate": 1.0, "rpe": 0.1,
                                                        "chamfer": 2.0, "iou": 0.5})
     base = load_config("configs/nominal.yaml")
-    results = runner.run_phase_b(base, {"bandwidth_hz": [20e6, 160e6]},
+    # "20.0e6" as a string mirrors how PyYAML parses scientific notation
+    results = runner.run_phase_b(base, {"bandwidth_hz": ["20.0e6", 160e6]},
                                  np.random.default_rng(0))
     assert len(results) == 2
     assert results[0]["swept_param"] == "bandwidth_hz"
+    assert results[0]["value"] == 20e6
