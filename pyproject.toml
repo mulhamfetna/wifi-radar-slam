@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wifi-radar-slam"
+version = "0.1.0"
+description = "Ambient WiFi as a radar replacement for automotive SLAM (feasibility simulation)"
+requires-python = ">=3.11"
+license = { text = "AGPL-3.0-or-later" }
+authors = [{ name = "Mulham Fetna", email = "contact@mulhamfetna.com" }]
+dependencies = [
+  "numpy>=1.26",
+  "scipy>=1.11",
+  "matplotlib>=3.8",
+  "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+# Installed on the GPU box; Sionna/TF carry their own narrower Python range.
+sim = ["sionna>=0.19,<1.1", "tensorflow>=2.13"]
+dev = ["pytest>=7.4"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
