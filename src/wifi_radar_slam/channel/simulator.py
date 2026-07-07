@@ -5,45 +5,39 @@ from ..scene.builder import BuiltScene
 from ..geometry import RX_HEIGHT_M
 
 
-def _subcarrier_freqs(rf: RFConfig) -> np.ndarray:
-    return np.linspace(-rf.bandwidth_hz / 2, rf.bandwidth_hz / 2, rf.n_subcarriers)
-
-
 def simulate_csi(built: BuiltScene, rf: RFConfig, snr_db: float, rng) -> np.ndarray:
     """Ray-trace the AP->vehicle channel per frame -> CSI timeseries.
 
     Returns complex array (n_frames, n_ap, n_rx_antennas, n_subcarriers).
 
-    NOTE (Sionna API): compute_paths(...) / paths.cfr(...) target Sionna RT
-    0.19.x. Newer Sionna exposes PathSolver + paths.cir(); if so, adapt within
-    this file and keep the returned shape identical. On first bring-up, print
-    `h_freq.shape` once to confirm the squeeze/transpose, then remove the print.
+    Targets sionna-rt 2.0.x. `cfr(..., out_type="numpy")` returns
+    (n_rx, n_rx_ant, n_tx, n_tx_ant, n_time, n_sub); with one receiver and the APs
+    as transmitters that is (1, n_rx_ant, n_ap, 1, 1, n_sub), which we reduce to
+    (n_ap, n_rx_ant, n_sub) per frame. `samples_per_src` is the compute/RAM knob;
+    override via WRS_NUM_SAMPLES for quick/low-memory runs.
     """
     import os
-    import sionna.rt as rt   # lazy: GPU stage, only imported when actually simulating
+    import sionna.rt as rt   # lazy: heavy import, only when simulating
+    import mitsuba as mi
 
-    # Ray-tracing sample count dominates VRAM. Override on low-memory GPUs
-    # (e.g. 4 GB) via WRS_NUM_SAMPLES to avoid OOM during local bring-up.
-    num_samples = int(os.environ.get("WRS_NUM_SAMPLES", "1000000"))
+    n_samples = int(os.environ.get("WRS_NUM_SAMPLES", "1000000"))
     scene = built.scene
     n_frames = built.trajectory.shape[0]
     n_ap = len(built.ap_positions)
-    freqs = _subcarrier_freqs(rf)
+    freqs = rt.subcarrier_frequencies(rf.n_subcarriers, rf.bandwidth_hz / rf.n_subcarriers)
+    solver = rt.PathSolver()
     csi = np.zeros((n_frames, n_ap, rf.n_rx_antennas, rf.n_subcarriers), dtype=complex)
 
-    scene.add(rt.Receiver(name="veh", position=[0.0, 0.0, RX_HEIGHT_M]))
-
+    rx = scene.receivers["veh"]
     for f in range(n_frames):
         x, y, _yaw = built.trajectory[f]
-        scene.receivers["veh"].position = [float(x), float(y), RX_HEIGHT_M]
-        paths = scene.compute_paths(max_depth=3, num_samples=num_samples)
-        # channel frequency response; collapse the singleton tx/rx indices,
-        # keep [tx=ap, rx_antenna, freq].
-        h_freq = paths.cfr(frequencies=freqs, normalize=False).numpy()
-        h = np.squeeze(h_freq)
-        if h.ndim == 2:               # single-AP edge case -> add ap axis
-            h = h[None, ...]
-        csi[f] = h[:n_ap]
+        rx.position = mi.Point3f(float(x), float(y), RX_HEIGHT_M)
+        paths = solver(scene, max_depth=3, samples_per_src=n_samples,
+                       seed=int(rng.integers(1, 2**31 - 1)))
+        h = np.asarray(paths.cfr(frequencies=freqs, normalize=False, out_type="numpy"))
+        # (n_rx=1, n_rx_ant, n_tx=n_ap, n_tx_ant=1, n_time=1, n_sub) -> (n_ap, n_rx_ant, n_sub)
+        h = h[0, :, :, 0, 0, :]                 # (n_rx_ant, n_ap, n_sub)
+        csi[f] = np.transpose(h, (1, 0, 2))     # (n_ap, n_rx_ant, n_sub)
 
     # additive white Gaussian noise at the configured SNR
     sig_p = np.mean(np.abs(csi) ** 2) + 1e-30

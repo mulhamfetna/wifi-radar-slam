@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import numpy as np
 from ..config import RunConfig
-from ..geometry import straight_trajectory, targets_to_pointmap
+from ..geometry import straight_trajectory, RX_HEIGHT_M
 
 
 @dataclass
@@ -13,34 +13,31 @@ class BuiltScene:
     ground_truth_map: np.ndarray
 
 
+# Map config scene names to built-in Sionna RT outdoor scenes. Sionna RT 2.0 has
+# no programmatic box primitive, so we use a shipped street scene (more credible
+# than hand-built boxes) and derive ground truth from its actual meshes.
+_BUILTIN_SCENE = {
+    "parking_lot": "simple_street_canyon_with_cars",
+    "parking_lot_smoke": "simple_street_canyon_with_cars",
+    "street_canyon": "simple_street_canyon_with_cars",
+    "floor_wall": "floor_wall",
+}
+
+
 def build_scene(cfg: RunConfig) -> BuiltScene:
-    """Build a Sionna RT scene for the parking-lot config and its ground truth.
+    """Build a Sionna RT 2.0 scene from a built-in outdoor environment.
 
-    NOTE (Sionna API): constructor/method names below target Sionna RT 0.19.x.
-    If the pinned Sionna differs, adapt ONLY within this file and keep the
-    BuiltScene fields identical so downstream stages are unaffected.
-    Verify with: python -c "import sionna.rt as rt; help(rt)".
+    Targets `sionna-rt` 2.0.x: load_scene / PlanarArray / Transmitter / Receiver /
+    PathSolver. Ground truth is the positions of the scene's static scatterers
+    (cars + buildings, excluding the floor). AP positions and RF/trajectory come
+    from the config.
     """
-    import sionna.rt as rt   # lazy: GPU stage, only imported when actually building
+    import sionna.rt as rt   # lazy: heavy Mitsuba/Dr.Jit import, only when building
 
-    scene = rt.load_scene()                       # empty scene
+    key = _BUILTIN_SCENE.get(cfg.scene.name, "simple_street_canyon_with_cars")
+    scene = rt.load_scene(getattr(rt.scene, key))
     scene.frequency = cfg.rf.carrier_hz
 
-    # ground plane
-    scene.add(rt.Rectangle(
-        name="ground", size=[200.0, 200.0], position=[30.0, 0.0, 0.0],
-        material=rt.RadioMaterial("itu_concrete"),
-    ))
-
-    # box targets (cars / poles / walls) as cuboids
-    for i, t in enumerate(cfg.scene.targets):
-        material = "itu_metal" if t["kind"] == "car" else "itu_concrete"
-        scene.add(rt.Box(
-            name=f"target_{i}", size=list(t["size"]), position=list(t["center"]),
-            material=rt.RadioMaterial(material),
-        ))
-
-    # transmit array = APs (single iso element); receive array = vehicle ULA
     scene.tx_array = rt.PlanarArray(
         num_rows=1, num_cols=1, vertical_spacing=0.5, horizontal_spacing=0.5,
         pattern="iso", polarization="V",
@@ -52,10 +49,19 @@ def build_scene(cfg: RunConfig) -> BuiltScene:
 
     ap_positions = [np.array(p, dtype=float) for p in cfg.scene.ap_positions]
     for i, ap in enumerate(ap_positions):
-        scene.add(rt.Transmitter(name=f"ap_{i}", position=ap.tolist()))
+        scene.add(rt.Transmitter(name=f"ap_{i}",
+                                 position=[float(ap[0]), float(ap[1]), float(ap[2])]))
+    scene.add(rt.Receiver(name="veh", position=[0.0, 0.0, RX_HEIGHT_M]))
 
-    traj = straight_trajectory(
-        cfg.trajectory.length_m, cfg.trajectory.speed_mps, cfg.trajectory.timestep_s)
-    gt_map = targets_to_pointmap(cfg.scene.targets, spacing=0.5)
+    # trajectory centered so the vehicle drives through the middle of the scene
+    traj = straight_trajectory(cfg.trajectory.length_m, cfg.trajectory.speed_mps,
+                               cfg.trajectory.timestep_s)
+    traj[:, 0] -= cfg.trajectory.length_m / 2.0
+
+    # ground-truth map: positions of static scatterers (exclude the floor plane)
+    gt = [np.array(obj.position).ravel()[:3]
+          for name, obj in scene.objects.items() if "floor" not in name.lower()]
+    ground_truth_map = np.array(gt) if gt else np.zeros((0, 3))
+
     return BuiltScene(scene=scene, trajectory=traj,
-                      ap_positions=ap_positions, ground_truth_map=gt_map)
+                      ap_positions=ap_positions, ground_truth_map=ground_truth_map)

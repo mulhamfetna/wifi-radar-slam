@@ -17,8 +17,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Installed on the GPU box; Sionna/TF carry their own narrower Python range.
-sim = ["sionna>=0.19,<1.1", "tensorflow>=2.13"]
+# Sionna RT 2.x is TensorFlow-free (Dr.Jit/Mitsuba); runs on CUDA GPU or CPU (LLVM).
+sim = ["sionna-rt>=2.0,<3"]
 dev = ["pytest>=7.4"]
 
 [tool.setuptools.packages.find]
