@@ -2,9 +2,34 @@ from __future__ import annotations
 import numpy as np
 
 
-def _reproject(pose, reflector):
-    d = reflector - pose[:2]
-    return np.linalg.norm(d), np.arctan2(d[1], d[0])
+def _triangulate_bistatic(pose_xy, ap_xy, path_len, aoa):
+    """Locate a reflector from a bistatic path length + angle of arrival.
+
+    The measured path length is |AP->R| + |R->vehicle| (an ellipse with foci AP
+    and vehicle). The AoA gives the bearing from the vehicle to R, so
+    R = vehicle + s * u(aoa). Solving |AP - R| = path_len - s for s:
+
+        s = (path_len^2 - |AP-vehicle|^2) / (2 (path_len - (AP-vehicle) . u))
+
+    Returns None for the direct/LOS path (s <= 0) or degenerate geometry.
+    """
+    u = np.array([np.cos(aoa), np.sin(aoa)])
+    v2ap = np.asarray(ap_xy, dtype=float) - np.asarray(pose_xy, dtype=float)
+    dist_ap = np.linalg.norm(v2ap)
+    denom = 2.0 * (path_len - v2ap @ u)
+    if abs(denom) < 1e-6:
+        return None
+    s = (path_len ** 2 - dist_ap ** 2) / denom
+    if s <= 0.1:                       # <= direct path or behind the vehicle
+        return None
+    return np.asarray(pose_xy, dtype=float) + s * u
+
+
+def _reproject_bistatic(pose_xy, ap_xy, refl):
+    """Predicted (bistatic path length, AoA) of a reflector from a pose."""
+    d = np.asarray(refl) - np.asarray(pose_xy)
+    path = np.linalg.norm(np.asarray(ap_xy)[:2] - np.asarray(refl)) + np.linalg.norm(d)
+    return path, np.arctan2(d[1], d[0])
 
 
 def run_slam(detections, ap_positions, velocity, timestep_s, rng,
@@ -30,19 +55,20 @@ def run_slam(detections, ap_positions, velocity, timestep_s, rng,
 
         dets = detections[f]
         if dets.shape[0] > 0:
-            # anchor reflector triangulation on the current weighted-mean pose
             mean_pose = np.average(particles, axis=0, weights=weights)
-            for rng_m, aoa, _ap in dets:
-                refl = mean_pose[:2] + rng_m * np.array([np.cos(aoa), np.sin(aoa)])
+            for path_len, aoa, ap_i in dets:
+                ap_xy = np.asarray(ap_positions[int(ap_i)])[:2]
+                refl = _triangulate_bistatic(mean_pose[:2], ap_xy, path_len, aoa)
+                if refl is None:                           # direct path / degenerate
+                    continue
                 mapped_points.append(refl)
-                # weight update: consistency of each particle with this detection
-                pr = np.array([_reproject(p, refl) for p in particles])
-                err = (pr[:, 0] - rng_m) ** 2 + (pr[:, 1] - aoa) ** 2
+                # weight update: bistatic consistency of each particle
+                pr = np.array([_reproject_bistatic(p[:2], ap_xy, refl) for p in particles])
+                err = (pr[:, 0] - path_len) ** 2 + (pr[:, 1] - aoa) ** 2
                 weights *= np.exp(-0.5 * err / (0.5 ** 2))
             weights += 1e-300
             weights /= weights.sum()
 
-            # resample if effective sample size collapses
             neff = 1.0 / np.sum(weights ** 2)
             if neff < n_particles / 2:
                 idx = rng.choice(n_particles, n_particles, p=weights)
