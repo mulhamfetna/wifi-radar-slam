@@ -35,7 +35,26 @@ If a Sionna API call mismatches the installed version, fix it **only inside**
 On first bring-up, temporarily `print(h_freq.shape)` inside `simulate_csi` to confirm the
 `squeeze`/axis handling, then remove it.
 
-## Running the experiments (GPU box)
+## Local bring-up on a low-VRAM GPU (e.g. 4 GB)
+
+Ray-tracing sample count dominates VRAM, so validate the Sionna wiring at reduced scale before
+committing to a full server run:
+
+```bash
+# tiny scene + far fewer ray samples so it fits in ~4 GB
+WRS_NUM_SAMPLES=100000 .venv/bin/python -c "
+import numpy as np
+from wifi_radar_slam.config import load_config
+from wifi_radar_slam.runner import run_phase_a
+cfg = load_config('configs/smoke.yaml')
+print(run_phase_a(cfg, np.random.default_rng(cfg.seed)))
+"
+```
+
+If this still OOMs, lower `WRS_NUM_SAMPLES` further (e.g. 20000) and/or shrink `configs/smoke.yaml`.
+This only checks that the ray tracer runs and shapes line up — it is **not** a scientific result.
+
+## Running the experiments (GPU box / server)
 
 **Phase A — nominal case:**
 ```bash

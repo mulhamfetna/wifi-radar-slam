@@ -19,8 +19,12 @@ def simulate_csi(built: BuiltScene, rf: RFConfig, snr_db: float, rng) -> np.ndar
     this file and keep the returned shape identical. On first bring-up, print
     `h_freq.shape` once to confirm the squeeze/transpose, then remove the print.
     """
+    import os
     import sionna.rt as rt   # lazy: GPU stage, only imported when actually simulating
 
+    # Ray-tracing sample count dominates VRAM. Override on low-memory GPUs
+    # (e.g. 4 GB) via WRS_NUM_SAMPLES to avoid OOM during local bring-up.
+    num_samples = int(os.environ.get("WRS_NUM_SAMPLES", "1000000"))
     scene = built.scene
     n_frames = built.trajectory.shape[0]
     n_ap = len(built.ap_positions)
@@ -32,7 +36,7 @@ def simulate_csi(built: BuiltScene, rf: RFConfig, snr_db: float, rng) -> np.ndar
     for f in range(n_frames):
         x, y, _yaw = built.trajectory[f]
         scene.receivers["veh"].position = [float(x), float(y), RX_HEIGHT_M]
-        paths = scene.compute_paths(max_depth=3, num_samples=1_000_000)
+        paths = scene.compute_paths(max_depth=3, num_samples=num_samples)
         # channel frequency response; collapse the singleton tx/rx indices,
         # keep [tx=ap, rx_antenna, freq].
         h_freq = paths.cfr(frequencies=freqs, normalize=False).numpy()

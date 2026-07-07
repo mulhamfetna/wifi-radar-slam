@@ -1,0 +1,23 @@
+# Tiny scene for local Sionna bring-up on a low-VRAM GPU (e.g. 4 GB Quadro P620).
+# Validates the ray-tracing wiring without OOM. NOT a scientific run — use
+# configs/nominal.yaml on the server for real results.
+run_name: smoke_local
+seed: 42
+snr_db: 20.0
+rf:
+  carrier_hz: 5.2e9
+  bandwidth_hz: 40.0e6
+  n_subcarriers: 32
+  n_rx_antennas: 4
+  antenna_spacing_frac: 0.5
+trajectory:
+  length_m: 5.0          # ~20 frames instead of 240
+  speed_mps: 5.0
+  timestep_s: 0.25
+  shape: straight
+scene:
+  name: parking_lot_smoke
+  ap_positions:
+    - [0.0, 10.0, 6.0]   # single AP
+  targets:
+    - {kind: car, center: [6.0, 3.0, 0.75], size: [4.5, 1.8, 1.5]}
