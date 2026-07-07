@@ -1,6 +1,10 @@
 from __future__ import annotations
 import numpy as np
 
+# Reflectors farther than this from the vehicle are rejected as non-physical
+# (ill-conditioned bistatic solves or array-relative AoA inconsistencies).
+MAX_REFLECTOR_RANGE_M = 150.0
+
 
 def _triangulate_bistatic(pose_xy, ap_xy, path_len, aoa):
     """Locate a reflector from a bistatic path length + angle of arrival.
@@ -17,10 +21,10 @@ def _triangulate_bistatic(pose_xy, ap_xy, path_len, aoa):
     v2ap = np.asarray(ap_xy, dtype=float) - np.asarray(pose_xy, dtype=float)
     dist_ap = np.linalg.norm(v2ap)
     denom = 2.0 * (path_len - v2ap @ u)
-    if abs(denom) < 1e-6:
+    if abs(denom) < 1.0:               # near-degenerate ellipse -> unstable solve
         return None
     s = (path_len ** 2 - dist_ap ** 2) / denom
-    if s <= 0.1:                       # <= direct path or behind the vehicle
+    if s <= 0.1 or s > MAX_REFLECTOR_RANGE_M:   # direct path, behind, or implausible
         return None
     return np.asarray(pose_xy, dtype=float) + s * u
 
