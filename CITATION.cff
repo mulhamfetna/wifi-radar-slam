@@ -14,7 +14,7 @@ authors:
     orcid: "https://orcid.org/0009-0006-4432-798X"
     email: contact@mulhamfetna.com
 version: 0.1.0
-date-released: "2026-07-04"
+date-released: "2026-07-07"
 license: AGPL-3.0-or-later
 doi: 10.5281/zenodo.21247288
 repository-code: "https://github.com/mulhamfetna/wifi-radar-slam"
@@ -24,8 +24,8 @@ identifiers:
     value: 10.5281/zenodo.21247288
     description: Concept DOI (resolves to the latest version)
   - type: doi
-    value: 10.5281/zenodo.21247289
-    description: Version DOI for the first archived release
+    value: 10.5281/zenodo.21247363
+    description: Version DOI for v0.1.0
 keywords:
   - WiFi sensing
   - passive WiFi radar
