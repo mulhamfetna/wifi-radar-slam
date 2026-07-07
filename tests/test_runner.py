@@ -27,3 +27,17 @@ def test_phase_a_wiring(monkeypatch, tmp_path):
     metrics = runner.run_phase_a(cfg, np.random.default_rng(0))
     assert set(metrics) == {"ate", "rpe", "chamfer", "iou"}
     assert np.isfinite(metrics["ate"])
+
+
+def test_phase_b_grid(monkeypatch, tmp_path):
+    from wifi_radar_slam import io_artifacts as io
+    monkeypatch.setattr(io, "RESULTS_ROOT", tmp_path)
+    # stub run_phase_a to avoid re-running the pipeline
+    monkeypatch.setattr(runner, "run_phase_a",
+                        lambda cfg, rng, force=False: {"ate": 1.0, "rpe": 0.1,
+                                                       "chamfer": 2.0, "iou": 0.5})
+    base = load_config("configs/nominal.yaml")
+    results = runner.run_phase_b(base, {"bandwidth_hz": [20e6, 160e6]},
+                                 np.random.default_rng(0))
+    assert len(results) == 2
+    assert results[0]["swept_param"] == "bandwidth_hz"

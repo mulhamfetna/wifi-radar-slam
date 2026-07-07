@@ -1,0 +1,6 @@
+base: configs/nominal.yaml
+sweeps:
+  bandwidth_hz: [20.0e6, 40.0e6, 80.0e6, 160.0e6]
+  snr_db: [0.0, 10.0, 20.0, 30.0]
+  n_aps: [1, 2, 3, 4]
+  speed_mps: [1.0, 5.0, 10.0, 15.0]

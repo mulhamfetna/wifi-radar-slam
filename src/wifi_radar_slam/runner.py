@@ -1,4 +1,5 @@
 from __future__ import annotations
+import dataclasses
 from .config import RunConfig
 from .geometry import velocity_from_poses
 from .sensing.frontend import extract_detections
@@ -37,3 +38,33 @@ def run_phase_a(cfg: RunConfig, rng, force: bool = False) -> dict:
     plot_map(est_map, gt_xy, est_traj, gt_traj,
              str(io.run_dir(run) / "eval" / "map.png"))
     return metrics
+
+
+def run_phase_b(base_cfg: RunConfig, sweep: dict, rng) -> list[dict]:
+    """Run Phase A over a sweep grid; one swept parameter at a time."""
+    results = []
+    for param, values in sweep.items():
+        for v in values:
+            if param == "bandwidth_hz":
+                rf = dataclasses.replace(base_cfg.rf, bandwidth_hz=float(v))
+                cfg = dataclasses.replace(base_cfg, rf=rf,
+                                          run_name=f"sweep_{param}_{v:.0f}")
+            elif param == "snr_db":
+                cfg = dataclasses.replace(base_cfg, snr_db=float(v),
+                                          run_name=f"sweep_{param}_{v:.0f}")
+            elif param == "speed_mps":
+                traj = dataclasses.replace(base_cfg.trajectory, speed_mps=float(v))
+                cfg = dataclasses.replace(base_cfg, trajectory=traj,
+                                          run_name=f"sweep_{param}_{v:.0f}")
+            elif param == "n_aps":
+                sc = dataclasses.replace(
+                    base_cfg.scene,
+                    ap_positions=base_cfg.scene.ap_positions[: int(v)])
+                cfg = dataclasses.replace(base_cfg, scene=sc,
+                                          run_name=f"sweep_{param}_{int(v)}")
+            else:
+                raise ValueError(f"unknown sweep parameter: {param}")
+            m = run_phase_a(cfg, rng)
+            results.append({"swept_param": param, "value": float(v), **m})
+    io.save_json("sweep", "eval", "summary", {"results": results})
+    return results
