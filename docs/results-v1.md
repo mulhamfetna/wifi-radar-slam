@@ -45,17 +45,22 @@ positive feasibility signal for WiFi as a radar-substitute pose sensor in SLAM.
 ## Limitations / next research (the map)
 
 Localization works; **map reconstruction does not yet**. The estimated reflector cloud is bounded
-(after the plausibility guard) but diffuse, not resolved to building/car surfaces. Root causes:
-1. **AoA is array-relative**, not converted to a global bearing via the receiver/array orientation —
-   the dominant map error. Needs proper array-frame → world-frame AoA calibration.
-2. **Delay–AoA pairing** by sort index mis-associates across multipath; needs joint delay-AoA
-   estimation.
-3. **Ground truth = Sionna object mesh centroids** (some building centroids at z≈25 m), not the actual
-   reflecting facades — the Chamfer/IoU metric is comparing against the wrong reference. Needs facade/
-   footprint ground truth from mesh geometry.
+(after the plausibility guard) but diffuse. An **oracle test** (feeding Sionna's true per-path `tau`
+and `phi_r` into the bistatic triangulation) pinned the root causes precisely:
 
-These are the concrete next steps to make the *mapping* half of the SLAM claim quantitative; the
-*localization* half is already a solid result.
+1. **AoA convention is CORRECT** (verified): line-of-sight `phi_r` equals the geometric bearing to each
+   AP (e.g. 90° for an AP due north). World bearing = `phi_r`. So the geometry/formula are right.
+2. **Multi-bounce paths are the dominant error.** With `max_depth=3` most of the ~19 paths/AP are 2–3
+   bounce; the single-reflector bistatic model maps them to *phantom* positions. **Fix:** filter to
+   single-specular-bounce paths (via `paths.interactions`) before mapping.
+3. **Ground truth = object mesh centroids**, but reflections occur on **facades** — Chamfer/IoU compare
+   against the wrong reference. **Fix:** derive ground truth from mesh bounding-box/footprint surfaces.
+4. **Realistic sensing** (MUSIC AoA from commodity CSI) is a separate, harder problem than the oracle;
+   the estimator's steering model must match Sionna's antenna phase convention.
+
+Concrete next steps: (a) single-bounce path filtering + facade ground truth → makes the *oracle* map
+quantitative; (b) then close the gap to MUSIC-estimated sensing. The *localization* half is already a
+solid result and is independent of these.
 
 ## Reproduce
 
