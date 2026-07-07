@@ -46,10 +46,22 @@ Two phases:
 | `docs/` | Design specs and implementation plans |
 | `src/` | Simulation pipeline (added during implementation) |
 
-## Citing / license
+## Citing
 
-This project is intended for open, citable release. Licensed **AGPL-3.0-or-later**; see
-[`CITATION.cff`](CITATION.cff). A Zenodo DOI will be minted on first release (`.zenodo.json` prepared).
+Archived on Zenodo — **concept DOI [10.5281/zenodo.21247288](https://doi.org/10.5281/zenodo.21247288)**
+(always resolves to the latest version). Licensed **AGPL-3.0-or-later** (see [`LICENSE`](LICENSE));
+citation metadata in [`CITATION.cff`](CITATION.cff).
+
+```bibtex
+@software{fetna_wifi_radar_slam,
+  author  = {Fetna, Mulham},
+  title   = {{WiFi-Radar-for-SLAM: Ambient WiFi as a Radar Replacement for Automotive SLAM}},
+  year    = {2026},
+  publisher = {Zenodo},
+  doi     = {10.5281/zenodo.21247288},
+  url     = {https://github.com/mulhamfetna/wifi-radar-slam}
+}
+```
 
 **Author:** Mulham Fetna — [ORCID 0009-0006-4432-798X](https://orcid.org/0009-0006-4432-798X) ·
 contact@mulhamfetna.com · [GitHub](https://github.com/mulhamfetna)

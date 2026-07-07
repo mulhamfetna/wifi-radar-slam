@@ -16,8 +16,16 @@ authors:
 version: 0.1.0
 date-released: "2026-07-04"
 license: AGPL-3.0-or-later
+doi: 10.5281/zenodo.21247288
 repository-code: "https://github.com/mulhamfetna/wifi-radar-slam"
 url: "https://github.com/mulhamfetna/wifi-radar-slam"
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.21247288
+    description: Concept DOI (resolves to the latest version)
+  - type: doi
+    value: 10.5281/zenodo.21247289
+    description: Version DOI for the first archived release
 keywords:
   - WiFi sensing
   - passive WiFi radar
