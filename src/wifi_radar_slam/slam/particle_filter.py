@@ -8,9 +8,13 @@ def _reproject(pose, reflector):
 
 
 def run_slam(detections, ap_positions, velocity, timestep_s, rng,
-             n_particles: int = 200):
+             n_particles: int = 200, init_pose=None):
     n_frames = len(detections)
     particles = np.zeros((n_particles, 3))                 # x, y, yaw
+    if init_pose is not None:                              # known start (e.g. GPS prior)
+        particles[:, 0] = init_pose[0]
+        particles[:, 1] = init_pose[1]
+        particles[:, 2] = init_pose[2] if len(init_pose) > 2 else 0.0
     weights = np.ones(n_particles) / n_particles
     est_traj = np.zeros((n_frames, 3))
     mapped_points: list[np.ndarray] = []
