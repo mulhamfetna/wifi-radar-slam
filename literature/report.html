@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WiFi-as-Radar for Automotive SLAM — Literature Survey</title>
+<style>
+  :root{
+    --bg:#f7f8fa; --panel:#ffffff; --ink:#1a1d24; --muted:#5b6472; --line:#e3e7ee;
+    --accent:#2f6df6; --accent-soft:#eaf1ff; --good:#1a8f5a; --good-soft:#e6f6ee;
+    --warn:#b45309; --warn-soft:#fdf1e0; --bad:#c02626; --bad-soft:#fdeaea;
+    --code:#eef1f6;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0f1319; --panel:#161b24; --ink:#e8ecf3; --muted:#9aa4b2; --line:#252c38;
+      --accent:#6ea0ff; --accent-soft:#16233d; --good:#4cc38a; --good-soft:#13291f;
+      --warn:#e0a24a; --warn-soft:#2c2211; --bad:#f47070; --bad-soft:#301616;
+      --code:#1b212c;
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:48px 24px 96px}
+  header.top{border-bottom:2px solid var(--line); padding-bottom:28px; margin-bottom:8px}
+  .kicker{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-weight:700}
+  h1{font-size:34px; line-height:1.15; margin:.35em 0 .2em; letter-spacing:-.01em}
+  .sub{color:var(--muted); font-size:17px; max-width:64ch}
+  .meta{display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:18px; font-size:13px; color:var(--muted)}
+  .meta b{color:var(--ink); font-weight:600}
+  h2{font-size:24px; margin:56px 0 6px; letter-spacing:-.01em; scroll-margin-top:20px}
+  h2 .n{color:var(--accent); font-variant-numeric:tabular-nums; margin-right:.4em}
+  h3{font-size:18px; margin:30px 0 4px}
+  p{margin:12px 0}
+  a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent}
+  a:hover{border-bottom-color:currentColor}
+  .lead{font-size:18px; color:var(--ink)}
+  .toc{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:20px 24px; margin:28px 0}
+  .toc h4{margin:0 0 10px; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
+  .toc ol{margin:0; padding-left:20px; columns:2; column-gap:32px; font-size:14px}
+  .toc li{margin:4px 0; break-inside:avoid}
+  .callout{border-radius:12px; padding:16px 20px; margin:22px 0; border:1px solid var(--line); background:var(--panel)}
+  .callout.accent{background:var(--accent-soft); border-color:transparent}
+  .callout.warn{background:var(--warn-soft); border-color:transparent}
+  .callout.bad{background:var(--bad-soft); border-color:transparent}
+  .callout .tag{font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; display:block; margin-bottom:6px}
+  .callout.accent .tag{color:var(--accent)} .callout.warn .tag{color:var(--warn)} .callout.bad .tag{color:var(--bad)}
+  .thesis{font-size:19px; line-height:1.5; font-weight:500}
+  table{width:100%; border-collapse:collapse; margin:20px 0; font-size:14.5px}
+  th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:600}
+  td.c{white-space:nowrap}
+  .pill{display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; line-height:1.5}
+  .pill.hi{background:var(--good-soft); color:var(--good)}
+  .pill.med{background:var(--warn-soft); color:var(--warn)}
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:26px 0}
+  .stat{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px}
+  .stat .v{font-size:26px; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+  .stat .l{font-size:12px; color:var(--muted); margin-top:2px}
+  .threadcard{background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:10px; padding:4px 22px 18px; margin:22px 0}
+  .threadcard.mature{border-left-color:var(--good)}
+  .threadcard.gap{border-left-color:var(--warn)}
+  .threadcard.missing{border-left-color:var(--bad); border-left-style:dashed}
+  .status{font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase}
+  .status.mature{color:var(--good)} .status.gap{color:var(--warn)} .status.missing{color:var(--bad)} .status.ready{color:var(--accent)}
+  ul.tight li{margin:6px 0}
+  .refs{font-size:14px}
+  .ref{padding:12px 0; border-bottom:1px solid var(--line)}
+  .ref .id{display:inline-block; font-weight:700; color:var(--accent); min-width:44px}
+  .ref .oa{font-size:11px; font-weight:700; padding:1px 7px; border-radius:5px; margin-left:4px}
+  .oa.open{background:var(--good-soft); color:var(--good)} .oa.pay{background:var(--bad-soft); color:var(--bad)}
+  .ref .contact{color:var(--muted); font-size:13px}
+  code{background:var(--code); padding:1px 6px; border-radius:5px; font-size:.9em; font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  footer{margin-top:64px; padding-top:20px; border-top:1px solid var(--line); color:var(--muted); font-size:13px}
+  @media (max-width:640px){ .toc ol{columns:1} .stats{grid-template-columns:repeat(2,1fr)} h1{font-size:27px} }
+  @media print{ body{background:#fff} .wrap{max-width:none} a{color:inherit} .toc{break-inside:avoid} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <span class="kicker">Literature Survey · Rounds 1–2 · Verified</span>
+  <h1>WiFi Signals as a Radar Replacement for Automotive SLAM</h1>
+  <p class="sub">A related-work survey and novelty-positioning report for a Q1 submission: turning
+  ambient WiFi plus an on-vehicle antenna into a 3D scan that substitutes for radar in SLAM.</p>
+  <div class="meta">
+    <span><b>Compiled</b> 2026-07-04 (2 rounds)</span>
+    <span><b>Method</b> Adversarially-verified deep research</span>
+    <span><b>Effort</b> 214 agents · ~4M tokens · 50 claims verified</span>
+    <span><b>Threads</b> all 4 now sourced</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <h4>Contents</h4>
+  <ol>
+    <li><a href="#summary">Executive summary</a></li>
+    <li><a href="#gap">The novelty gap</a></li>
+    <li><a href="#method">How this was verified</a></li>
+    <li><a href="#t1">Thread 1 — Passive WiFi radar</a></li>
+    <li><a href="#t2">Thread 2 — CSI sensing &amp; 3D</a></li>
+    <li><a href="#t3">Thread 3 — RF-SLAM</a></li>
+    <li><a href="#t4">Thread 4 — ISAC / 802.11bf</a></li>
+    <li><a href="#risk">Feasibility &amp; risk register</a></li>
+    <li><a href="#data">Datasets &amp; toolkits</a></li>
+    <li><a href="#anti">Claims that failed verification</a></li>
+    <li><a href="#refs">Annotated bibliography</a></li>
+  </ol>
+</nav>
+
+<section id="summary">
+  <h2><span class="n">1</span>Executive summary</h2>
+  <p class="lead">Four mature but historically separate communities each supply one capability this
+  project needs. Every capability has been demonstrated — but never in this combination, and never on a
+  moving vehicle outdoors.</p>
+  <div class="stats">
+    <div class="stat"><div class="v">4</div><div class="l">research threads mapped</div></div>
+    <div class="stat"><div class="v">23</div><div class="l">claims verified true</div></div>
+    <div class="stat"><div class="v">1</div><div class="l">moving-vehicle passive radar (uses 5G, not WiFi)</div></div>
+    <div class="stat"><div class="v">0</div><div class="l">outdoor / vehicular WiFi 3D-scan systems</div></div>
+  </div>
+  <p>Passive WiFi radar is <b>mature</b> — ambient APs as illuminators, through-wall detection, sub-metre
+  tracking — but always indoor and static. CSI sensing reaches <b>dense 3D reconstruction</b> (skeletons,
+  multi-person pose comparable to mmWave radar, depth images) but is confined to 2–4 m fixed indoor zones
+  that generalize poorly. RF-SLAM already provides a <b>transferable back-end</b> (multipath-as-virtual-
+  transmitter). The ISAC / 802.11bf / mmWave thread — which decides whether commodity WiFi can reach
+  radar-grade resolution — is the frontier and needs a second research pass.</p>
+</section>
+
+<section id="gap">
+  <h2><span class="n">2</span>The novelty gap</h2>
+  <div class="callout accent">
+    <span class="tag">Defensible contribution</span>
+    <p class="thesis">An <b>on-vehicle, mobile, outdoor</b> WiFi (802.11) passive-radar / CSI system that
+    produces <b>3D scans usable inside a SLAM pipeline</b> — combining the automotive moving-platform
+    concept (so far shown only with 5G) with WiFi-band sensing (so far shown only indoors and static).
+    No prior work occupies that intersection.</p>
+  </div>
+  <p>The closest prior art — a passive radar on a moving car (Maksymiuk 2024) — proves the moving-platform
+  concept is real, but uses <b>5G downlink</b>, not WiFi. Substituting an ambient-WiFi illuminator, on a
+  vehicle, outdoors, with a SLAM-facing 3D output, is the unoccupied point in the design space. The
+  novelty is the <em>transfer</em> of indoor/static WiFi sensing into the mobile/outdoor regime, and the
+  engineering that transfer requires is the paper's technical content.</p>
+  <div class="callout bad">
+    <span class="tag">Two guardrails (from refuted claims)</span>
+    <p style="margin:6px 0"><b>Do not</b> claim WiFi's low bandwidth restricts passive radar to
+    Doppler-only — cross-ambiguity recovers full range–Doppler; bandwidth limits range <em>resolution</em>
+    only. <b>Do not</b> attribute the automotive gap to any survey — it is our inference from the
+    pervasive indoor/static pattern.</p>
+  </div>
+</section>
+
+<section id="method">
+  <h2><span class="n">3</span>How this was verified</h2>
+  <p>The map was built by a deep-research harness, not ad-hoc searching, so each claim's weight is known.
+  The question was decomposed into five angles; the top 24 sources were fetched in full and mined for
+  107 falsifiable claims; the 25 most load-bearing were each put to a <b>three-vote adversarial
+  verification</b> in which reviewers were told to <em>refute</em>. A claim survived only if it was not
+  killed by a majority. <b>23 were confirmed, 2 killed, 0 left unverified</b>; after de-duplication, 11
+  findings remained. The one thread that produced no surviving claim (Thread 4) is flagged as incomplete
+  rather than silently dropped.</p>
+</section>
+
+<section id="t1">
+  <h2><span class="n">4</span>Thread 1 — Passive WiFi radar <span class="status mature">· mature</span></h2>
+  <div class="threadcard mature">
+    <p>The classical-radar analogue: ambient WiFi APs as illuminators of opportunity, reference +
+    surveillance channels, cross-ambiguity processing for range/Doppler. If a car already carries a WiFi
+    antenna, the reception hardware for a passive radar is largely present.</p>
+    <table>
+      <tr><th>Finding</th><th class="c">Conf.</th></tr>
+      <tr><td><b>First through-wall detection of moving personnel</b>; extracts <b>both range and
+        Doppler</b>, matching bistatic theory. (Chetty, Smith &amp; Woodbridge, UCL, 2012)</td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+      <tr><td><b>Ordinary 802.11b beacons are viable illuminators</b>; beacon ambiguity function analyzed
+        from real data. (Pham Duc Su, 2021)</td>
+        <td class="c"><span class="pill med">Medium</span></td></tr>
+      <tr><td><b>Fourier processing is inadequate</b> for WiFi's short bursts / low bandwidth →
+        <b>ESPRIT super-resolution</b>. (Yildirim, Griffiths, UCL, 2021)</td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+      <tr><td><b>Runs against an unmodified stand-alone AP</b> (CAF + modified CAF for idle beacons);
+        receiver still a dedicated SDR. (Li, Chetty, UCL/Bristol, 2021)</td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+      <tr><td><b>2025 CSI-power bistatic tracking</b> — phase-independent <code>|CSI|²</code>, cascaded
+        3D-FFT + EKF; <b>~0.4 m median</b> indoor error, &lt;2 ms latency. (arXiv:2511.22144)</td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+    </table>
+    <p style="margin-bottom:4px"><b>Takeaway.</b> The physics and processing are solved for the indoor,
+    static case, and we inherit a clear recipe (super-resolution front end; CAF variants; CSI-power
+    tracking; EKF back-end). The frontier is whether it survives a moving receiver — untested here.</p>
+  </div>
+  <div class="callout accent">
+    <span class="tag">Load-bearing prior art</span>
+    <p style="margin:6px 0"><b>Maksymiuk et al. (2024)</b> — a passive radar on a <b>moving vehicle</b>
+    imaging its surroundings, validated on real data — but using <b>5G downlink</b>. This is the exact
+    scope of our novelty: do it with WiFi.</p>
+  </div>
+</section>
+
+<section id="t2">
+  <h2><span class="n">5</span>Thread 2 — CSI sensing, imaging &amp; 3D <span class="status gap">· proven but brittle</span></h2>
+  <div class="threadcard gap">
+    <p>Evidence that WiFi yields the dense, structured output a SLAM front end wants — and, in the same
+    papers, evidence of the gap.</p>
+    <table>
+      <tr><th>Finding</th><th class="c">Conf.</th></tr>
+      <tr><td>WiFi-band signals pass through walls / reflect off bodies; deep nets recover <b>3D
+        skeletons ~4 cm</b> (RF-Pose3D, MIT). <em>FMCW radio, not 802.11 CSI.</em></td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+      <tr><td><b>Commodity-WiFi 3D multi-person pose</b> — 91.7 / 108.1 / 125.3 mm (1/2/3 persons),
+        "comparable to cameras and mmWave radar." (Person-in-WiFi 3D, CVPR 2024)</td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+      <tr><td><b>Depth images from CSI</b> (Wi-Depth, 2025) and <b>CSI→diffusion imagery</b>
+        (LatentCSI, 2025).</td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+      <tr><td><b>The gap, quantified:</b> 4×3.5 m and 2×4 m fixed indoor rigs; untrained-scene collapse to
+        mIoU 0.12 / mPCK 19.34 (only 0.24 / 31.06 with domain adaptation).</td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+    </table>
+    <p style="margin-bottom:4px"><b>Takeaway.</b> Dense reconstruction from commodity WiFi is settled; the
+    uniform limitation is small fixed indoor zones and poor generalization. A moving vehicle is the
+    ultimate stress test — <em>every frame is a new environment</em>, a reframing that may itself be a
+    contribution.</p>
+  </div>
+</section>
+
+<section id="t3">
+  <h2><span class="n">6</span>Thread 3 — RF-SLAM <span class="status ready">· back-end ready</span></h2>
+  <div class="threadcard">
+    <table>
+      <tr><th>Finding</th><th class="c">Conf.</th></tr>
+      <tr><td><b>Channel-SLAM:</b> each multipath component treated as a "virtual transmitter," jointly
+        estimating VT positions with receiver pose/velocity/clock bias — <b>no prior map, no known
+        reflectors.</b> Directly reusable back-end. (Gentner, DLR, 2016/2017)</td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+      <tr><td>Joint comms + SLAM is explicitly <b>"in its infancy."</b> (Karagiannidis et al. survey,
+        2026) <em>— does not name an automotive gap.</em></td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+    </table>
+    <p style="margin-bottom:4px"><b>Takeaway.</b> We don't invent a SLAM formulation — the virtual-
+    transmitter model is proven and citable. Open question: does it survive a fast-moving vehicular
+    receiver and dynamic outdoor multipath? Likely the project's core research risk.</p>
+  </div>
+</section>
+
+<section id="t4">
+  <h2><span class="n">7</span>Thread 4 — ISAC / 802.11bf / mmWave <span class="status ready">· verified (Round 2)</span></h2>
+  <div class="threadcard">
+    <div class="callout bad" style="margin-top:14px">
+      <span class="tag">Decisive result — answers the core feasibility question</span>
+      <p class="thesis" style="margin:6px 0">Commodity <b>sub-7 GHz</b> 802.11 CSI <b>cannot</b> reach
+      automotive-radar-grade range resolution. It is bandwidth-limited (ΔR = c/2B); only <b>60 GHz mmWave
+      (802.11ad/ay DMG)</b> closes the gap — an ~11× jump.</p>
+    </div>
+    <table>
+      <tr><th>Waveform / bandwidth</th><th>Range resolution ΔR = c/2B</th></tr>
+      <tr><td>40 MHz (commodity 802.11n/ac channel)</td><td><b>~3.75 m</b></td></tr>
+      <tr><td>160 MHz (802.11ac/ax/be bonded)</td><td><b>~0.94 m</b></td></tr>
+      <tr><td>1.76 GHz (802.11ad 60 GHz DMG channel)</td><td><b>~8.5 cm</b></td></tr>
+      <tr><td>77 GHz automotive radar (reference)</td><td>~4–15 cm</td></tr>
+    </table>
+    <table>
+      <tr><th>Finding</th><th class="c">Conf.</th></tr>
+      <tr><td><b>Range resolution is bandwidth-limited</b> — sub-7 GHz WiFi "cannot achieve cm-level
+        range … due to insufficiently low bandwidth." (Kumari/Heath; 802.11bf overview)</td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+      <tr><td><b>802.11ad 60 GHz reused as a long-range radar</b> via the preamble's Golay sequences:
+        &lt;0.1 m range res, &lt;0.6 m/s velocity res, &gt;99.9% detection to 200 m + Gbps comms.
+        <em>Theory/simulation, not hardware.</em> (Kumari, Choi, González-Prelcic &amp; Heath, TVT 2018)</td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+      <tr><td><b>Same waveform does radar IMAGING (ISAR)</b> in V2I — RSU transmits 802.11ad, forms
+        high-res vehicle images from echoes. (Han, Choi &amp; Heath, 2022)</td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+      <tr><td><b>802.11bf standardizes the measurement plumbing, not a sensing outcome</b> — leaves
+        algorithms to vendors (that vendor-open space is our contribution's home). (ComST 2024)</td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+      <tr><td><b>ISAC theory bounds the design</b> — dual-functional shared hardware/spectrum + the
+        fundamental sensing–communication tradeoff (CRB-rate region). (Liu 2022; Xiong/Liu 2023)</td>
+        <td class="c"><span class="pill hi">High</span></td></tr>
+    </table>
+  </div>
+  <div class="callout accent">
+    <span class="tag">The central design fork this forces</span>
+    <p style="margin:6px 0"><b>(1) Stay sub-7 GHz</b> — lean on channel bonding (→ ~0.94 m at 160 MHz) and
+    reframe the contribution as coarse occupancy + SLAM-pose mapping, where <em>multipath geometry</em>,
+    not fine range, carries the information (cf. Channel-SLAM). Do not claim radar-grade resolution.
+    <b>(2) Move to 60 GHz / 802.11bf DMG</b> — adopt the 802.11ad Golay-preamble radar approach to claim
+    genuine ~8.5 cm resolution, at the cost of 60 GHz range/penetration limits and sparser ambient
+    illumination. State this fork explicitly in the paper.</p>
+  </div>
+</section>
+
+<section id="risk">
+  <h2><span class="n">8</span>Feasibility &amp; risk register</h2>
+  <ul class="tight">
+    <li><b>Ego-motion &amp; dynamic outdoor multipath (highest risk).</b> All pipelines were validated on
+      static indoor geometry. A moving vehicle adds ego-Doppler, moving clutter, and shifting illuminator
+      geometry. <b>Prototype Channel-SLAM robustness to a fast receiver first.</b></li>
+    <li><b>Range resolution vs bandwidth (RESOLVED — Round 2).</b> Sub-7 GHz WiFi is bandwidth-limited to
+      ~0.94–3.75 m; radar-grade (~8.5 cm) needs 60 GHz mmWave. Forces the design fork in §7. (Coarse
+      resolution ≠ no range.)</li>
+    <li><b>Illumination budget outdoors.</b> Ambient APs are sparse, low-power, uncontrolled — a link-
+      budget question to answer analytically before building hardware.</li>
+    <li><b>Phase instability.</b> Adopt self-conjugate <code>|CSI|²</code>; open question whether power-only
+      processing retains enough information for metric 3D mapping.</li>
+  </ul>
+</section>
+
+<section id="data">
+  <h2><span class="n">9</span>Datasets &amp; toolkits</h2>
+  <p>None contain outdoor or vehicle-mounted captures — itself evidence for the gap, and a possible
+  secondary contribution (a novel dataset).</p>
+  <ul class="tight">
+    <li><b>CSIKit</b> — <a href="https://github.com/Gi-z/CSIKit">github.com/Gi-z/CSIKit</a> — CSI parsing
+      (Intel 5300, Atheros, ESP32, nexmon, PicoScenes). Practical starting point.</li>
+    <li><b>Awesome-WiFi-CSI-Sensing</b> — <a href="https://github.com/NTUMARS/Awesome-WiFi-CSI-Sensing">curated index</a>.</li>
+    <li>Reproducibility &amp; taxonomy surveys (ResearchGate 401244480, 346954384).</li>
+    <li>Classic tools to name-check: Intel 5300 / Atheros CSI Tool, ESP32-CSI, PicoScenes, Widar3.0;
+      USRP/SDR passive-radar front ends.</li>
+  </ul>
+</section>
+
+<section id="anti">
+  <h2><span class="n">10</span>Claims that failed verification</h2>
+  <div class="callout bad">
+    <p style="margin:6px 0"><b>❌ "WiFi's 20–40 MHz bandwidth means passive WiFi radar can extract only
+    Doppler, not range."</b> False — cross-ambiguity yields full range–Doppler surfaces. Bandwidth limits
+    range <em>resolution</em>, not range extraction.</p>
+    <p style="margin:6px 0"><b>❌ "The comms-meets-SLAM survey identifies a specific automotive gap."</b>
+    It does not. The automotive gap is <em>our</em> inference — argue it ourselves.</p>
+  </div>
+</section>
+
+<section id="refs">
+  <h2><span class="n">11</span>Annotated bibliography</h2>
+  <p style="color:var(--muted); font-size:14px">
+    <span class="oa open" style="font-size:11px;font-weight:700;padding:1px 7px;border-radius:5px">OA</span>
+    open-access ·
+    <span class="oa pay" style="font-size:11px;font-weight:700;padding:1px 7px;border-radius:5px">PAY</span>
+    paywalled (author copy noted). BibTeX in <code>references.bib</code>.</p>
+
+  <h3>Thread 1 — Passive WiFi radar</h3>
+  <div class="refs">
+    <div class="ref"><span class="id">R1</span> Chetty, Smith &amp; Woodbridge (2012), <i>Through-the-Wall
+      Sensing of Personnel Using Passive Bistatic WiFi Radar,</i> IEEE TGRS. <span class="oa pay">PAY</span>
+      <a href="https://ieeexplore.ieee.org/document/6020778">IEEE 6020778</a> · OA copy at UCL Discovery.
+      <div class="contact">✉ Kevin Chetty, UCL — k.chetty@ucl.ac.uk</div></div>
+    <div class="ref"><span class="id">R2</span> Pham Duc Su (2021), <i>Ambiguity Function Analysis of WiFi
+      Beacon Transmissions,</i> JMST 71. <span class="oa open">OA</span>
+      <a href="https://online.jmst.info/index.php/jmst/article/view/97">jmst.info</a>
+      <div class="contact">Lightly-indexed venue — pair with a higher-tier IEEE cite.</div></div>
+    <div class="ref"><span class="id">R3</span> Yildirim, Griffiths et al. (2021), <i>Super-resolution
+      passive radars based on 802.11ax,</i> IET RSN 15(4). <span class="oa open">OA</span>
+      <a href="https://ietresearch.onlinelibrary.wiley.com/doi/full/10.1049/rsn2.12038">DOI 10.1049/rsn2.12038</a>
+      <div class="contact">✉ Hugh Griffiths, UCL — h.griffiths@ucl.ac.uk</div></div>
+    <div class="ref"><span class="id">R4</span> Li, Piechocki, Woodbridge, Tang &amp; Chetty (2021),
+      <i>Passive WiFi Radar Using a Stand-Alone AP,</i> IEEE TGRS 59(3). <span class="oa pay">PAY</span>
+      <a href="https://discovery.ucl.ac.uk/id/eprint/10103371">OA author PDF (UCL)</a>
+      <div class="contact">✉ Wenda Li (Dundee) · Kevin Chetty, UCL — k.chetty@ucl.ac.uk</div></div>
+    <div class="ref"><span class="id">R5</span> Wang et al. (2025), <i>Bistatic Passive Sensing via CSI
+      Power,</i> arXiv:2511.22144. <span class="oa open">OA</span>
+      <a href="https://arxiv.org/abs/2511.22144">arXiv</a>
+      <div class="contact">Preprint; NOT "PowerSense". ✉ confirm in metadata.</div></div>
+    <div class="ref"><span class="id">R6</span> Maksymiuk et al. (2024), <i>5G-based passive radar on a
+      moving platform,</i> IET RSN. <span class="oa pay">PAY</span>
+      <a href="https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/rsn2.12559">DOI 10.1049/rsn2.12559</a> · OA at repo.pw.edu.pl
+      <div class="contact">✉ Warsaw Univ. of Technology, Krzysztof Kulpa PBR group.</div></div>
+  </div>
+
+  <h3>Thread 2 — CSI sensing / 3D</h3>
+  <div class="refs">
+    <div class="ref"><span class="id">R7</span> Zhao et al. (2018), <i>RF-Pose</i> (CVPR) &amp;
+      <i>RF-Pose3D</i> (SIGCOMM), MIT CSAIL. <span class="oa open">OA</span>
+      <a href="https://rfpose.csail.mit.edu/">rfpose.csail.mit.edu</a>
+      <div class="contact">✉ Dina Katabi, MIT — dk@mit.edu · WiFi-band FMCW, not 802.11 CSI.</div></div>
+    <div class="ref"><span class="id">R8</span> Yan et al. (2024), <i>Person-in-WiFi 3D,</i> CVPR. XJTU.
+      <span class="oa open">OA</span>
+      <a href="https://openaccess.thecvf.com/content/CVPR2024/papers/Yan_Person-in-WiFi_3D_End-to-End_Multi-Person_3D_Pose_Estimation_with_Wi-Fi_CVPR_2024_paper.pdf">CVF PDF</a>
+      <div class="contact">Commodity Intel 5300 NICs.</div></div>
+    <div class="ref"><span class="id">R9</span> Wang, Zhou, Panev, Han &amp; Huang (2019),
+      <i>Person-in-WiFi,</i> ICCV. CMU/XJTU. <span class="oa open">OA</span>
+      <a href="https://www.ri.cmu.edu/app/uploads/2019/09/Person_in_WiFi_ICCV2019.pdf">CMU PDF</a>
+      <div class="contact">✉ Dong Huang (CMU) · Jinsong Han (XJTU) — confirm.</div></div>
+    <div class="ref"><span class="id">R10</span> Wi-Depth (2025), arXiv:2503.06458.
+      <span class="oa open">OA</span> <a href="https://arxiv.org/abs/2503.06458">arXiv</a>
+      <div class="contact">✉ confirm in metadata.</div></div>
+    <div class="ref"><span class="id">R11</span> LatentCSI (2025), arXiv:2506.10605.
+      <span class="oa open">OA</span> <a href="https://arxiv.org/abs/2506.10605">arXiv</a>
+      <div class="contact">✉ confirm in metadata.</div></div>
+  </div>
+
+  <h3>Thread 3 — RF-SLAM</h3>
+  <div class="refs">
+    <div class="ref"><span class="id">R12</span> Gentner et al. (2016), <i>Channel-SLAM,</i> IEEE TWC;
+      Ulmschneider et al. (2017), <i>Mobile Information Systems</i> 9170746.
+      <span class="oa open">OA</span> <a href="https://www.hindawi.com/journals/misy/2017/9170746/">Hindawi (2017)</a>
+      <div class="contact">✉ Christian Gentner, DLR — christian.gentner@dlr.de</div></div>
+    <div class="ref"><span class="id">R13</span> Gounis, …, Karagiannidis (2026), <i>When SLAM Meets
+      Wireless Communications: A Survey,</i> arXiv:2602.06995. <span class="oa open">OA</span>
+      <a href="https://arxiv.org/abs/2602.06995">arXiv</a>
+      <div class="contact">✉ George K. Karagiannidis, AUTh — geokarag@auth.gr</div></div>
+    <div class="ref"><span class="id">R13a</span> Leitinger, Wielandner, Venus &amp; Witrisal (2024),
+      <i>Multipath-based SLAM with Cooperation and Map Fusion in MIMO Systems,</i> arXiv:2405.02126.
+      <span class="oa open">OA</span> <a href="https://arxiv.org/abs/2405.02126">arXiv</a>
+      <div class="contact">TU Graz. Virtual-anchor MP-SLAM — the living continuation of Channel-SLAM.
+        ✉ Leitinger / Witrisal (@tugraz.at, confirm).</div></div>
+    <div class="ref"><span class="id">R13b</span> Li, Cai, Leitinger &amp; Tufvesson (2024), <i>A Belief
+      Propagation Algorithm for Multipath-based SLAM … mmWave MIMO,</i> arXiv:2403.10095.
+      <span class="oa open">OA</span> <a href="https://arxiv.org/abs/2403.10095">arXiv</a>
+      <div class="contact">Lund/Graz. Factor-graph BP MP-SLAM, real mmWave-MIMO data. ✉ Tufvesson,
+        Lund (@eit.lth.se).</div></div>
+  </div>
+
+  <h3>Thread 4 — ISAC / 802.11bf / mmWave <span style="font-weight:400;color:var(--good);font-size:13px">(verified, Round 2)</span></h3>
+  <div class="refs">
+    <div class="ref"><span class="id">R14</span> <i>An Overview on IEEE 802.11bf: WLAN Sensing,</i> IEEE
+      ComST 2024, arXiv:2310.17661. <span class="oa open">OA</span>
+      <a href="https://arxiv.org/abs/2310.17661">arXiv</a>
+      <div class="contact">✉ Francesca Meneghello / Rui Du group (confirm from PDF). Standardizes
+        measurement across sub-7 GHz + 60 GHz DMG; leaves algorithms to vendors.</div></div>
+    <div class="ref"><span class="id">R15</span> Kumari, Choi, González-Prelcic &amp; Heath (2018),
+      <i>IEEE 802.11ad-Based Radar: Joint Vehicular Communication-Radar,</i> IEEE TVT 67(4):3012–3027.
+      <span class="oa open">OA</span> <a href="https://arxiv.org/abs/1702.05833">arXiv:1702.05833</a>
+      <span class="oa pay">PAY</span> (IEEE)
+      <div class="contact">✉ Robert W. Heath Jr., UT Austin / NC State — rheath@utexas.edu · Golay-preamble
+        radar, &lt;0.1 m res — theory/simulation only.</div></div>
+    <div class="ref"><span class="id">R16</span> Han, Choi &amp; Heath (2022), <i>Radar Imaging Based on
+      IEEE 802.11ad Waveform in V2I,</i> arXiv:2208.02473. <span class="oa open">OA</span>
+      <a href="https://arxiv.org/abs/2208.02473">arXiv</a>
+      <div class="contact">✉ Heath group. ISAR imaging from the comms waveform.</div></div>
+    <div class="ref"><span class="id">R17</span> Zhang et al., <i>JCAS survey,</i> arXiv:2102.12780.
+      <span class="oa open">OA</span> <a href="https://arxiv.org/abs/2102.12780">arXiv</a></div>
+    <div class="ref"><span class="id">R18</span> ISAC theory: Liu et al., <i>Toward Dual-Functional
+      Wireless Networks for 6G,</i> IEEE JSAC <b>40(6):1728–1767</b>, 2022 · Xiong, Liu et al.,
+      <i>Fundamental Tradeoff of ISAC under Gaussian Channels,</i> IEEE Trans. Inf. Theory
+      <b>69(9):5723–5751</b>, 2023 — dual-functional framing + sensing–communication tradeoff.</div>
+  </div>
+</section>
+
+<footer>
+  Generated from a verified deep-research run (106 agents; 23/25 claims confirmed under adversarial
+  verification). Companion files: <code>00-literature-foundation.md</code> (condensed),
+  <code>01-detailed-survey-report.md</code> (full prose), <code>references.bib</code> (BibTeX).
+  Round-2 (Thread 4) folded in 2026-07-04. See <code>02-round2-isac-80211bf-mmwave.md</code> for full findings.
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "WiFi-Radar-for-SLAM: Ambient WiFi as a Radar Replacement for Automotive SLAM"
+abstract: >-
+  A physics-based (Sionna RT ray-traced) feasibility study and, subsequently, a
+  system for using ambient sub-7 GHz WiFi signals received on a moving vehicle to
+  build a 3D scan of the surroundings usable in place of radar in SLAM pipelines.
+  This release covers the simulation-first feasibility milestone for the sub-7 GHz
+  path; a 60 GHz / IEEE 802.11ad mmWave extension is planned as future work.
+type: software
+authors:
+  - family-names: Fetna
+    given-names: Mulham
+    orcid: "https://orcid.org/0009-0006-4432-798X"
+    email: contact@mulhamfetna.com
+version: 0.1.0
+date-released: "2026-07-04"
+license: AGPL-3.0-or-later
+repository-code: "https://github.com/mulhamfetna/wifi-radar-slam"
+url: "https://github.com/mulhamfetna/wifi-radar-slam"
+keywords:
+  - WiFi sensing
+  - passive WiFi radar
+  - channel state information
+  - SLAM
+  - integrated sensing and communication
+  - automotive radar
+  - Sionna RT
+  - multipath-based SLAM

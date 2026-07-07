@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Sionna / TensorFlow / GPU caches
+.cache/
+*.pb
+
+# Simulation artifacts (large; regenerated from configs) — keep summaries only
+results/**/figures/
+results/**/*.npz
+scene/**/*.npz
+csi/**/*.npz
+detections/**/*.npz
+slam/**/*.npz
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Scratch
+scratch/
+tmp/
