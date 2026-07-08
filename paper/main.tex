@@ -5,11 +5,9 @@
 %%  Target: Q1 journal (e.g. IEEE IoT-J / IEEE Sensors J. / IEEE T-ITS).
 %%  Build:  latexmk -pdf main.tex   (or upload the paper/ folder to Overleaf)
 %%
-%%  STATUS: skeleton. Sub-7 GHz localization + sensing + mapping sections are
-%%  written from the released results (docs/results-v1.md, v0.4.0). The 60 GHz
-%%  extension (Sec. VII) and any real-CSI validation are PENDING and are marked
-%%  with %% TODO. Numbers tagged %% CHECK should be re-read from the artifacts
-%%  before submission.
+%%  STATUS: draft. Localization, sensing, mapping, the 60 GHz test and the
+%%  real-CSI proof-of-concept are all written from the released result artifacts
+%%  (docs/results-v1.md). All result numbers are reproduced from those artifacts.
 %% ============================================================================
 \documentclass[journal]{IEEEtran}
 
@@ -224,8 +222,8 @@ sensing from illumination effects. Unless stated otherwise: carrier
 \SI{5.2}{GHz}, \SI{40}{MHz} bandwidth, $N_\mathrm{sc}=64$, $N_\mathrm{rx}=4$
 (half-wavelength ULA), \num{3} access points, \SI{20}{dB} SNR, \SI{5}{m/s} straight
 trajectory. Simulations run CPU-only (Sionna RT LLVM backend) on a 32-thread
-workstation; each Phase-A run completes in tens of seconds.
-%% CHECK: confirm exact nominal config against configs/nominal.yaml before submission.
+workstation; each Phase-A run completes in tens of seconds. All numbers below are
+reproduced from the released result artifacts (\texttt{docs/results-v1.md}).
 
 \begin{figure}[t]
 \centering
@@ -267,7 +265,6 @@ one parameter swept at a time about the nominal point.}
 \bottomrule
 \end{tabular}
 \end{table}
-%% CHECK: numbers from docs/results-v1.md Phase B; regenerate table from results if configs change.
 
 \subsection{Realistic Sensing: Joint Delay--Angle MUSIC}
 Separate 1-D delay and 1-D angle estimates paired by sorted index mis-associate in
@@ -309,7 +306,6 @@ Controlled wall, realistic (joint) & 4.8 & 4.1 & 0.0\\
 \raggedright\footnotesize $^\dagger$ symmetric Chamfer inflated by partial
 coverage; a single WiFi pass illuminates only street-facing facades.
 \end{table}
-%% CHECK: numbers from docs/results-v1.md ("Mapping demonstration" + "Realistic sensing").
 
 \begin{figure}[t]
 \centering
@@ -394,10 +390,30 @@ ray tracer's interaction type; commodity CSI carries no such label.
 \textbf{Consequence.} The realistic-mapping limit is neither the $\Delta R=c/2B$
 resolution ceiling nor array aperture---so \SI{60}{GHz} alone does not enable
 passive-WiFi mapping. It is the absence of bounce/path discrimination in commodity
-CSI, which we identify as the key open problem. Approaches that could close it
-(learned path classification, physical bounce-count features, multi-pass geometric
-consistency) are left to future work. Localization, which does not require this
-discrimination, is unaffected and remains centimetre-level at both bands.
+CSI, which we identify as the key open problem. Localization, which does not require
+this discrimination, is unaffected and remains centimetre-level at both bands.
+
+As a first step toward discrimination, we gate on the bistatic \emph{excess} path
+length (LOS and floor paths barely detour, so their excess is near zero). This
+halves the phantom error (map accuracy \SI{4.8}{m}$\to$\SI{2.0}{m}) but collapses
+coverage, because the delay bias makes genuine reflections low-excess too and they
+are gated out alongside the phantoms. A robust discriminator that does not rely on
+unbiased delays---e.g.\ a learned LOS/reflection classifier on CSI features---remains
+open.
+
+% ============================================================================
+\section{Future Work}
+% ============================================================================
+Three directions follow directly. \emph{(i) Path discrimination}---the identified
+mapping bottleneck---calls for a learned or feature-based classifier that labels a
+CSI component as line-of-sight, single reflection, or multi-bounce without relying
+on unbiased delays. \emph{(ii) An outdoor, vehicle-mounted WiFi-CSI dataset}: our
+real-CSI proof-of-concept is limited to indoor static captures because no public
+outdoor/vehicular CSI exists; collecting one is a contribution in itself and the
+prerequisite for full-system validation. \emph{(iii)} Tighter integration with a
+virtual-transmitter multipath-SLAM back-end
+\cite{gentner2016channelslam,leitinger2024mpslamcoop} and Doppler exploitation for
+moving clutter.
 
 % ============================================================================
 \section{Conclusion}
