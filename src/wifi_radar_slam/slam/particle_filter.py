@@ -6,7 +6,7 @@ import numpy as np
 MAX_REFLECTOR_RANGE_M = 150.0
 
 
-def _triangulate_bistatic(pose_xy, ap_xy, path_len, aoa):
+def _triangulate_bistatic(pose_xy, ap_xy, path_len, aoa, min_excess_m=0.0):
     """Locate a reflector from a bistatic path length + angle of arrival.
 
     The measured path length is |AP->R| + |R->vehicle| (an ellipse with foci AP
@@ -15,11 +15,20 @@ def _triangulate_bistatic(pose_xy, ap_xy, path_len, aoa):
 
         s = (path_len^2 - |AP-vehicle|^2) / (2 (path_len - (AP-vehicle) . u))
 
-    Returns None for the direct/LOS path (s <= 0) or degenerate geometry.
+    `min_excess_m` gates on the bistatic excess path length (path_len - |AP-veh|):
+    line-of-sight and floor-bounce paths have near-zero excess (they barely detour),
+    whereas a genuine facade reflection detours significantly. Requiring a minimum
+    excess is a physically-motivated path discriminator that rejects the
+    trajectory-hugging LOS/floor phantoms commodity CSI cannot otherwise label.
+
+    Returns None for the direct/LOS path (s <= 0), degenerate geometry, or a path
+    whose excess is below `min_excess_m`.
     """
     u = np.array([np.cos(aoa), np.sin(aoa)])
     v2ap = np.asarray(ap_xy, dtype=float) - np.asarray(pose_xy, dtype=float)
     dist_ap = np.linalg.norm(v2ap)
+    if path_len - dist_ap < min_excess_m:   # LOS / floor / near-forward path
+        return None
     denom = 2.0 * (path_len - v2ap @ u)
     if abs(denom) < 1e-6:              # exactly degenerate -> avoid divide-by-zero
         return None
@@ -39,7 +48,8 @@ def _reproject_bistatic(pose_xy, ap_xy, refl):
 
 
 def run_slam(detections, ap_positions, velocity, timestep_s, rng,
-             n_particles: int = 200, init_pose=None, map_min_support: int = 1):
+             n_particles: int = 200, init_pose=None, map_min_support: int = 1,
+             map_min_excess_m: float = 0.0):
     n_frames = len(detections)
     particles = np.zeros((n_particles, 3))                 # x, y, yaw
     if init_pose is not None:                              # known start (e.g. GPS prior)
@@ -64,7 +74,8 @@ def run_slam(detections, ap_positions, velocity, timestep_s, rng,
             mean_pose = np.average(particles, axis=0, weights=weights)
             for path_len, aoa, ap_i in dets:
                 ap_xy = np.asarray(ap_positions[int(ap_i)])[:2]
-                refl = _triangulate_bistatic(mean_pose[:2], ap_xy, path_len, aoa)
+                refl = _triangulate_bistatic(mean_pose[:2], ap_xy, path_len, aoa,
+                                             min_excess_m=map_min_excess_m)
                 if refl is None:                           # direct path / degenerate
                     continue
                 mapped_points.append(refl)

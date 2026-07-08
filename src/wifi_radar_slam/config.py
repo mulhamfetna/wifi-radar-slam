@@ -50,6 +50,8 @@ class RunConfig:
     map_min_support: int = 1      # drop mapped clusters with fewer than this many detections
                                   # (consensus filter; rejects delay-AoA mis-pairing phantoms)
     joint_estimation: bool = False  # joint 2-D (delay-angle) MUSIC vs separate 1-D + sorted pairing
+    map_min_excess_m: float = 0.0   # reject detections with bistatic excess below this
+                                    # (path discriminator: drops LOS/floor phantoms)
 
 
 def load_config(path: str) -> RunConfig:
@@ -84,4 +86,5 @@ def load_config(path: str) -> RunConfig:
         world_aoa=bool(raw.get("world_aoa", False)),
         map_min_support=int(raw.get("map_min_support", 1)),
         joint_estimation=bool(raw.get("joint_estimation", False)),
+        map_min_excess_m=float(raw.get("map_min_excess_m", 0.0)),
     )

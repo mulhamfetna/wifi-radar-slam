@@ -32,6 +32,24 @@ def test_triangulate_grazing_geometry():
     assert np.allclose(est, refl, atol=1e-6)
 
 
+def test_min_excess_gate_rejects_low_excess_paths():
+    # a near-forward path with tiny bistatic excess (LOS/floor-like) is rejected
+    # by the excess gate but a genuine detour reflection is kept.
+    pose = np.array([0.0, 0.0])
+    ap = np.array([0.0, 40.0])
+    dist_ap = 40.0
+    # low-excess: path_len only 1 m longer than direct -> LOS/floor-like
+    low = _triangulate_bistatic(pose, ap, dist_ap + 1.0, np.deg2rad(80.0), min_excess_m=3.0)
+    assert low is None
+    # genuine reflector at (10, 3): large detour, kept even with the gate on
+    refl = np.array([10.0, 3.0])
+    d = refl - pose
+    path = np.linalg.norm(ap - refl) + np.linalg.norm(d)
+    assert path - dist_ap > 3.0                        # confirm it clears the gate
+    est = _triangulate_bistatic(pose, ap, path, np.arctan2(d[1], d[0]), min_excess_m=3.0)
+    assert est is not None and np.allclose(est, refl, atol=1e-6)
+
+
 def test_recovers_straight_trajectory():
     n = 20
     dt = 0.05
