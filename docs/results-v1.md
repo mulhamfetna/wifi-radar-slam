@@ -173,11 +173,33 @@ is not the azimuth ambiguity):
 **Conclusion (realistic sensing).** With clean single-bounce (oracle) sensing the map reconstructs
 to ~0.25–0.30 m; with realistic commodity-CSI MUSIC sensing it is bounded to **~5 m Chamfer**
 (≈10–20× worse), limited by delay/AoA estimation bias and multipath association — not by bandwidth
-or array aperture. This quantifies the core difficulty of the *mapping* half and is itself a result:
-passive-WiFi **localization** is cm-level and practical today, while passive-WiFi **mapping** needs
-sensing advances (joint delay-angle estimation, bounce discrimination) beyond super-resolution on a
-single commodity link. The oracle map is the perfect-sensing upper bound; the consensus filter
-(`map_min_support`, backward-compatible default 1) is retained as a reusable improvement.
+or array aperture.
+
+### Joint 2-D (delay-angle) MUSIC (`joint_estimation`, opt-in)
+
+The separate 1-D delay / 1-D AoA estimates are paired by sorted index, which mis-associates in
+multipath and scatters phantom reflectors. A single **2-D MUSIC** (2-D spatial smoothing, SVD
+subspace, delay grid bounded to the unambiguous `1/df` range) recovers each path's delay **and**
+angle *together*, so the association is intrinsic. Effect (controlled wall, 160 MHz, `world_aoa`):
+
+| metric | sorted 1-D | joint 2-D |
+|--------|-----------|-----------|
+| ATE | 0.73 m | **0.027 m** (matches the 0.045 m oracle) |
+| Chamfer | 4.8 m | 4.1 m |
+| map_completeness | 4.5 m | 3.5 m |
+
+Correct association makes **realistic localization essentially oracle-quality** in sparse multipath,
+and improves the map modestly. But the map's **~4–5 m short-range bias persists** — confirming it is a
+delay *estimation bias* in multipath, not an association error. The benefit is **scene-dependent**:
+in the dense street canyon (≈19 paths, 4 antennas) joint estimation cannot resolve the paths and does
+not help (nominal ATE 0.033 → 0.091 m), so it is off by default.
+
+**Overall.** Passive-WiFi **localization** is cm-level and practical — and with joint estimation it
+reaches oracle quality from realistic CSI in sparse scenes. Passive-WiFi **mapping** remains bounded
+(~4–5 m) by delay estimation bias, needing further sensing advances (bounce discrimination, wider
+aperture) beyond what super-resolution on a single commodity link delivers. The oracle map is the
+perfect-sensing upper bound; the consensus filter (`map_min_support`) and joint estimator
+(`joint_estimation`) are retained as opt-in, backward-compatible improvements.
 
 ## Reproduce
 
