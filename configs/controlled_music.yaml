@@ -1,0 +1,22 @@
+run_name: controlled_music
+seed: 42
+snr_db: 20.0
+sensing_mode: music        # realistic: CSI -> MUSIC delays/AoA (vs the oracle config)
+rf:
+  carrier_hz: 5.2e9
+  bandwidth_hz: 40.0e6
+  n_subcarriers: 64
+  n_rx_antennas: 4
+  antenna_spacing_frac: 0.5
+trajectory:
+  length_m: 30.0
+  speed_mps: 5.0
+  timestep_s: 0.05
+  shape: straight
+scene:
+  name: controlled_wall
+  ap_positions:
+    - [-12.0, 0.0, 2.5]
+    - [-8.0, -18.0, 2.5]
+    - [-8.0, 18.0, 2.5]
+  targets: []
