@@ -322,6 +322,17 @@ uncovered (coverage, not accuracy, limited).}
 \label{fig:maps}
 \end{figure}
 
+\subsection{Real Commodity-CSI Proof-of-Concept}
+To verify that the sensing front-end is not simulation-specific, we ran the same
+MUSIC delay/AoA estimator on measured hardware CSI through a CSIKit-backed adapter.
+On Intel~5300 captures (30 subcarriers, 3 antennas) and Broadcom nexmon 802.11ac
+captures (\SI{80}{MHz}), the front-end runs end-to-end and returns plausible indoor
+multipath delay/angle estimates. This is a front-end validation only---the captures
+are indoor and static with no ground-truth trajectory---but it confirms the pipeline
+consumes real commodity CSI. A full outdoor, vehicle-mounted validation is blocked
+by the absence of any public outdoor/vehicular WiFi-CSI dataset (the very gap this
+work targets) and is the key next step.
+
 % ============================================================================
 \section{Discussion}
 % ============================================================================

@@ -239,6 +239,26 @@ gating is therefore a useful but partial discriminator (retained as opt-in `map_
 classifier on CSI features—remains the open problem. This is consistent with the \SI{60}{GHz}/aperture
 result: the mapping bottleneck is path identity, not resolution.
 
+## Real commodity-CSI proof-of-concept
+
+To check that the sensing front-end is not simulation-specific, the *same* MUSIC
+delay/AoA estimator was run on **measured hardware CSI** via a CSIKit-backed
+ingestion adapter (`io_csi.load_real_csi`, `experiments/run_real_csi.py`):
+
+- **Intel 5300** (`log.all_csi.6.7.6.dat`, 30 subcarriers, 3 antennas, HT20): the
+  front-end runs end-to-end over all frames and returns plausible indoor multipath
+  delay/AoA estimates (AoA \(\in[-20\degree,26\degree]\)).
+- **Broadcom nexmon** (802.11ac, \SI{80}{MHz}): parses and runs equally.
+
+This is a *front-end* validation, not a SLAM one: the captures are indoor and
+static with no ground-truth trajectory (and CSI carries no absolute timing
+reference, so absolute path length is not calibrated—only relative multipath
+structure). It demonstrates the pipeline consumes real Intel-5300/nexmon CSI and
+produces sensible estimates. A full outdoor, vehicle-mounted validation is blocked
+by the absence of any public outdoor/vehicular WiFi-CSI dataset—itself the gap this
+work targets—and remains the key next step. Fetch the CSIKit sample captures with
+`experiments/fetch_real_csi.sh`; install the parser with `pip install -e .[realcsi]`.
+
 ## Reproduce
 
 On a machine with `sionna-rt`: `WRS_NUM_SAMPLES=1000000 python experiments/run_phase_a.py` and

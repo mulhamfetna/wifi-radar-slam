@@ -30,3 +30,6 @@ slam/**/*.npz
 # Scratch
 scratch/
 tmp/
+
+# fetched real-CSI samples (belong to CSIKit; use experiments/fetch_real_csi.sh)
+data/real/
