@@ -121,6 +121,10 @@ in sparse multipath.
 gap shown---by a \SI{60}{GHz} and a 16-antenna test---to be a \emph{path-
 discrimination} limit of commodity CSI rather than a bandwidth or aperture
 (resolution) limit, identifying the key open problem for WiFi mapping.
+\item \textbf{WiFiSLAM-Sim}, the first (ray-traced) outdoor/vehicular WiFi-CSI
+dataset with per-path labels, and a learned discriminator that predicts
+mapping-useful reflections from estimable features (F1~$\approx0.9$ at realistic
+noise)---a first concrete step on the path-discrimination problem.
 \end{itemize}
 
 % ============================================================================
@@ -404,20 +408,34 @@ As a first step toward discrimination, we gate on the bistatic \emph{excess} pat
 length (LOS and floor paths barely detour, so their excess is near zero). This
 halves the phantom error (map accuracy \SI{4.8}{m}$\to$\SI{2.0}{m}) but collapses
 coverage, because the delay bias makes genuine reflections low-excess too and they
-are gated out alongside the phantoms. A robust discriminator that does not rely on
-unbiased delays---e.g.\ a learned LOS/reflection classifier on CSI features---remains
-open.
+are gated out alongside the phantoms.
+
+\subsection{Learned Path Discrimination}
+Is the discrimination \emph{learnable}? We release \textbf{WiFiSLAM-Sim}, a ray-traced
+outdoor/vehicular WiFi-CSI dataset that---uniquely, being simulated---carries a
+per-path oracle label (bounce count, interaction type, floor flag) usable as a
+supervised target. A random forest predicts the binary label \emph{``mapping-useful
+single-scatter facade reflection''} from per-path features a receiver can estimate
+(range, bistatic excess, azimuth, elevation, azimuth-deviation-from-AP)---not the
+interaction type. On exact features the classes are perfectly separable (F1~$=1.00$,
+excess and azimuth-deviation dominating); under realistic MUSIC-level feature error
+it degrades gracefully---F1~$=0.94/0.90/0.86$ at range/azimuth noise of
+$(1\,\text{m},3\degree)/(2\,\text{m},6\degree)/(4\,\text{m},10\degree)$---well above
+the fixed excess gate. Path discrimination is thus \emph{learnable and robust}; its
+ceiling is set by feature-estimation accuracy (chiefly the delay-derived excess),
+closing the loop with the delay-bias finding.
 
 % ============================================================================
 \section{Future Work}
 % ============================================================================
-Three directions follow directly. \emph{(i) Path discrimination}---the identified
-mapping bottleneck---calls for a learned or feature-based classifier that labels a
-CSI component as line-of-sight, single reflection, or multi-bounce without relying
-on unbiased delays. \emph{(ii) An outdoor, vehicle-mounted WiFi-CSI dataset}: our
-real-CSI proof-of-concept is limited to indoor static captures because no public
-outdoor/vehicular CSI exists; collecting one is a contribution in itself and the
-prerequisite for full-system validation. \emph{(iii)} Tighter integration with a
+Three directions follow directly. \emph{(i) Feature estimation for path
+discrimination}: our learned discriminator is accurate given estimable features, so
+the remaining problem is estimating them (chiefly the delay-derived excess) robustly
+from noisy CSI---e.g.\ end-to-end learning directly on CSI rather than on MUSIC
+outputs. \emph{(ii) A real outdoor, vehicle-mounted WiFi-CSI capture}: WiFiSLAM-Sim
+supplies a simulated dataset with labels, but real-hardware outdoor CSI still does
+not exist and is the prerequisite for full-system (not just front-end) validation.
+\emph{(iii)} Tighter integration with a
 virtual-transmitter multipath-SLAM back-end
 \cite{gentner2016channelslam,leitinger2024mpslamcoop} and Doppler exploitation for
 moving clutter.
