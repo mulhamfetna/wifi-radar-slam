@@ -151,10 +151,33 @@ found the gap is a stack of four factors — two fixable conventions, two fundam
 
 Realistic MUSIC on the controlled wall (`configs/controlled_music.yaml`, `world_aoa: true`) gives
 **map_completeness 0.90 m** (the wall *is* recovered) but **map_accuracy 12 m** and **ATE 2.4 m** —
-the phantom clutter from (3)+(4) dominates. **Conclusion:** the convention fixes are correct but
-insufficient; a single ULA at 40 MHz cannot map realistically. This motivates the next milestone —
-a **2D vehicle array** (resolves the azimuth ambiguity) and **wider bandwidth** (resolves dense
-multipath) — which is where realistic mapping can actually close the gap.
+the phantom clutter from (3)+(4) dominates.
+
+### What actually bounds realistic mapping (wider band + 2D array + consensus)
+
+Three levers were tested to close the gap, on the controlled wall (front/back-free, so any residual
+is not the azimuth ambiguity):
+
+- **Wider bandwidth (160 MHz):** improved ATE (2.4 → 0.73 m) but **not** map_accuracy (12 → 11.6 m).
+  Bandwidth is not the map-accuracy driver here.
+- **Consensus map filter (`map_min_support`):** the map has a dense correct cluster on the wall plus
+  a wide scatter of phantoms from delay-AoA sorted-index mis-pairing. Dropping clusters with < 5
+  supporting detections cut the scatter: map_accuracy **12 → 5.1 m**, Chamfer **6.3 → 4.8 m**.
+- **2D vehicle array — not pursued, and here is why:** after consensus, the surviving wall cluster
+  is **systematically biased ~5 m toward the vehicle** (reflectors land at x≈−3 for a wall at x=0),
+  with IoU 0. This is a **range bias**: MUSIC underestimates the delay in the LOS+floor+wall+multi-
+  bounce mixture, placing reflectors short. Since this happens in a scene with **no front/back
+  ambiguity**, a 2D array (which only resolves that ambiguity) cannot remove it. The ~5 m floor is
+  MUSIC estimation bias, not array geometry.
+
+**Conclusion (realistic sensing).** With clean single-bounce (oracle) sensing the map reconstructs
+to ~0.25–0.30 m; with realistic commodity-CSI MUSIC sensing it is bounded to **~5 m Chamfer**
+(≈10–20× worse), limited by delay/AoA estimation bias and multipath association — not by bandwidth
+or array aperture. This quantifies the core difficulty of the *mapping* half and is itself a result:
+passive-WiFi **localization** is cm-level and practical today, while passive-WiFi **mapping** needs
+sensing advances (joint delay-angle estimation, bounce discrimination) beyond super-resolution on a
+single commodity link. The oracle map is the perfect-sensing upper bound; the consensus filter
+(`map_min_support`, backward-compatible default 1) is retained as a reusable improvement.
 
 ## Reproduce
 

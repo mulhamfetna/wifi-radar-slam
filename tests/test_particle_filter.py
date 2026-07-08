@@ -1,5 +1,17 @@
 import numpy as np
-from wifi_radar_slam.slam.particle_filter import run_slam, _triangulate_bistatic
+from wifi_radar_slam.slam.particle_filter import run_slam, _triangulate_bistatic, _cluster
+
+
+def test_cluster_min_support_rejects_phantoms():
+    # a dense cluster of 6 near (10, 3) + two isolated phantoms far away
+    dense = np.array([[10.0, 3.0]] * 6) + np.random.default_rng(0).normal(0, 0.05, (6, 2))
+    phantoms = np.array([[80.0, -40.0], [-30.0, 60.0]])
+    pts = np.vstack([dense, phantoms])
+    kept = _cluster(pts, radius=0.5, min_support=3)
+    assert len(kept) == 1                                   # only the dense cluster survives
+    assert np.linalg.norm(kept[0] - [10.0, 3.0]) < 0.2
+    # default min_support=1 keeps everything (back-compatible)
+    assert len(_cluster(pts, radius=0.5, min_support=1)) == 3
 
 
 def test_triangulate_grazing_geometry():
