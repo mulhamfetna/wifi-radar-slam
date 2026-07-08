@@ -3,6 +3,7 @@ seed: 42
 snr_db: 20.0
 sensing_mode: music
 world_aoa: true
+map_min_support: 5         # consensus filter: drop isolated delay-AoA mis-pairing phantoms
 rf:
   carrier_hz: 5.2e9
   bandwidth_hz: 160.0e6      # 4x nominal -> delay resolution c/2B ~= 0.94 m

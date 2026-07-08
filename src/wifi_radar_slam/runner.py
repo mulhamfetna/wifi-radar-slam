@@ -29,7 +29,8 @@ def run_phase_a(cfg: RunConfig, rng, force: bool = False) -> dict:
     velocity = velocity_from_poses(built.trajectory, cfg.trajectory.timestep_s)
     est_traj, est_map = run_slam(detections, built.ap_positions, velocity,
                                  cfg.trajectory.timestep_s, rng,
-                                 init_pose=built.trajectory[0])
+                                 init_pose=built.trajectory[0],
+                                 map_min_support=cfg.map_min_support)
 
     gt_traj = built.trajectory
     gt_xy = built.ground_truth_map[:, :2]

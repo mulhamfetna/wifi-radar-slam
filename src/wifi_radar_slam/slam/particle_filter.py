@@ -39,7 +39,7 @@ def _reproject_bistatic(pose_xy, ap_xy, refl):
 
 
 def run_slam(detections, ap_positions, velocity, timestep_s, rng,
-             n_particles: int = 200, init_pose=None):
+             n_particles: int = 200, init_pose=None, map_min_support: int = 1):
     n_frames = len(detections)
     particles = np.zeros((n_particles, 3))                 # x, y, yaw
     if init_pose is not None:                              # known start (e.g. GPS prior)
@@ -83,12 +83,19 @@ def run_slam(detections, ap_positions, velocity, timestep_s, rng,
 
         est_traj[f] = np.average(particles, axis=0, weights=weights)
 
-    est_map = _cluster(np.array(mapped_points)) if mapped_points else np.empty((0, 2))
+    est_map = (_cluster(np.array(mapped_points), min_support=map_min_support)
+               if mapped_points else np.empty((0, 2)))
     return est_traj, est_map
 
 
-def _cluster(points: np.ndarray, radius: float = 0.5) -> np.ndarray:
-    """Greedy merge of nearby mapped points into landmark centroids."""
+def _cluster(points: np.ndarray, radius: float = 0.5, min_support: int = 1) -> np.ndarray:
+    """Greedy merge of nearby mapped points into landmark centroids.
+
+    `min_support` drops clusters with fewer than that many contributing detections.
+    A true surface is triangulated from many poses (dense cluster); phantom
+    reflectors from delay-AoA mis-pairing are one-off (isolated), so requiring
+    consensus support rejects them while keeping real surfaces.
+    """
     kept = []
     used = np.zeros(len(points), dtype=bool)
     for i in range(len(points)):
@@ -97,5 +104,6 @@ def _cluster(points: np.ndarray, radius: float = 0.5) -> np.ndarray:
         d = np.linalg.norm(points - points[i], axis=1)
         group = d < radius
         used |= group
-        kept.append(points[group].mean(axis=0))
-    return np.array(kept)
+        if int(group.sum()) >= min_support:
+            kept.append(points[group].mean(axis=0))
+    return np.array(kept) if kept else np.empty((0, 2))
