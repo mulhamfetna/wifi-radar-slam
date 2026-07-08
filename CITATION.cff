@@ -9,17 +9,19 @@ abstract: >-
   envelope, and with joint 2-D (delay-angle) MUSIC it reaches oracle quality from
   realistic commodity CSI in sparse-multipath scenes. Mapping is characterised in
   two tiers: with clean single-bounce (oracle) sensing the bistatic SLAM back-end
-  reconstructs reflecting surfaces to ~25-30 cm, while realistic sensing is bounded
-  to ~4-5 m by delay estimation bias in multipath - quantifying that passive-WiFi
-  localization is practical today whereas mapping needs further sensing advances.
-  A 60 GHz / IEEE 802.11ad mmWave extension remains planned as future work.
+  reconstructs reflecting surfaces to ~25-30 cm, while realistic commodity-CSI
+  sensing is bounded to ~4-5 m. A 60 GHz (1.76 GHz bandwidth) and a 16-antenna test
+  show this mapping floor is removed by neither wider bandwidth nor larger aperture:
+  it is a path-discrimination limit (separating genuine reflections from
+  line-of-sight/floor paths) of commodity CSI, not a resolution limit - identifying
+  the key open problem for WiFi-based mapping while localization remains practical.
 type: software
 authors:
   - family-names: Fetna
     given-names: Mulham
     orcid: "https://orcid.org/0009-0006-4432-798X"
     email: contact@mulhamfetna.com
-version: 0.4.0
+version: 0.5.0
 date-released: "2026-07-08"
 license: AGPL-3.0-or-later
 doi: 10.5281/zenodo.21247288
@@ -31,7 +33,7 @@ identifiers:
     description: Concept DOI (resolves to the latest version)
   - type: doi
     value: 10.5281/zenodo.21263556
-    description: Version DOI for v0.4.0 (this release)
+    description: Version DOI for v0.4.0
   - type: doi
     value: 10.5281/zenodo.21263134
     description: Version DOI for v0.3.0
