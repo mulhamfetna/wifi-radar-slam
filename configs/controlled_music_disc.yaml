@@ -5,7 +5,7 @@ sensing_mode: music
 world_aoa: true
 joint_estimation: true     # joint 2-D delay-angle MUSIC (correct association)
 map_min_support: 5
-map_min_excess_m: 3.0     # path discriminator: reject LOS/floor (low-excess) phantoms
+map_min_excess_m: 1.5     # path discriminator (tuned)
 rf:
   carrier_hz: 5.2e9
   bandwidth_hz: 160.0e6
