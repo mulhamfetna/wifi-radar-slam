@@ -53,11 +53,13 @@ MUSIC front-end lifts \emph{realistic} commodity-CSI localization to
 oracle-sensing quality in sparse-multipath scenes. In contrast, \emph{mapping}
 separates into two tiers: with clean single-bounce (oracle) sensing the back-end
 reconstructs reflecting surfaces to \SIrange{25}{30}{cm}, whereas realistic
-sensing is bounded to \SIrange{4}{5}{m} by a systematic delay-estimation bias in
-dense multipath---not by bandwidth or array aperture. These results delineate
-precisely what passive sub-\SI{7}{GHz} WiFi can and cannot do for automotive
-SLAM, and motivate a \SI{60}{GHz} extension as the physical remedy for the
-mapping limitation.
+sensing is bounded to \SIrange{4}{5}{m}. Counter-intuitively, this floor is
+removed by \emph{neither} a $44\times$ bandwidth increase (\SI{60}{GHz}) \emph{nor}
+a $4\times$ larger array: the limit is not resolution but \emph{path
+discrimination}---telling a genuine reflection from a line-of-sight or floor
+path---which commodity CSI does not provide. These results delineate precisely
+what passive WiFi can and cannot do for automotive SLAM and identify bounce/path
+discrimination as the key open problem for WiFi mapping.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -111,8 +113,9 @@ association lifts realistic commodity-CSI localization to oracle-sensing quality
 in sparse multipath.
 \item A two-tier characterization of \emph{mapping}: an oracle upper bound
 (\SIrange{25}{30}{cm}) and a realistic bound (\SIrange{4}{5}{m}), with the residual
-gap pinned to a delay-estimation bias in dense multipath rather than to bandwidth
-or aperture---clarifying exactly what further sensing advances mapping requires.
+gap shown---by a \SI{60}{GHz} and a 16-antenna test---to be a \emph{path-
+discrimination} limit of commodity CSI rather than a bandwidth or aperture
+(resolution) limit, identifying the key open problem for WiFi mapping.
 \end{itemize}
 
 % ============================================================================
@@ -282,11 +285,11 @@ Table~\ref{tab:map} contrasts the two sensing tiers. With oracle sensing the map
 reconstructs reflecting surfaces to \SIrange{25}{30}{cm}
 (Fig.~\ref{fig:maps}, left); the same geometry under realistic MUSIC sensing is
 bounded to \SIrange{4}{5}{m}. Critically, this residual persists even in the
-front/back-unambiguous controlled scene and even under wider bandwidth and joint
-estimation, so it is a \emph{delay-estimation bias in dense multipath}, not an
-association or aperture problem. Passive-WiFi mapping therefore requires further
-sensing advances (bounce discrimination, wider bandwidth) beyond super-resolution
-on a single commodity link.
+front/back-unambiguous controlled scene and even under joint estimation; as
+Sec.~\ref{sec:60ghz} shows, it is removed by neither wider bandwidth nor larger
+aperture. The bound is therefore a \emph{path-discrimination} limit---genuine
+facade reflections cannot be separated from the consistent LOS/floor paths
+commodity CSI returns without an interaction label---not a resolution problem.
 
 \begin{table}[t]
 \caption{Mapping accuracy: oracle vs.\ realistic sensing.}
@@ -325,26 +328,65 @@ uncovered (coverage, not accuracy, limited).}
 The results delineate a clear boundary. \emph{Localization} from ambient
 sub-\SI{7}{GHz} WiFi is practical today: centimetre-level and, with joint
 estimation, oracle-quality from realistic CSI in favourable geometry. \emph{Mapping}
-is fundamentally harder: the low bandwidth blends dense multipath, biasing delay
-estimates and flooring realistic map accuracy at a few metres. This is the physical
-signature of the $\Delta R=c/2B$ ceiling, and it is precisely what a wider-band
-\SI{60}{GHz} front-end would relieve. Limitations of this study are its
-simulation-only scope and the single-array receiver; both are addressed in the
-roadmap below.
+is fundamentally harder, but---as Sec.~\ref{sec:60ghz} shows---not for the reason
+one would expect: the realistic floor is removed by neither wider bandwidth nor
+larger aperture, so it is not a resolution limit but a \emph{path-discrimination}
+limit. Genuine facade reflections cannot be separated from the consistent
+line-of-sight and floor paths that commodity CSI returns without an interaction
+label. Limitations of this study are its simulation-only scope and the single-array
+receiver.
 
 % ============================================================================
-\section{The 60\,GHz Extension (Ongoing)}\label{sec:60ghz}
+\section{Does More Bandwidth or Aperture Fix Mapping? A 60\,GHz Test}\label{sec:60ghz}
 % ============================================================================
-%% TODO: run and write. The mapping limitation above is a bandwidth problem; the
-%% 60 GHz (802.11ad DMG, ~1.76 GHz) waveform gives DR ~ 8.5 cm and should resolve
-%% the dense multipath that biases sub-7 GHz delay estimation, enabling realistic
-%% mapping. Plan: (i) wide-band Sionna sim at 60 GHz with Golay-preamble-style
-%% sensing; (ii) re-run the same pipeline/metrics; (iii) test whether cm-resolution
-%% removes the ~5 m realistic map bias. Compare against Kumari et al. \cite{kumari2018adradar}.
-The mapping limitation identified above is, by construction, a bandwidth problem.
-A \SI{60}{GHz} (IEEE~802.11ad DMG) front-end offers \(\sim\)\SI{1.76}{GHz} of
-bandwidth ($\Delta R\approx\SI{8.5}{cm}$) and is the natural remedy. This extension
-is in progress and will be reported in a subsequent revision.
+The intuitive remedy for the mapping floor is finer resolution: a \SI{60}{GHz}
+(IEEE~802.11ad DMG) front-end offers \(\sim\)\SI{1.76}{GHz} of bandwidth
+($\Delta R\approx\SI{8.5}{cm}$, a $44\times$ improvement), and a larger array
+sharpens angle. We tested both directly by re-running the controlled-wall pipeline
+at \SI{60}{GHz} and with a 16-element array (Table~\ref{tab:60ghz}).
+
+\begin{table}[t]
+\caption{Neither bandwidth nor aperture moves realistic map accuracy.}
+\label{tab:60ghz}
+\centering\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Configuration (controlled wall, joint) & accuracy (m) & ATE (m)\\
+\midrule
+sub-\SI{7}{GHz}, \SI{40}{MHz}, 4-antenna & 4.8 & 0.027\\
+\SI{60}{GHz}, \SI{1.76}{GHz}, 4-antenna & 4.8 & 0.030\\
+\SI{60}{GHz}, \SI{1.76}{GHz}, 16-antenna & 4.75 & 0.034\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\columnwidth]{controlled_music_60ghz_map.png}
+\caption{Realistic \SI{60}{GHz} map (joint MUSIC). Despite \SI{8.5}{cm} range
+resolution, the estimated reflectors (orange) form a consistent phantom arc along
+the vehicle trajectory (LOS/floor paths), not the wall (grey, at $x{=}0$).}
+\label{fig:phantom}
+\end{figure}
+
+Strikingly, neither change moves the map accuracy (Fig.~\ref{fig:phantom}). The
+reason is visible in the reconstructed map: the estimated reflectors form a
+\emph{consistent phantom arc along the vehicle trajectory}, not the wall---these
+are the line-of-sight and
+floor-bounce paths, which MUSIC returns among the strongest components at every
+pose and which, being geometrically consistent, survive consensus filtering.
+Bandwidth and aperture sharpen \emph{resolution}, but the mapping floor is
+\emph{path discrimination}: distinguishing a genuine facade reflection from an
+LOS/floor/multi-bounce path. The oracle succeeds only because it can filter by the
+ray tracer's interaction type; commodity CSI carries no such label.
+
+\textbf{Consequence.} The realistic-mapping limit is neither the $\Delta R=c/2B$
+resolution ceiling nor array aperture---so \SI{60}{GHz} alone does not enable
+passive-WiFi mapping. It is the absence of bounce/path discrimination in commodity
+CSI, which we identify as the key open problem. Approaches that could close it
+(learned path classification, physical bounce-count features, multi-pass geometric
+consistency) are left to future work. Localization, which does not require this
+discrimination, is unaffected and remains centimetre-level at both bands.
 
 % ============================================================================
 \section{Conclusion}
@@ -354,9 +396,11 @@ WiFi as a radar replacement for automotive SLAM. Ambient WiFi localizes a moving
 vehicle to centimetre level---and to oracle-sensing quality from realistic CSI via
 joint delay--angle MUSIC in sparse multipath---while mapping separates into an
 oracle upper bound (\SIrange{25}{30}{cm}) and a realistic bound
-(\SIrange{4}{5}{m}) set by delay-estimation bias in dense multipath. The study thus
-maps the boundary of the achievable for passive sub-\SI{7}{GHz} WiFi perception and
-motivates a \SI{60}{GHz} extension to close the mapping gap.
+(\SIrange{4}{5}{m}). We further showed that this mapping floor is removed by
+neither a \SI{60}{GHz} wide-band front-end nor a larger array---it is a
+\emph{path-discrimination} limit of commodity CSI, not a resolution one. The study
+thus maps the boundary of the achievable for passive WiFi perception and identifies
+bounce/path discrimination as the central open problem for WiFi-based mapping.
 
 \section*{Reproducibility}
 All code, configurations, scenes and result artifacts are openly available:
