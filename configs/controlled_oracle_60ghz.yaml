@@ -1,0 +1,22 @@
+run_name: controlled_oracle_60ghz
+seed: 42
+snr_db: 20.0
+sensing_mode: oracle       # single-scatter detections from Sionna's true paths
+rf:
+  carrier_hz: 60.48e9
+  bandwidth_hz: 1.76e9
+  n_subcarriers: 256
+  n_rx_antennas: 4
+  antenna_spacing_frac: 0.5
+trajectory:
+  length_m: 30.0           # vehicle sweeps y in [-15, 15] at fixed x=-8
+  speed_mps: 5.0
+  timestep_s: 0.05
+  shape: straight
+scene:
+  name: controlled_wall    # large metal wall (x=0 plane) + floor; single-bounce clean
+  ap_positions:            # all on the x<0 side, so single specular bounce off wall reaches vehicle
+    - [-12.0, 0.0, 2.5]
+    - [-8.0, -18.0, 2.5]
+    - [-8.0, 18.0, 2.5]
+  targets: []              # geometry comes from the built-in scaled scene
