@@ -33,3 +33,6 @@ tmp/
 
 # fetched real-CSI samples (belong to CSIKit; use experiments/fetch_real_csi.sh)
 data/real/
+
+# generated dataset artifacts (attach to releases; regenerate via experiments/make_dataset.py)
+data/*.npz
