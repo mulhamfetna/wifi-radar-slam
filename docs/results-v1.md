@@ -196,10 +196,35 @@ not help (nominal ATE 0.033 → 0.091 m), so it is off by default.
 
 **Overall.** Passive-WiFi **localization** is cm-level and practical — and with joint estimation it
 reaches oracle quality from realistic CSI in sparse scenes. Passive-WiFi **mapping** remains bounded
-(~4–5 m) by delay estimation bias, needing further sensing advances (bounce discrimination, wider
-aperture) beyond what super-resolution on a single commodity link delivers. The oracle map is the
-perfect-sensing upper bound; the consensus filter (`map_min_support`) and joint estimator
-(`joint_estimation`) are retained as opt-in, backward-compatible improvements.
+(~4–5 m). The oracle map is the perfect-sensing upper bound; the consensus filter (`map_min_support`)
+and joint estimator (`joint_estimation`) are retained as opt-in, backward-compatible improvements.
+
+### What actually floors realistic mapping: path discrimination, not resolution
+
+We tested the intuitive remedy—more bandwidth and more aperture—directly, on the controlled wall:
+
+| configuration | map\_accuracy | ATE |
+|---------------|--------------|-----|
+| sub-\SI{7}{GHz}, \SI{40}{MHz}, 4-ant, joint | 4.8 m | 0.027 m |
+| **\SI{60}{GHz}, \SI{1.76}{GHz}, 4-ant, joint** | **4.8 m** | 0.030 m |
+| **\SI{60}{GHz}, \SI{1.76}{GHz}, 16-ant, joint** | **4.75 m** | 0.034 m |
+
+Neither a \(44\times\) bandwidth increase (\(\Delta R:\SI{3.75}{m}\!\to\!\SI{8.5}{cm}\)) nor a \(4\times\)
+larger array moves the map accuracy. The map figure (`docs/assets/controlled_music_60ghz_map.png`)
+explains why: the estimated reflectors form a **consistent phantom arc hugging the vehicle
+trajectory**, not the wall. These phantoms are the line-of-sight and floor-bounce paths, which MUSIC
+returns among the strongest components at every pose; being geometrically consistent, they survive the
+consensus filter. Bandwidth and aperture sharpen *resolution*, but the floor is **path
+discrimination**—telling a genuine facade reflection from an LOS/floor/multi-bounce path. The oracle
+map works precisely because it can filter by Sionna's interaction type; commodity CSI carries no such
+label.
+
+**Revised mapping conclusion.** The realistic-mapping limit is *not* the $\Delta R = c/2B$ resolution
+ceiling and is *not* array aperture—so \SI{60}{GHz} alone does not enable it. It is the absence of
+bounce/path discrimination in commodity CSI. Closing it needs a different class of method (e.g.
+learned path classification, physical bounce-count features, or multi-pass geometric consistency),
+which we identify as the key open problem for passive-WiFi mapping. Localization, which does not
+require this discrimination, is unaffected and remains practical at both bands.
 
 ## Reproduce
 
