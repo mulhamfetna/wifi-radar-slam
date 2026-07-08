@@ -25,7 +25,8 @@ def test_phase_a_wiring(monkeypatch, tmp_path):
     monkeypatch.setattr(runner, "simulate_csi", fake_csi)
 
     metrics = runner.run_phase_a(cfg, np.random.default_rng(0))
-    assert set(metrics) == {"ate", "rpe", "chamfer", "iou"}
+    assert set(metrics) == {"ate", "rpe", "chamfer",
+                            "map_accuracy", "map_completeness", "iou"}
     assert np.isfinite(metrics["ate"])
 
 

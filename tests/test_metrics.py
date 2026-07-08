@@ -1,5 +1,19 @@
 import numpy as np
-from wifi_radar_slam.eval.metrics import ate, rpe, chamfer, occupancy_iou
+from wifi_radar_slam.eval.metrics import (
+    ate, rpe, chamfer, occupancy_iou, map_accuracy, map_completeness,
+)
+
+
+def test_directional_map_metrics():
+    # est points sit exactly on GT (perfect accuracy) but cover only 1 of 3 GT
+    # surfaces (poor completeness) -> accuracy 0, completeness > 0, and the
+    # symmetric chamfer is the average of the two directions.
+    gt = np.array([[0.0, 0.0], [10.0, 0.0], [20.0, 0.0]])
+    est = np.array([[0.0, 0.0]])
+    assert np.isclose(map_accuracy(est, gt), 0.0)
+    assert map_completeness(est, gt) > 0.0
+    assert np.isclose(chamfer(est, gt),
+                      0.5 * (map_accuracy(est, gt) + map_completeness(est, gt)))
 
 
 def test_ate_zero_for_identical():

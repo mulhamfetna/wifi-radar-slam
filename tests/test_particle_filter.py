@@ -1,5 +1,23 @@
 import numpy as np
-from wifi_radar_slam.slam.particle_filter import run_slam
+from wifi_radar_slam.slam.particle_filter import run_slam, _triangulate_bistatic
+
+
+def test_triangulate_grazing_geometry():
+    # Reflector nearly in line with the AP direction -> small denom but a
+    # well-determined solve. The identity path/aoa are built from `refl`, so the
+    # solver must recover it (the old |denom|<1 guard wrongly rejected this).
+    pose = np.array([0.0, 0.0])
+    ap = np.array([0.0, 40.0])
+    refl = np.array([1.0, 20.0])
+    d = refl - pose
+    path = np.linalg.norm(ap - refl) + np.linalg.norm(d)
+    aoa = np.arctan2(d[1], d[0])
+    # confirm this really is the grazing (small-denom) regime
+    u = np.array([np.cos(aoa), np.sin(aoa)])
+    assert abs(2.0 * (path - (ap - pose) @ u)) < 1.0
+    est = _triangulate_bistatic(pose, ap, path, aoa)
+    assert est is not None
+    assert np.allclose(est, refl, atol=1e-6)
 
 
 def test_recovers_straight_trajectory():
