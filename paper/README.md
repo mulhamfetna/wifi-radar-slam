@@ -1,10 +1,14 @@
-# Paper draft — Ambient WiFi as a Radar Replacement for Automotive SLAM
+# Paper — Ambient WiFi as a Radar Replacement for Automotive SLAM
 
-Q1-targeted manuscript (IEEEtran journal class). **Status: skeleton.** The
-sub-7 GHz localization, realistic-sensing and mapping sections are written from the
-released results (`../docs/results-v1.md`, v0.4.0). The **60 GHz extension**
-(Sec. VII) and any real-CSI validation are pending — marked `%% TODO` in `main.tex`.
-Numbers to re-verify against the artifacts before submission are marked `%% CHECK`.
+**Target venue: IEEE Internet of Things Journal (IoT-J)** — IEEEtran journal class.
+**Status: complete draft, editorially passed.** All sections (localization, joint
+MUSIC, oracle-vs-realistic mapping, the 60 GHz/aperture path-discrimination finding,
+the learned discriminator, real-CSI proof-of-concept) are written from the released
+result artifacts (`../docs/results-v1.md`); all numbers are reproduced from those.
+`refs.bib` has been cleaned of internal working notes for submission.
+
+Before submitting: create the IoT-J submission on ScholarOne with this source, and
+consider adding an outdoor real-CSI capture (the one item flagged in Future Work).
 
 ## Build
 

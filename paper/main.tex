@@ -2,12 +2,12 @@
 %%  Ambient WiFi as a Radar Replacement for Automotive SLAM
 %%  A physics-based (Sionna RT) feasibility study.
 %%
-%%  Target: Q1 journal (e.g. IEEE IoT-J / IEEE Sensors J. / IEEE T-ITS).
-%%  Build:  latexmk -pdf main.tex   (or upload the paper/ folder to Overleaf)
+%%  Target venue: IEEE Internet of Things Journal (IoT-J). IEEEtran journal class.
+%%  Build:  pdflatex main && bibtex main && pdflatex main && pdflatex main
+%%          (IEEEtran.cls/.bst vendored; no siunitx dependency) or use Overleaf.
 %%
-%%  STATUS: draft. Localization, sensing, mapping, the 60 GHz test and the
-%%  real-CSI proof-of-concept are all written from the released result artifacts
-%%  (docs/results-v1.md). All result numbers are reproduced from those artifacts.
+%%  STATUS: draft, editorially passed for IoT-J. All result numbers are reproduced
+%%  from the released artifacts (docs/results-v1.md).
 %% ============================================================================
 \documentclass[journal]{IEEEtran}
 
@@ -25,6 +25,14 @@
 \newcommand{\num}[1]{#1}
 \newcommand{\si}[1]{#1}
 \providecommand{\degree}{\ensuremath{^\circ}}
+
+% No-op fallbacks for IEEEtran bibliography spacing macros (the real IEEEtran.cls
+% defines these; \providecommand leaves it untouched on a full TeX/Overleaf build).
+\providecommand{\BIBdecl}{}
+\providecommand{\BIBentrySTDinterwordspacing}{}
+\providecommand{\BIBentryALTinterwordspacing}{}
+\providecommand{\BIBentryALTinterwordstretchfactor}[1]{}
+\providecommand{\BIBforeignlanguage}[2]{#2}
 
 \begin{document}
 
@@ -62,14 +70,17 @@ sensing is bounded to \SIrange{4}{5}{m}. Counter-intuitively, this floor is
 removed by \emph{neither} a $44\times$ bandwidth increase (\SI{60}{GHz}) \emph{nor}
 a $4\times$ larger array: the limit is not resolution but \emph{path
 discrimination}---telling a genuine reflection from a line-of-sight or floor
-path---which commodity CSI does not provide. These results delineate precisely
-what passive WiFi can and cannot do for automotive SLAM and identify bounce/path
-discrimination as the key open problem for WiFi mapping.
+path---which commodity CSI does not provide. We show this discrimination is
+\emph{learnable} (F1~$\approx0.9$ under realistic estimation error), delineating
+precisely what passive WiFi can and cannot do for automotive SLAM. To support
+further work we release the full pipeline and \textbf{WiFiSLAM-Sim}, the first
+ray-traced outdoor/vehicular WiFi-CSI dataset with per-path labels.
 \end{abstract}
 
 \begin{IEEEkeywords}
-WiFi sensing, passive WiFi radar, channel state information, SLAM, integrated
-sensing and communication, automotive perception, multipath-based SLAM, Sionna RT.
+Internet of Things, WiFi sensing, passive WiFi radar, channel state information,
+SLAM, integrated sensing and communication (ISAC), connected and autonomous
+vehicles, automotive perception, multipath-based SLAM.
 \end{IEEEkeywords}
 
 % ============================================================================
@@ -77,12 +88,16 @@ sensing and communication, automotive perception, multipath-based SLAM, Sionna R
 % ============================================================================
 \IEEEPARstart{A}{utomotive} perception relies heavily on radar for its robustness
 to weather and lighting, but radar is a dedicated, cost- and power-bearing sensor.
-In parallel, WiFi radios are ubiquitous---in vehicles, roadside units and the
-built environment---and the emerging ISAC paradigm and the IEEE~802.11bf sensing
-amendment are turning communication hardware into opportunistic sensors
-\cite{overview2024ieee80211bf,liu2022isac,zhang2021jcassurvey}. This raises a
-concrete question for autonomous systems: \emph{can ambient WiFi, received on a
-moving vehicle, replace radar as the perception input to SLAM?}
+In parallel, the built environment is saturated with WiFi: access points, roadside
+units and connected vehicles form a dense, ambient IoT connectivity fabric. Under
+the integrated sensing and communication (ISAC) paradigm and the IEEE~802.11bf
+sensing amendment, this same communication infrastructure is increasingly
+dual-purpose---turning already-deployed radios into opportunistic sensors at no
+extra hardware cost \cite{overview2024ieee80211bf,liu2022isac,zhang2021jcassurvey}.
+For connected and autonomous vehicles, exploiting this ambient IoT fabric for
+perception is especially attractive. This raises a concrete question: \emph{can
+ambient WiFi, received on a moving vehicle, replace radar as the perception input
+to SLAM?}
 
 \textbf{The gap.} A two-round, adversarially fact-checked survey (summarized in
 Sec.~\ref{sec:related}) exposes a clean and defensible gap. Passive WiFi radar and
@@ -351,8 +366,13 @@ one would expect: the realistic floor is removed by neither wider bandwidth nor
 larger aperture, so it is not a resolution limit but a \emph{path-discrimination}
 limit. Genuine facade reflections cannot be separated from the consistent
 line-of-sight and floor paths that commodity CSI returns without an interaction
-label. Limitations of this study are its simulation-only scope and the single-array
-receiver.
+label. For deployment, the practical implication is encouraging: a connected
+vehicle can obtain a cm-level pose from the ambient WiFi it already receives, with
+no dedicated sensor and no new spectrum---an attractive low-cost complement to (or
+graceful fallback for) radar in the IoT-connected fleet---while environment mapping
+awaits the discrimination advances above. Limitations of this study are its
+simulation-primary scope (mitigated by the real-CSI front-end check of
+Sec.~\ref{sec:results}) and the single-array receiver.
 
 % ============================================================================
 \section{Does More Bandwidth or Aperture Fix Mapping? A 60\,GHz Test}\label{sec:60ghz}
@@ -454,10 +474,15 @@ neither a \SI{60}{GHz} wide-band front-end nor a larger array---it is a
 thus maps the boundary of the achievable for passive WiFi perception and identifies
 bounce/path discrimination as the central open problem for WiFi-based mapping.
 
-\section*{Reproducibility}
-All code, configurations, scenes and result artifacts are openly available:
-GitHub \url{https://github.com/mulhamfetna/wifi-radar-slam}; archived on Zenodo
-(concept DOI \texttt{10.5281/zenodo.21247288}).
+\section*{Reproducibility and Data Availability}
+The complete pipeline (channel simulation, MUSIC/joint-MUSIC sensing, bistatic
+mapping, particle-filter SLAM, and the learned discriminator), all scene/run
+configurations, and every result artifact are openly available under AGPL-3.0:
+GitHub \url{https://github.com/mulhamfetna/wifi-radar-slam}, versioned and archived
+on Zenodo (concept DOI \texttt{10.5281/zenodo.21247288}). Each table/figure is
+reproduced by a single command from a released config. The \textbf{WiFiSLAM-Sim}
+dataset is generated by \texttt{make\_dataset.py} and documented by a datasheet; a
+sample is attached to the release.
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
