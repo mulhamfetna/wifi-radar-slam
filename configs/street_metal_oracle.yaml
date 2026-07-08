@@ -1,0 +1,22 @@
+run_name: street_metal_oracle
+seed: 42
+snr_db: 20.0
+sensing_mode: oracle       # single-scatter detections from Sionna's true paths
+rf:
+  carrier_hz: 5.2e9
+  bandwidth_hz: 40.0e6
+  n_subcarriers: 64
+  n_rx_antennas: 4
+  antenna_spacing_frac: 0.5
+trajectory:
+  length_m: 60.0           # vehicle drives x in [-30, 30] at y=0 (down the street)
+  speed_mps: 5.0
+  timestep_s: 0.05
+  shape: straight
+scene:
+  name: street_canyon_metal   # street canyon with building/car materials -> metal (reflective)
+  ap_positions:               # in the street (not embedded in buildings) so single bounce reaches vehicle
+    - [-25.0, -6.0, 5.0]
+    - [0.0, 6.0, 5.0]
+    - [25.0, -6.0, 5.0]
+  targets: []
