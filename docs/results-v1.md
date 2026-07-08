@@ -101,6 +101,31 @@ the mapping geometry end-to-end**: given clean single-bounce sensing, the bistat
 reconstructs the reflecting surface to ~25 cm. Reproduce:
 `WRS_NUM_SAMPLES=1000000 python experiments/run_phase_a.py configs/controlled_oracle.yaml`.
 
+## Mapping in the realistic scene — reflective street canyon (`street_canyon_metal`)
+
+The street-canyon mapping obstacle was the **penetrable** building material, not the estimator.
+Overriding the building/car materials to a perfect reflector (metal) — a realistic model for
+concrete/brick at 5.2 GHz, where penetration loss is high — and placing the APs **in the street**
+(not embedded in the buildings) restores single-bounce specular returns. Oracle sensing, 3 APs,
+40 MHz, ~21 s on the server.
+
+| metric | value | note |
+|--------|-------|------|
+| map_accuracy (est→GT) | **0.30 m** | as precise as the controlled scene — reflectors lie on the true facades |
+| map_completeness (GT→est) | 24.4 m | only illuminated facades are covered |
+| Chamfer (symmetric) | 12.3 m | dominated by the coverage gap |
+| occupancy IoU | 0.077 | partial coverage |
+| ATE / RPE | 0.116 / 0.007 m | localization unaffected |
+
+`docs/assets/street_metal_map.png` shows the estimated reflectors tracing the two **street-facing
+facades** (y≈+9.6 and y≈−8.6) over the illuminated x-span, while the outer building perimeters and
+distant buildings are not covered. **Interpretation:** the mapping geometry/estimator is correct
+(30 cm precision, matching the controlled scene), but a single passive-WiFi pass illuminates only
+a subset of surfaces — coverage, not accuracy, is the limitation. This motivates multi-pass
+mapping or multi-bounce SLAM as future work, and cleanly separates the two mapping challenges.
+
+Reproduce: `WRS_NUM_SAMPLES=1000000 python experiments/run_phase_a.py configs/street_metal_oracle.yaml`.
+
 ## Reproduce
 
 On a machine with `sionna-rt`: `WRS_NUM_SAMPLES=1000000 python experiments/run_phase_a.py` and
