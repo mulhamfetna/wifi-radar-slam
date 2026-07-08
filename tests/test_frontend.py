@@ -21,10 +21,13 @@ def test_single_target_range_and_angle():
     delay = 40e-9
     aoa = 0.3                                        # electrical angle in the CSI
     csi = _make_csi(5, rf, delay, aoa)
+    # default: raw electrical angle (localization-preserving)
     dets = extract_detections(csi, rf, n_paths=1)
     assert len(dets) == 5
     r, a, ap = dets[0][0]
     assert np.isclose(r, delay * C, atol=1.0)      # within 1 m
-    # frontend now returns a world azimuth: beta = arcsin(-sin(electrical)) = -aoa
-    assert np.isclose(a, -aoa, atol=0.05)
+    assert np.isclose(a, aoa, atol=0.05)
     assert ap == 0
+    # world_aoa=True maps to world azimuth beta = arcsin(-sin(electrical)) = -aoa
+    dets_w = extract_detections(csi, rf, n_paths=1, world_aoa=True)
+    assert np.isclose(dets_w[0][0][1], -aoa, atol=0.05)

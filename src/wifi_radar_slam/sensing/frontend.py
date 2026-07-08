@@ -9,15 +9,17 @@ C = 299792458.0
 MAX_RANGE_M = 150.0
 
 
-def extract_detections(csi_timeseries: np.ndarray, rf: RFConfig, n_paths: int = 3) -> list[np.ndarray]:
+def extract_detections(csi_timeseries: np.ndarray, rf: RFConfig, n_paths: int = 3,
+                       world_aoa: bool = False) -> list[np.ndarray]:
     """CSI (n_frames, n_ap, n_rx_antennas, n_subcarriers) -> per-frame detections.
 
-    Each per-frame array has shape (k, 3): columns [range_m, aoa_rad, ap_index],
-    where aoa_rad is a world-frame azimuth. Delays use antennas as snapshots (and a
-    physically-bounded grid); AoA uses subcarriers as snapshots and is converted
-    from the array-relative electrical angle to world azimuth. Delays and angles
-    are paired by sorted index (adequate for the low-target case; joint delay-AoA
-    estimation is a documented future refinement).
+    Each per-frame array has shape (k, 3): columns [range_m, aoa_rad, ap_index].
+    Delays use antennas as snapshots with a physically-bounded grid; AoA uses
+    subcarriers as snapshots. When `world_aoa` is set, the array-relative electrical
+    angle is mapped to a world-frame azimuth (needed for a physically-correct map,
+    but its single-ULA front/back ambiguity regresses localization in multi-sided
+    scenes, so it is off by default). Delays and angles are paired by sorted index
+    (adequate for the low-target case; joint delay-AoA estimation is future work).
     """
     n_frames, n_ap = csi_timeseries.shape[0], csi_timeseries.shape[1]
     out = []
@@ -28,7 +30,7 @@ def extract_detections(csi_timeseries: np.ndarray, rf: RFConfig, n_paths: int = 
             delays = np.sort(estimate_delays(block, rf.bandwidth_hz, n_paths,
                                              max_range_m=MAX_RANGE_M))
             electrical = estimate_aoa(block.T, rf.antenna_spacing_frac, n_paths)
-            angles = np.sort(azimuth_from_electrical(electrical))
+            angles = np.sort(azimuth_from_electrical(electrical) if world_aoa else electrical)
             k = min(len(delays), len(angles))
             for i in range(k):
                 rows.append([delays[i] * C, angles[i], float(ap)])

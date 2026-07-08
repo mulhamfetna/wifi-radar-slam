@@ -2,6 +2,7 @@ run_name: controlled_music
 seed: 42
 snr_db: 20.0
 sensing_mode: music        # realistic: CSI -> MUSIC delays/AoA (vs the oracle config)
+world_aoa: true            # map electrical angle -> world azimuth (wall is on a known side)
 rf:
   carrier_hz: 5.2e9
   bandwidth_hz: 40.0e6
