@@ -20,6 +20,7 @@ dependencies = [
 # Sionna RT 2.x is TensorFlow-free (Dr.Jit/Mitsuba); runs on CUDA GPU or CPU (LLVM).
 sim = ["sionna-rt>=2.0,<3"]
 realcsi = ["CSIKit>=2.0"]   # parse real commodity CSI (Intel 5300, nexmon, ESP32, ...)
+ml = ["scikit-learn>=1.3"]  # learned path discriminator (train_discriminator.py)
 dev = ["pytest>=7.4"]
 
 [tool.setuptools.packages.find]
