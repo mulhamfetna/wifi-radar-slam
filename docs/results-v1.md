@@ -226,6 +226,19 @@ learned path classification, physical bounce-count features, or multi-pass geome
 which we identify as the key open problem for passive-WiFi mapping. Localization, which does not
 require this discrimination, is unaffected and remains practical at both bands.
 
+### A first path-discriminator: bistatic-excess gating (`map_min_excess_m`)
+
+LOS and floor-bounce paths barely detour, so their bistatic *excess* (path\_len $-\ |AP-\text{veh}|$)
+is near zero, whereas a genuine facade reflection detours significantly. Requiring a minimum excess
+(controlled wall, 160 MHz, joint) cuts the phantom error—**map\_accuracy 4.8 $\to$ 2.0 m**—but
+**collapses coverage** (completeness 3.5 $\to$ 10 m), and lowering the threshold from 3.0 to 1.5 m does
+not recover it. The reason is the delay bias itself: MUSIC under-estimates the wall path's delay, so
+*genuine* reflections also present a low excess and are gated out alongside the phantoms. Bistatic-excess
+gating is therefore a useful but partial discriminator (retained as opt-in `map_min_excess_m`, default
+0); a *robust* path discriminator that does not rely on unbiased delays—e.g. a learned LOS/reflection
+classifier on CSI features—remains the open problem. This is consistent with the \SI{60}{GHz}/aperture
+result: the mapping bottleneck is path identity, not resolution.
+
 ## Reproduce
 
 On a machine with `sionna-rt`: `WRS_NUM_SAMPLES=1000000 python experiments/run_phase_a.py` and
