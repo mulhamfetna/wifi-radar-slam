@@ -49,6 +49,7 @@ class RunConfig:
                                   # regresses localization in multi-sided scenes)
     map_min_support: int = 1      # drop mapped clusters with fewer than this many detections
                                   # (consensus filter; rejects delay-AoA mis-pairing phantoms)
+    joint_estimation: bool = False  # joint 2-D (delay-angle) MUSIC vs separate 1-D + sorted pairing
 
 
 def load_config(path: str) -> RunConfig:
@@ -82,4 +83,5 @@ def load_config(path: str) -> RunConfig:
         sensing_mode=str(raw.get("sensing_mode", "music")),
         world_aoa=bool(raw.get("world_aoa", False)),
         map_min_support=int(raw.get("map_min_support", 1)),
+        joint_estimation=bool(raw.get("joint_estimation", False)),
     )

@@ -1,0 +1,27 @@
+run_name: nominal_joint
+seed: 42
+snr_db: 20.0
+sensing_mode: music
+joint_estimation: true     # joint 2-D delay-angle MUSIC (world_aoa off: localization mode)
+rf:
+  carrier_hz: 5.2e9
+  bandwidth_hz: 40.0e6
+  n_subcarriers: 64
+  n_rx_antennas: 4
+  antenna_spacing_frac: 0.5
+trajectory:
+  length_m: 60.0
+  speed_mps: 5.0
+  timestep_s: 0.05
+  shape: straight
+scene:
+  name: parking_lot
+  ap_positions:
+    - [0.0, 20.0, 6.0]
+    - [40.0, -20.0, 6.0]
+    - [60.0, 20.0, 6.0]
+  targets:
+    - {kind: car,  center: [10.0, 3.0, 0.75], size: [4.5, 1.8, 1.5]}
+    - {kind: car,  center: [20.0, 3.0, 0.75], size: [4.5, 1.8, 1.5]}
+    - {kind: pole, center: [15.0, -3.0, 1.5], size: [0.2, 0.2, 3.0]}
+    - {kind: wall, center: [30.0, 6.0, 1.5], size: [20.0, 0.3, 3.0]}

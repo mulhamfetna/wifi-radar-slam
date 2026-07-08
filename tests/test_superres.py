@@ -1,7 +1,27 @@
 import numpy as np
 from wifi_radar_slam.sensing.superres import (
-    estimate_delays, estimate_aoa, azimuth_from_electrical,
+    estimate_delays, estimate_aoa, azimuth_from_electrical, estimate_joint,
 )
+
+
+def test_joint_recovers_paired_delay_angle():
+    """Joint 2-D MUSIC recovers each path's (delay, angle) TOGETHER, so the
+    association is correct by construction (no sorted-index mis-pairing)."""
+    bw, n_sub, n_ant, spacing = 160e6, 48, 6, 0.5
+    df = bw / n_sub
+    true = [(20e-9, 0.3), (60e-9, -0.4)]           # (delay_s, electrical angle)
+    ia, jf = np.arange(n_ant), np.arange(n_sub)
+    block = np.zeros((n_ant, n_sub), dtype=complex)
+    for tau, th in true:
+        a = np.exp(-1j * 2 * np.pi * spacing * ia * np.sin(th))[:, None]
+        d = np.exp(-1j * 2 * np.pi * (jf * df) * tau)[None, :]
+        block += a * d
+    pairs = estimate_joint(block, bw, spacing, n_paths=2, max_range_m=150.0)
+    assert pairs.shape == (2, 2)
+    # every true (delay, angle) has a matching estimated pair
+    for tau, th in true:
+        matched = any(abs(p[0] - tau) < 3e-9 and abs(p[1] - th) < 0.05 for p in pairs)
+        assert matched, f"no estimated pair near ({tau*1e9:.0f} ns, {th:.2f} rad): {pairs}"
 
 
 def _synth_freq(delays, subcarrier_freqs):
