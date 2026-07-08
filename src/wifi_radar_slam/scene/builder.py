@@ -20,8 +20,14 @@ _BUILTIN_SCENE = {
     "parking_lot": "simple_street_canyon_with_cars",
     "parking_lot_smoke": "simple_street_canyon_with_cars",
     "street_canyon": "simple_street_canyon_with_cars",
+    "street_canyon_metal": "simple_street_canyon_with_cars",
     "floor_wall": "floor_wall",
 }
+
+# scenes whose building/car materials are overridden to a perfect reflector, so
+# single-bounce specular returns exist (the default penetrable materials refract
+# and yield no localizable single-bounce reflections). Used with in-street APs.
+_METAL_SCENES = {"street_canyon_metal"}
 
 
 def _footprint_ground_truth(scene):
@@ -101,6 +107,12 @@ def build_scene(cfg: RunConfig) -> BuiltScene:
     key = _BUILTIN_SCENE.get(cfg.scene.name, "simple_street_canyon_with_cars")
     scene = rt.load_scene(getattr(rt.scene, key))
     scene.frequency = cfg.rf.carrier_hz
+
+    if cfg.scene.name in _METAL_SCENES:   # perfect-reflector buildings -> clean specular
+        metal = rt.ITURadioMaterial("sc_metal", "metal", thickness=0.3)
+        for name, obj in scene.objects.items():
+            if "floor" not in name.lower():
+                obj.radio_material = metal
 
     scene.tx_array = rt.PlanarArray(
         num_rows=1, num_cols=1, vertical_spacing=0.5, horizontal_spacing=0.5,
