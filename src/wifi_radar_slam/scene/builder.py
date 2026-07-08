@@ -57,13 +57,16 @@ def _build_controlled_wall(cfg: RunConfig, rt, mi) -> BuiltScene:
     """
     import numpy as np
     scene = rt.load_scene(rt.scene.floor_wall)
-    scene.frequency = cfg.rf.carrier_hz
     wall, floor = scene.objects["wall"], scene.objects["floor"]
     wall.scaling = mi.Point3f(1.0, 12.0, 4.0)      # -> y in [-21, 21], z in [-2.1, 5.9]
     floor.scaling = mi.Point3f(15.0, 12.0, 1.0)    # -> x in [-30, 30], y in [-24, 24]
+    # assign metal BEFORE setting the frequency: the default brick/concrete ITU
+    # materials are undefined at 60 GHz and the frequency setter updates all
+    # assigned materials, so the override must precede it.
     metal = rt.ITURadioMaterial("wr_metal", "metal", thickness=0.02)
     wall.radio_material = metal
     floor.radio_material = metal
+    scene.frequency = cfg.rf.carrier_hz
 
     scene.tx_array = rt.PlanarArray(num_rows=1, num_cols=1, vertical_spacing=0.5,
                                     horizontal_spacing=0.5, pattern="iso", polarization="V")
@@ -106,13 +109,15 @@ def build_scene(cfg: RunConfig) -> BuiltScene:
 
     key = _BUILTIN_SCENE.get(cfg.scene.name, "simple_street_canyon_with_cars")
     scene = rt.load_scene(getattr(rt.scene, key))
-    scene.frequency = cfg.rf.carrier_hz
 
     if cfg.scene.name in _METAL_SCENES:   # perfect-reflector buildings -> clean specular
+        # override BEFORE setting frequency (default ITU materials may be undefined
+        # at 60 GHz, and the frequency setter updates all assigned materials)
         metal = rt.ITURadioMaterial("sc_metal", "metal", thickness=0.3)
         for name, obj in scene.objects.items():
             if "floor" not in name.lower():
                 obj.radio_material = metal
+    scene.frequency = cfg.rf.carrier_hz
 
     scene.tx_array = rt.PlanarArray(
         num_rows=1, num_cols=1, vertical_spacing=0.5, horizontal_spacing=0.5,
