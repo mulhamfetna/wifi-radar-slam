@@ -13,9 +13,11 @@ def _music(block: np.ndarray, steering, grid: np.ndarray, n_sources: int) -> np.
     """
     block = np.atleast_2d(block)
     n = block.shape[1]
+    n_sources = max(1, min(n_sources, n - 1))     # need at least 1 noise eigenvector
     L = max(n_sources + 1, (2 * n) // 3)          # subarray length
+    L = min(L, n)                                 # cannot exceed the element count
     R = np.zeros((L, L), dtype=complex)
-    n_sub = n - L + 1
+    n_sub = max(1, n - L + 1)
     for snap in block:                             # accumulate smoothed covariance
         subs = np.stack([snap[i:i + L] for i in range(n_sub)], axis=1)  # (L, n_sub)
         R += subs @ subs.conj().T
