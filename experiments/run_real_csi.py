@@ -23,7 +23,8 @@ def main(path: str, bandwidth_hz: float = 20e6):
 
     rf = RFConfig(carrier_hz=5.5e9, bandwidth_hz=bandwidth_hz, n_subcarriers=n_sub,
                   n_rx_antennas=n_rx, antenna_spacing_frac=0.5)
-    dets = extract_detections(csi, rf, n_paths=3)
+    n_paths = max(1, min(3, n_rx - 1))            # AoA MUSIC needs n_paths < n_rx
+    dets = extract_detections(csi, rf, n_paths=n_paths)
 
     ranges = np.concatenate([d[:, 0] for d in dets if d.size]) if any(d.size for d in dets) else np.array([])
     aoas = np.concatenate([d[:, 1] for d in dets if d.size]) if any(d.size for d in dets) else np.array([])
