@@ -114,7 +114,9 @@ def estimate_joint(block: np.ndarray, bandwidth_hz: float, spacing_frac: float,
     block = np.asarray(block)
     n_ant, n_sub = block.shape
     df = bandwidth_hz / n_sub
-    La = max(2, n_ant - 1)                              # antenna subarray length
+    # antenna subarray length: full aperture minus one for small arrays; ~n/2 for
+    # larger ones so 2-D spatial smoothing keeps several antenna positions
+    La = min(n_ant - 1, max(2, n_ant // 2 + 1))
     Lf = max(n_paths + 1, min(n_sub // 4, (2 * n_sub) // 3))  # subcarrier subarray length
     dim = La * Lf
 
