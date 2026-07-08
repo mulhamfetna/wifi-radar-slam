@@ -14,10 +14,17 @@
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
-\usepackage{siunitx}
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 \graphicspath{{../docs/assets/}}
+
+% Lightweight unit macros (self-contained; equivalent to siunitx \SI/\SIrange/\num
+% output but with no external dependency, so the paper builds anywhere).
+\newcommand{\SI}[2]{#1\,#2}
+\newcommand{\SIrange}[3]{#1--#2\,#3}
+\newcommand{\num}[1]{#1}
+\newcommand{\si}[1]{#1}
+\providecommand{\degree}{\ensuremath{^\circ}}
 
 \begin{document}
 

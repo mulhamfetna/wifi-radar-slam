@@ -1,0 +1,9 @@
+# LaTeX build artifacts (keep main.pdf, which is the committed rendered version)
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls

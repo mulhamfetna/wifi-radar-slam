@@ -8,13 +8,17 @@ Numbers to re-verify against the artifacts before submission are marked `%% CHEC
 
 ## Build
 
+`main.pdf` is the committed rendered version (current release). To rebuild:
+
 ```bash
-latexmk -pdf main.tex        # or: pdflatex main && bibtex main && pdflatex main x2
+pdflatex main && bibtex main && pdflatex main && pdflatex main
 ```
 
-Or upload the `paper/` folder to Overleaf (it pulls figures from `../docs/assets/`
-via `\graphicspath`; on Overleaf, copy the needed PNGs alongside `main.tex` or
-adjust the path).
+`IEEEtran.cls`/`IEEEtran.bst` are vendored so the paper builds without a TeX
+distribution that ships them, and the unit macros are defined inline (no
+`siunitx` dependency). Figures come from `../docs/assets/` via `\graphicspath`;
+on Overleaf, upload `paper/` and either copy the referenced PNGs next to
+`main.tex` or keep the relative path.
 
 ## Files
 - `main.tex` — manuscript.
