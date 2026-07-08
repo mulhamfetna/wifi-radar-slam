@@ -1,6 +1,6 @@
 {
   "title": "WiFi-Radar-for-SLAM: Ambient WiFi as a Radar Replacement for Automotive SLAM",
-  "description": "A physics-based (Sionna RT ray-traced) feasibility study and system for using ambient sub-7 GHz WiFi signals received on a moving vehicle to build a 3D scan of the surroundings usable in place of radar in SLAM pipelines. Vehicle localization is centimetre-level and, with joint 2-D (delay-angle) MUSIC, reaches oracle quality from realistic commodity CSI in sparse-multipath scenes. Mapping is two-tier: ~25-30 cm with clean single-bounce (oracle) sensing and ~4-5 m with realistic CSI. A 60 GHz (1.76 GHz bandwidth) and a 16-antenna test show this mapping floor is removed by neither wider bandwidth nor larger aperture: it is a path-discrimination limit of commodity CSI, not a resolution limit, identifying the key open problem for WiFi mapping while localization stays practical. A CSIKit-backed adapter runs the same sensing front-end on real commodity CSI (Intel 5300, nexmon) as a proof-of-concept.",
+  "description": "A physics-based (Sionna RT ray-traced) feasibility study and system for using ambient sub-7 GHz WiFi signals received on a moving vehicle to build a 3D scan of the surroundings usable in place of radar in SLAM pipelines. Vehicle localization is centimetre-level and, with joint 2-D (delay-angle) MUSIC, reaches oracle quality from realistic commodity CSI in sparse-multipath scenes. Mapping is two-tier: ~25-30 cm with clean single-bounce (oracle) sensing and ~4-5 m with realistic CSI. A 60 GHz (1.76 GHz bandwidth) and a 16-antenna test show this mapping floor is removed by neither wider bandwidth nor larger aperture: it is a path-discrimination limit of commodity CSI, not a resolution limit, identifying the key open problem for WiFi mapping while localization stays practical. A CSIKit-backed adapter runs the same sensing front-end on real commodity CSI (Intel 5300, nexmon) as a proof-of-concept. This release adds WiFiSLAM-Sim (a ray-traced outdoor/vehicular WiFi-CSI dataset with per-path labels) and a learned path discriminator that predicts mapping-useful reflections from estimable features (F1 ~0.9 at realistic noise) - a first concrete step on the path-discrimination open problem.",
   "upload_type": "software",
   "access_right": "open",
   "license": "AGPL-3.0-or-later",
@@ -18,6 +18,7 @@
     "integrated sensing and communication",
     "automotive radar",
     "Sionna RT",
-    "multipath-based SLAM"
+    "multipath-based SLAM",
+    "dataset"
   ]
 }

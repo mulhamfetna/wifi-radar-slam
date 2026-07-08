@@ -21,7 +21,7 @@ authors:
     given-names: Mulham
     orcid: "https://orcid.org/0009-0006-4432-798X"
     email: contact@mulhamfetna.com
-version: 0.6.0
+version: 0.7.0
 date-released: "2026-07-08"
 license: AGPL-3.0-or-later
 doi: 10.5281/zenodo.21247288
@@ -33,7 +33,7 @@ identifiers:
     description: Concept DOI (resolves to the latest version)
   - type: doi
     value: 10.5281/zenodo.21263556
-    description: Version DOI for v0.4.0 (v0.5.0/v0.6.0 DOIs on the Zenodo record)
+    description: Version DOI for v0.4.0 (v0.5.0+ DOIs on the Zenodo record)
   - type: doi
     value: 10.5281/zenodo.21263134
     description: Version DOI for v0.3.0
