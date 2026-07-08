@@ -19,11 +19,15 @@ def _make_csi(n_frames, rf, delay_s, aoa_rad):
 def test_single_target_range_and_angle():
     rf = RFConfig(5.2e9, 160e6, 128, 8, 0.5)
     delay = 40e-9
-    aoa = 0.3
+    aoa = 0.3                                        # electrical angle in the CSI
     csi = _make_csi(5, rf, delay, aoa)
+    # default: raw electrical angle (localization-preserving)
     dets = extract_detections(csi, rf, n_paths=1)
     assert len(dets) == 5
     r, a, ap = dets[0][0]
     assert np.isclose(r, delay * C, atol=1.0)      # within 1 m
     assert np.isclose(a, aoa, atol=0.05)
     assert ap == 0
+    # world_aoa=True maps to world azimuth beta = arcsin(-sin(electrical)) = -aoa
+    dets_w = extract_detections(csi, rf, n_paths=1, world_aoa=True)
+    assert np.isclose(dets_w[0][0][1], -aoa, atol=0.05)

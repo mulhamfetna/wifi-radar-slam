@@ -44,6 +44,9 @@ class RunConfig:
     trajectory: TrajectoryConfig
     scene: SceneConfig
     sensing_mode: str = "music"   # "music" (CSI->MUSIC) or "oracle" (Sionna true paths)
+    world_aoa: bool = False       # map MUSIC electrical angle -> world azimuth (single-ULA;
+                                  # off by default: the transform's front/back ambiguity
+                                  # regresses localization in multi-sided scenes)
 
 
 def load_config(path: str) -> RunConfig:
@@ -75,4 +78,5 @@ def load_config(path: str) -> RunConfig:
         run_name=raw["run_name"], seed=int(raw["seed"]),
         snr_db=float(raw["snr_db"]), rf=rf, trajectory=traj, scene=scene,
         sensing_mode=str(raw.get("sensing_mode", "music")),
+        world_aoa=bool(raw.get("world_aoa", False)),
     )

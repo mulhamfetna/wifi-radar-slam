@@ -25,7 +25,7 @@ def run_phase_a(cfg: RunConfig, rng, force: bool = False) -> dict:
             io.save_array(run, "channel", "csi", csi)
         else:
             csi = io.load_array(run, "channel", "csi")
-        detections = extract_detections(csi, cfg.rf, n_paths=3)
+        detections = extract_detections(csi, cfg.rf, n_paths=3, world_aoa=cfg.world_aoa)
     velocity = velocity_from_poses(built.trajectory, cfg.trajectory.timestep_s)
     est_traj, est_map = run_slam(detections, built.ap_positions, velocity,
                                  cfg.trajectory.timestep_s, rng,

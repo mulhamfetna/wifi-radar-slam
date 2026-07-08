@@ -126,6 +126,36 @@ mapping or multi-bounce SLAM as future work, and cleanly separates the two mappi
 
 Reproduce: `WRS_NUM_SAMPLES=1000000 python experiments/run_phase_a.py configs/street_metal_oracle.yaml`.
 
+## Realistic sensing — MUSIC from CSI (the oracle → realistic gap)
+
+All maps above use **oracle** sensing (Sionna's true per-path delay/AoA). The **realistic**
+path estimates delays/AoA from the CSI with MUSIC. Instrumenting CSI→MUSIC against oracle truth
+found the gap is a stack of four factors — two fixable conventions, two fundamental limits:
+
+1. **Delay grid alias + antenna averaging (fixed).** The 0–480 m delay grid placed spurious peaks
+   at the aliasing edge, and averaging the CSI over antennas cancelled the signal. Using antennas
+   as MUSIC **snapshots** and bounding the grid to a physical range fixed it — and *improved*
+   localization: nominal Phase-A ATE **0.09 → 0.033 m**. (The subcarrier centering was a red
+   herring — re-referencing yields the identical Vandermonde.)
+2. **Array-relative AoA (fixed, but opt-in).** MUSIC returns an electrical angle; the world
+   azimuth is `β = arcsin(−sin θ)` (array axis = world +y, verified on a clean LOS sweep). This is
+   physically correct but a **single ULA cannot resolve the front/back (Δx-sign) ambiguity**, so
+   in multi-sided scenes it mislabels behind-vehicle reflectors and regresses localization
+   (0.09 → 0.61 m). It is therefore gated behind `world_aoa` (default off); the controlled-scene
+   mapping demo enables it (the wall is on a known side).
+3. **Bandwidth ceiling (fundamental).** 40 MHz resolves `c/2B ≈ 3.75 m`; the street canyon's ~19
+   multipath components span only ~18 m, so MUSIC delays blend. This *is* the paper's thesis.
+4. **No bounce/LOS filtering (fundamental).** MUSIC picks the strongest paths (LOS + multi-bounce
+   + floor); without Sionna's `interactions` it cannot filter to single-scatter, so phantom
+   reflectors appear.
+
+Realistic MUSIC on the controlled wall (`configs/controlled_music.yaml`, `world_aoa: true`) gives
+**map_completeness 0.90 m** (the wall *is* recovered) but **map_accuracy 12 m** and **ATE 2.4 m** —
+the phantom clutter from (3)+(4) dominates. **Conclusion:** the convention fixes are correct but
+insufficient; a single ULA at 40 MHz cannot map realistically. This motivates the next milestone —
+a **2D vehicle array** (resolves the azimuth ambiguity) and **wider bandwidth** (resolves dense
+multipath) — which is where realistic mapping can actually close the gap.
+
 ## Reproduce
 
 On a machine with `sionna-rt`: `WRS_NUM_SAMPLES=1000000 python experiments/run_phase_a.py` and
