@@ -16,6 +16,8 @@
 \usepackage{booktabs}
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds}
 \graphicspath{{../docs/assets/}}
 
 % Lightweight unit macros (self-contained; equivalent to siunitx \SI/\SIrange/\num
@@ -123,8 +125,8 @@ is achievable now from what needs the mmWave extension.
 \textbf{Contributions.}
 \begin{itemize}
 \item An open, reproducible, physics-based (Sionna RT ray-traced) end-to-end
-pipeline for on-vehicle ambient-WiFi SLAM, spanning channel simulation,
-super-resolution sensing, bistatic mapping and particle-filter SLAM.
+pipeline for on-vehicle ambient-WiFi SLAM (Fig.~\ref{fig:overview}), spanning channel
+simulation, super-resolution sensing, bistatic mapping and particle-filter SLAM.
 \item A demonstration that ambient sub-\SI{7}{GHz} WiFi \emph{localizes} a moving
 vehicle to centimetre level, with an operating envelope (bandwidth, SNR, access
 points, speed) that quantitatively follows the $\Delta R=c/2B$ law.
@@ -141,6 +143,37 @@ dataset with per-path labels, and a learned discriminator that predicts
 mapping-useful reflections from estimable features (F1~$\approx0.9$ at realistic
 noise)---a first concrete step on the path-discrimination problem.
 \end{itemize}
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+  font=\small,
+  block/.style={draw, rounded corners, minimum height=1.0cm, text width=2.15cm,
+                align=center, inner sep=3pt},
+  io/.style={draw, rounded corners, fill=black!7, minimum height=1.0cm,
+             text width=2.05cm, align=center, inner sep=3pt},
+  >={Stealth[length=2mm]}]
+  \node[io] (scene) {Ambient WiFi APs\\ + moving vehicle\\ (ray-traced scene)};
+  \node[block, right=0.75cm of scene] (chan) {Channel model\\ (Sionna RT)\\ $\rightarrow$ CSI};
+  \node[block, right=0.75cm of chan] (sense) {Super-resolution\\ sensing: MUSIC /\\ joint 2-D MUSIC};
+  \node[block, right=0.75cm of sense] (map) {Bistatic\\ triangulation\\ (mapping)};
+  \node[block, right=0.75cm of map] (slam) {RBPF\\ SLAM};
+  \node[io, right=0.75cm of slam] (out) {Pose (ATE/RPE)\\ + map\\ (Chamfer/IoU)};
+  \foreach \a/\b in {scene/chan,chan/sense,sense/map,map/slam,slam/out}
+      \draw[->] (\a) -- (\b);
+  \node[below=0.12cm of sense, text width=3.4cm, align=center,
+        font=\footnotesize\itshape] (note)
+      {oracle vs.\ realistic CSI tiers;\\ learned path discriminator};
+  \draw[->, dashed] (note) -- (sense);
+\end{tikzpicture}
+\caption{End-to-end ambient-WiFi SLAM pipeline. Ambient access points illuminate a
+moving vehicle in a ray-traced scene; the channel-state information is processed by a
+super-resolution sensing front-end (MUSIC, or joint 2-D delay--angle MUSIC; evaluated
+under an oracle and a realistic tier, with an optional learned path discriminator)
+into bistatic reflector detections, which a Rao--Blackwellized particle filter fuses
+into a vehicle pose and a reflector map.}
+\label{fig:overview}
+\end{figure*}
 
 % ============================================================================
 \section{Related Work}\label{sec:related}
