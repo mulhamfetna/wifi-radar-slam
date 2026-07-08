@@ -239,6 +239,35 @@ gating is therefore a useful but partial discriminator (retained as opt-in `map_
 classifier on CSI features—remains the open problem. This is consistent with the \SI{60}{GHz}/aperture
 result: the mapping bottleneck is path identity, not resolution.
 
+## Learned path discrimination (+ the WiFiSLAM-Sim dataset)
+
+The mapping bottleneck is path discrimination, and the hand-tuned excess gate is too
+blunt. We test whether the discrimination is *learnable*. The ray-traced
+**WiFiSLAM-Sim** dataset (`experiments/make_dataset.py`, `docs/DATASHEET.md`) packages
+the vehicular scenario—CSI, ground-truth poses/APs/map, and a flat oracle **path
+table** whose per-path bounce/interaction/floor labels serve as training targets
+(8356 paths from the nominal street canyon). A RandomForest
+(`experiments/train_discriminator.py`) predicts the binary label *"mapping-useful
+single-scatter facade reflection"* from per-path features a receiver can estimate
+(range, bistatic excess, azimuth, elevation, azimuth-deviation-from-AP)—**not** the
+interaction type:
+
+| feature noise (range, azimuth) | held-out F1 (useful class) |
+|--------------------------------|----------------------------|
+| 0 m, 0\degree (oracle features) | **1.000** (AUC 1.000) |
+| 1 m, 3\degree | 0.937 |
+| 2 m, 6\degree | 0.901 |
+| 4 m, 10\degree | 0.863 |
+
+The classes are cleanly separable in the true feature space (excess and
+azimuth-deviation dominate the importance), and the classifier degrades gracefully
+under realistic MUSIC-level feature error, holding **F1 \(\approx0.9\)**—well above
+what the fixed excess gate achieves. **Path discrimination is therefore learnable and
+robust**; its ceiling is set by how accurately the features (chiefly the
+delay-derived excess) can be estimated—closing the loop with the delay-bias finding.
+This is a first concrete answer to the open problem, and the dataset makes it
+reproducible and extensible.
+
 ## Real commodity-CSI proof-of-concept
 
 To check that the sensing front-end is not simulation-specific, the *same* MUSIC
