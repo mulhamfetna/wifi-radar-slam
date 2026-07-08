@@ -1,7 +1,24 @@
 import numpy as np
 from wifi_radar_slam.geometry import (
     straight_trajectory, velocity_from_poses, mirror_image, targets_to_pointmap,
+    footprint_points,
 )
+
+
+def test_footprint_points_on_perimeter():
+    pts = footprint_points([0.0, 0.0, 0.0], [4.0, 2.0, 3.0], spacing=1.0)
+    assert pts.shape[1] == 2
+    assert len(pts) > 0
+    # every point lies on the rectangle boundary (on an x-edge or a y-edge)
+    on_x_edge = np.isclose(pts[:, 0], 0.0) | np.isclose(pts[:, 0], 4.0)
+    on_y_edge = np.isclose(pts[:, 1], 0.0) | np.isclose(pts[:, 1], 2.0)
+    assert np.all(on_x_edge | on_y_edge)
+    # all four corners are present
+    for c in ([0, 0], [4, 0], [0, 2], [4, 2]):
+        assert np.any(np.all(np.isclose(pts, c), axis=1))
+    # nothing in the interior
+    interior = (pts[:, 0] > 0.01) & (pts[:, 0] < 3.99) & (pts[:, 1] > 0.01) & (pts[:, 1] < 1.99)
+    assert not np.any(interior)
 
 
 def test_straight_trajectory_shape_and_endpoints():

@@ -26,6 +26,26 @@ def mirror_image(ap_xyz: np.ndarray, wall_point: np.ndarray, wall_normal: np.nda
     return ap_xyz - 2.0 * d * n
 
 
+def footprint_points(bbmin, bbmax, spacing: float = 1.0) -> np.ndarray:
+    """Sample the xy-perimeter (footprint outline) of an axis-aligned bounding box.
+
+    The SLAM map is reconstructed in the ground plane; specular reflections land on
+    vertical facades, whose xy locations trace the footprint rectangle of the
+    scatterer (a building/car AABB). Returns (M, 2) points on that rectangle's edges
+    — the right ground-truth reference for map Chamfer/IoU (facades, not centroids).
+    """
+    x0, y0 = float(bbmin[0]), float(bbmin[1])
+    x1, y1 = float(bbmax[0]), float(bbmax[1])
+    xs = np.arange(x0, x1 + 1e-9, spacing)
+    ys = np.arange(y0, y1 + 1e-9, spacing)
+    pts = []
+    for x in xs:
+        pts.append([x, y0]); pts.append([x, y1])
+    for y in ys:
+        pts.append([x0, y]); pts.append([x1, y])
+    return np.unique(np.array(pts), axis=0) if pts else np.empty((0, 2))
+
+
 def targets_to_pointmap(targets: list[dict], spacing: float = 0.5) -> np.ndarray:
     pts = []
     for t in targets:

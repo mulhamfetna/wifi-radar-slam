@@ -43,6 +43,7 @@ class RunConfig:
     rf: RFConfig
     trajectory: TrajectoryConfig
     scene: SceneConfig
+    sensing_mode: str = "music"   # "music" (CSI->MUSIC) or "oracle" (Sionna true paths)
 
 
 def load_config(path: str) -> RunConfig:
@@ -73,4 +74,5 @@ def load_config(path: str) -> RunConfig:
     return RunConfig(
         run_name=raw["run_name"], seed=int(raw["seed"]),
         snr_db=float(raw["snr_db"]), rf=rf, trajectory=traj, scene=scene,
+        sensing_mode=str(raw.get("sensing_mode", "music")),
     )

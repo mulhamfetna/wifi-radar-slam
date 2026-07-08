@@ -3,6 +3,7 @@ import dataclasses
 from .config import RunConfig
 from .geometry import velocity_from_poses
 from .sensing.frontend import extract_detections
+from .sensing.oracle import extract_oracle_detections
 from .slam.particle_filter import run_slam
 from .eval.metrics import ate, rpe, chamfer, occupancy_iou
 from .eval.figures import plot_map
@@ -15,13 +16,16 @@ def run_phase_a(cfg: RunConfig, rng, force: bool = False) -> dict:
     run = cfg.run_name
     built = build_scene(cfg)
 
-    if force or not io.exists(run, "channel", "csi"):
-        csi = simulate_csi(built, cfg.rf, cfg.snr_db, rng)
-        io.save_array(run, "channel", "csi", csi)
+    if cfg.sensing_mode == "oracle":
+        # oracle map: single-specular-bounce detections from Sionna's true paths
+        detections = extract_oracle_detections(built, cfg.rf, rng)
     else:
-        csi = io.load_array(run, "channel", "csi")
-
-    detections = extract_detections(csi, cfg.rf, n_paths=3)
+        if force or not io.exists(run, "channel", "csi"):
+            csi = simulate_csi(built, cfg.rf, cfg.snr_db, rng)
+            io.save_array(run, "channel", "csi", csi)
+        else:
+            csi = io.load_array(run, "channel", "csi")
+        detections = extract_detections(csi, cfg.rf, n_paths=3)
     velocity = velocity_from_poses(built.trajectory, cfg.trajectory.timestep_s)
     est_traj, est_map = run_slam(detections, built.ap_positions, velocity,
                                  cfg.trajectory.timestep_s, rng,

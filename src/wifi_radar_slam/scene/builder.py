@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import numpy as np
 from ..config import RunConfig
-from ..geometry import straight_trajectory, RX_HEIGHT_M
+from ..geometry import straight_trajectory, footprint_points, RX_HEIGHT_M
 
 
 @dataclass
@@ -58,10 +58,19 @@ def build_scene(cfg: RunConfig) -> BuiltScene:
                                cfg.trajectory.timestep_s)
     traj[:, 0] -= cfg.trajectory.length_m / 2.0
 
-    # ground-truth map: positions of static scatterers (exclude the floor plane)
-    gt = [np.array(obj.position).ravel()[:3]
-          for name, obj in scene.objects.items() if "floor" not in name.lower()]
-    ground_truth_map = np.array(gt) if gt else np.zeros((0, 3))
+    # ground-truth map: xy footprint (facade outline) of each static scatterer's
+    # bounding box, excluding the floor. Reflections land on facades, not mesh
+    # centroids, so the footprint is the correct reference for map Chamfer/IoU.
+    gt = []
+    for name, obj in scene.objects.items():
+        if "floor" in name.lower():
+            continue
+        bb = obj.mi_mesh.bbox()
+        fp = footprint_points(np.array(bb.min).ravel(), np.array(bb.max).ravel(),
+                              spacing=1.0)
+        if fp.size:
+            gt.append(np.column_stack([fp, np.zeros(len(fp))]))   # z=0 -> keep (M,3)
+    ground_truth_map = np.vstack(gt) if gt else np.zeros((0, 3))
 
     return BuiltScene(scene=scene, trajectory=traj,
                       ap_positions=ap_positions, ground_truth_map=ground_truth_map)
