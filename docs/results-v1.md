@@ -78,6 +78,29 @@ map; (2) forcing the street-canyon building materials opaque/reflective to elici
 specular returns in the realistic scene. Localization stands as the headline result and is
 independent of these.
 
+## Mapping demonstration — controlled reflective scene (`controlled_wall`)
+
+Because the penetrable street canyon yields no localizable single-bounce returns (above),
+mapping is demonstrated where single-bounce geometry is guaranteed clean: a large **metal wall**
+(the built-in `floor_wall` scaled to vehicle scale, perfect-reflector material → no transmission)
+with the vehicle driving parallel to it. Every AP produces one specular wall reflection per frame.
+Oracle sensing (`sensing_mode: oracle`), 3 APs, 40 MHz, run on the same server in ~6 s.
+
+| metric | value | note |
+|--------|-------|------|
+| map_accuracy (est→GT) | **0.25 m** | estimated reflectors lie ~25 cm from the true wall |
+| map_completeness (GT→est) | 0.77 m | wall covered over the illuminated span |
+| Chamfer (symmetric) | **0.51 m** | sub-metre |
+| occupancy IoU | **0.79** | strong overlap |
+| ATE / RPE | 0.045 / 0.007 m | localization unaffected |
+
+`docs/assets/controlled_map.png` shows the estimated reflectors tracing the wall at x≈0 over the
+illuminated y-span; `docs/assets/controlled_scene_paths.png` renders the metal wall, the three APs
+(red), the vehicle antenna (green) and the specular wall-reflection rays (blue). **This validates
+the mapping geometry end-to-end**: given clean single-bounce sensing, the bistatic SLAM back-end
+reconstructs the reflecting surface to ~25 cm. Reproduce:
+`WRS_NUM_SAMPLES=1000000 python experiments/run_phase_a.py configs/controlled_oracle.yaml`.
+
 ## Reproduce
 
 On a machine with `sionna-rt`: `WRS_NUM_SAMPLES=1000000 python experiments/run_phase_a.py` and
