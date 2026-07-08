@@ -5,18 +5,20 @@ abstract: >-
   A physics-based (Sionna RT ray-traced) feasibility study and, subsequently, a
   system for using ambient sub-7 GHz WiFi signals received on a moving vehicle to
   build a 3D scan of the surroundings usable in place of radar in SLAM pipelines.
-  This release adds a quantitative mapping milestone: with clean single-bounce
+  Vehicle localization is centimetre-level with a clean bandwidth/SNR operating
+  envelope. Mapping is characterised in two tiers: with clean single-bounce
   (oracle) sensing the bistatic SLAM back-end reconstructs reflecting surfaces to
-  ~25-30 cm in both a controlled reflective scene and a reflective street canyon,
-  while vehicle localization stays at centimetre level. A 60 GHz / IEEE 802.11ad
-  mmWave extension remains planned as future work.
+  ~25-30 cm, while realistic commodity-CSI MUSIC sensing is bounded to ~5 m by
+  delay/AoA estimation bias in multipath - quantifying that passive-WiFi
+  localization is practical today whereas mapping needs further sensing advances.
+  A 60 GHz / IEEE 802.11ad mmWave extension remains planned as future work.
 type: software
 authors:
   - family-names: Fetna
     given-names: Mulham
     orcid: "https://orcid.org/0009-0006-4432-798X"
     email: contact@mulhamfetna.com
-version: 0.2.0
+version: 0.3.0
 date-released: "2026-07-08"
 license: AGPL-3.0-or-later
 doi: 10.5281/zenodo.21247288
