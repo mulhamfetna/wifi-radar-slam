@@ -44,23 +44,39 @@ positive feasibility signal for WiFi as a radar-substitute pose sensor in SLAM.
 
 ## Limitations / next research (the map)
 
-Localization works; **map reconstruction does not yet**. The estimated reflector cloud is bounded
-(after the plausibility guard) but diffuse. An **oracle test** (feeding Sionna's true per-path `tau`
-and `phi_r` into the bistatic triangulation) pinned the root causes precisely:
+Localization works; **single-bounce map reconstruction is infeasible in this particular
+street-canyon scene** — and we can now say exactly why, from an oracle analysis that feeds
+Sionna's *true* per-path delay/AoA/interaction data into the geometry (`sensing/oracle.py`,
+`sensing_mode: oracle`):
 
-1. **AoA convention is CORRECT** (verified): line-of-sight `phi_r` equals the geometric bearing to each
-   AP (e.g. 90° for an AP due north). World bearing = `phi_r`. So the geometry/formula are right.
-2. **Multi-bounce paths are the dominant error.** With `max_depth=3` most of the ~19 paths/AP are 2–3
-   bounce; the single-reflector bistatic model maps them to *phantom* positions. **Fix:** filter to
-   single-specular-bounce paths (via `paths.interactions`) before mapping.
-3. **Ground truth = object mesh centroids**, but reflections occur on **facades** — Chamfer/IoU compare
-   against the wrong reference. **Fix:** derive ground truth from mesh bounding-box/footprint surfaces.
-4. **Realistic sensing** (MUSIC AoA from commodity CSI) is a separate, harder problem than the oracle;
-   the estimator's steering model must match Sionna's antenna phase convention.
+1. **The delay/AoA physics is exactly consistent.** For every single-scatter path, `phi_r`
+   equals the bearing to the true reflection vertex and `tau·c` equals the geometric two-leg
+   length `|AP→vertex| + |vertex→vehicle|` — residuals are **0.0** to float precision. The
+   sensing model and AoA convention are correct.
+2. **But the scene yields no *localizable* single-bounce returns.** The built-in
+   `simple_street_canyon_with_cars` buildings are **penetrable**, so (a) there are **zero**
+   clean single-specular facade reflections reaching the vehicle for this AP/trajectory layout
+   (confirmed with `refraction=False`), and (b) the single-scatter paths that exist are
+   **forward-refraction through a wall lying on the AP–vehicle line** — the reflection vertex is
+   ~collinear with the endpoints, so the bistatic excess delay is ≈0 and the ellipse is
+   degenerate (`denom→0`). The range is mathematically unrecoverable from delay+AoA. This is a
+   property of the scene/material, not the estimator.
+3. **Multi-bounce paths dominate** (`max_depth=3`: most of ~19 paths/AP are 2–3 bounce); the
+   single-reflector bistatic model does not describe them.
 
-Concrete next steps: (a) single-bounce path filtering + facade ground truth → makes the *oracle* map
-quantitative; (b) then close the gap to MUSIC-estimated sensing. The *localization* half is already a
-solid result and is independent of these.
+Fixes shipped that this analysis motivated (correct regardless of scene): single-scatter path
+filtering + floor-bounce exclusion (`sensing/oracle.py`), facade **footprint** ground truth via
+mesh bounding boxes (`geometry.footprint_points`, `scene/builder.py`), a relaxed
+`denom` triangulation guard (grazing solves are valid; plausibility is enforced on output range
+`s`), and **directional map metrics** (`map_accuracy` = est→GT precision, `map_completeness` =
+GT→est coverage) since a passive-WiFi map illuminates only a subset of surfaces.
+
+**Decision (2026-07-08): demonstrate mapping where single-bounce geometry is guaranteed clean.**
+Two follow-up experiments, each on its own research branch, then merged:
+(1) a controlled reflective scene (opaque floor+wall / few-reflector) for a quantitative *oracle*
+map; (2) forcing the street-canyon building materials opaque/reflective to elicit single-bounce
+specular returns in the realistic scene. Localization stands as the headline result and is
+independent of these.
 
 ## Reproduce
 
