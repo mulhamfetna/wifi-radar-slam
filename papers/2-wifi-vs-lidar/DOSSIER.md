@@ -51,8 +51,34 @@ Branch sequence off `paper2-wifi-vs-lidar`:
   six WiFi-comparable metrics (ATE, RPE, Chamfer, map-acc, map-completeness, IoU).
   NumPy-only, no Sionna. 11 new tests (45 pass / 2 Sionna skips). Plan:
   `../../docs/superpowers/plans/2026-07-10-paper2-lidar-harness.md`.
-- **Branch 1 — `paper2-lidar-geo` (model A)** — next. Mesh ray-cast sensor against the
-  Sionna/Mitsuba scene meshes, plugged into the `make_sensor` seam.
+- **Branch 1 — `paper2-lidar-geo` (model A) — DONE (results in), pending merge.**
+  Geometric 2D LiDAR: each non-floor object's bounding box is sliced at the scan
+  plane (`z = RX_HEIGHT_M = 1.5 m`) into wall segments (`mesh_slice.py`), then ray-cast
+  in pure NumPy with occlusion-correct nearest-hit (`sensor_geo.py`); `geo_sensor` is the
+  `make_sensor` factory. Ray math unit-tested locally; scene run is Sionna-gated
+  (`tests/test_lidar_geo_scene.py`, passes on the amd server). Fidelity: bbox segments
+  now (box-faithful, car-approximate); triangle-exact Mitsuba `ray_intersect` deferred.
+  Plan: `../../docs/superpowers/plans/2026-07-10-paper2-lidar-geo-modelA.md`.
+
+  **Model-A results** (`OUSTER_OS1`: 120 m / ±3 cm / 360°, ~1029 beams; amd server,
+  23 s throttled; `data/lidar_geo_results.json`):
+
+  | Scene | ATE (m) | RPE (m) | Chamfer (m) | map-acc (m) | map-complete (m) | IoU |
+  |-------|--------:|--------:|------------:|------------:|-----------------:|----:|
+  | controlled_wall | 0.102 | 0.030 | 0.209 | 0.250 | 0.168 | 0.977 |
+  | street_canyon   | 0.026 | 0.017 | 8.674 | 0.251 | 17.097 | 0.163 |
+
+  Reading: LiDAR **localization is excellent** (2.6 cm ATE on the street via ICP) and on
+  the clean wall the **map is near-perfect** (IoU 0.98). On the street, **map-accuracy
+  stays good (0.25 m)** — the points it maps are correct — but **map-completeness is
+  poor (17 m)**: a single horizontal ring at 1.5 m, scored against the *full-footprint*
+  GT (which includes sub-ring-height cars and occluded/backside facades the ring can
+  never see), leaves much of the GT uncovered. This is a fair modeling artifact, not a
+  bug — and it is scored on the **same GT** the WiFi side uses, so the comparison stays
+  apples-to-apples. Caveat to revisit for the paper: completeness for a single-ring
+  LiDAR vs full-footprint GT is coverage-bounded (options: multi-height rings, or
+  restricting GT to z-visible objects). WiFi oracle/realistic rows will be placed
+  beside these once the comparison table is assembled.
 - **Branch 2 — `paper2-lidar-sionna` (model B)** — Sionna optical-ray proxy.
 - **Branch 3 — `paper2-lidar-kitti` (model C)** — KITTI ingest + external-validity run.
 
