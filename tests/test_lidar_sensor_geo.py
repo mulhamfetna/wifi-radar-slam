@@ -1,6 +1,6 @@
 import numpy as np
 from wifi_radar_slam.lidar.config import LidarConfig
-from wifi_radar_slam.lidar.sensor_geo import _ray_segments_scan
+from wifi_radar_slam.lidar.sensor_geo import _ray_segments_scan, GeoSensor
 
 
 def _cfg():
@@ -32,3 +32,11 @@ def test_no_segments_returns_empty():
     scan = _ray_segments_scan(np.empty((0, 2, 2)), (0.0, 0.0, 0.0), _cfg(),
                               np.random.default_rng(0))
     assert len(scan) == 0
+
+
+def test_geosensor_calls_are_scans():
+    wall = np.array([[[5.0, -2.0], [5.0, 2.0]]])
+    sensor = GeoSensor(wall, _cfg(), np.random.default_rng(0))
+    scan = sensor((0.0, 0.0, 0.0))
+    assert len(scan) > 0
+    assert GeoSensor(np.empty((0, 2, 2)), _cfg(), np.random.default_rng(0))((0, 0, 0)) is not None

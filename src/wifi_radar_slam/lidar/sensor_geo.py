@@ -39,3 +39,23 @@ def _ray_segments_scan(segments, pose, cfg, rng) -> Scan:
     if not out_b:
         return Scan.empty()
     return Scan.from_ranges(np.array(out_b), np.array(out_r))
+
+
+class GeoSensor:
+    """Model A: geometric bbox-segment LiDAR. Static segments ray-cast per pose."""
+
+    def __init__(self, segments, cfg, rng):
+        self.segments = np.asarray(segments, dtype=float).reshape(-1, 2, 2)
+        self.cfg = cfg
+        self.rng = rng
+
+    def __call__(self, pose) -> Scan:
+        if self.segments.shape[0] == 0:
+            return Scan.empty()
+        return _ray_segments_scan(self.segments, pose, self.cfg, self.rng)
+
+
+def geo_sensor(built, cfg, rng, z_height: float = RX_HEIGHT_M) -> "GeoSensor":
+    """make_sensor factory: slice the scene into wall segments, return a GeoSensor."""
+    from .mesh_slice import scene_segments
+    return GeoSensor(scene_segments(built, z_height), cfg, rng)
