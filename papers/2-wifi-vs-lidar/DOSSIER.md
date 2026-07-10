@@ -83,10 +83,13 @@ Branch sequence off `paper2-wifi-vs-lidar`:
 - **Branch 3 — `paper2-lidar-kitti` (model C)** — KITTI ingest + external-validity run.
 
 ## Next step
-Write branch 1's plan (model A — geometric mesh ray-cast) against the `make_sensor`
-seam and `run_lidar` runner from branch 0, then implement. Later sub-projects (fusion,
-DL enhancement, cost model, venue) each get their own brainstorming → spec → plan
-cycle; do not start them before design approval.
+Branch 2 (`paper2-lidar-sionna`, model B — Sionna optical-ray proxy) against the same
+`make_sensor` seam and `run_lidar` runner. Model B is the first that genuinely needs
+Sionna path solving, so its plan leans on the amd-server workflow throughout. After
+B (and C, KITTI external-validity), assemble the WiFi-vs-LiDAR comparison table
+(place the WiFi oracle/realistic rows beside the LiDAR rows). Later sub-projects
+(fusion, DL enhancement, cost model, venue) each get their own brainstorming → spec →
+plan cycle; do not start them before design approval.
 
 ## Do-not-mix reminders
 - Paper 1 is frozen (`v0.7.1` / `paper1-submitted`); do not alter its *content* when
