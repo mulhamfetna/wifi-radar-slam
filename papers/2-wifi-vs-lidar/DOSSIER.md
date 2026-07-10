@@ -51,7 +51,7 @@ Branch sequence off `paper2-wifi-vs-lidar`:
   six WiFi-comparable metrics (ATE, RPE, Chamfer, map-acc, map-completeness, IoU).
   NumPy-only, no Sionna. 11 new tests (45 pass / 2 Sionna skips). Plan:
   `../../docs/superpowers/plans/2026-07-10-paper2-lidar-harness.md`.
-- **Branch 1 — `paper2-lidar-geo` (model A) — DONE (results in), pending merge.**
+- **Branch 1 — `paper2-lidar-geo` (model A) — DONE, merged.**
   Geometric 2D LiDAR: each non-floor object's bounding box is sliced at the scan
   plane (`z = RX_HEIGHT_M = 1.5 m`) into wall segments (`mesh_slice.py`), then ray-cast
   in pure NumPy with occlusion-correct nearest-hit (`sensor_geo.py`); `geo_sensor` is the
@@ -79,7 +79,36 @@ Branch sequence off `paper2-wifi-vs-lidar`:
   LiDAR vs full-footprint GT is coverage-bounded (options: multi-height rings, or
   restricting GT to z-visible objects). WiFi oracle/realistic rows will be placed
   beside these once the comparison table is assembled.
-- **Branch 2 — `paper2-lidar-sionna` (model B)** — Sionna optical-ray proxy.
+- **Branch 2 — `paper2-lidar-sionna` (model B) — DONE (results in), pending merge.**
+  Sionna optical-ray proxy: the LiDAR is a **monostatic node** (a `lidar_tx`
+  transmitter co-located with the vehicle RX) and scene materials are given
+  `scattering_coefficient = 0.7` with `diffuse_reflection=True`, so facades backscatter
+  toward the sensor. Single-scatter valid non-floor paths' **interaction vertices** are
+  the returns (`sensor_sionna.py`); pure helpers `vertices_to_scan` / `_voxel_downsample`
+  (range filter, radial noise, world→local, density cap) test locally, the PathSolver
+  sensor is Sionna-gated (`tests/test_lidar_sionna_scene.py`, passes on amd). Config note:
+  model B ignores beam params (it is ray-traced) but honors min/max-range + range-sigma.
+  Physics validated by a server spike (specular monostatic ≈ 0 returns vs diffuse 8417).
+  Plan: `../../docs/superpowers/plans/2026-07-10-paper2-lidar-sionna-modelB.md`.
+
+  **Model-B results** (`OUSTER_OS1`, `WRS_NUM_SAMPLES=1e6`, `max_depth=2`; amd server,
+  5.4 min throttled; `data/lidar_sionna_results.json`):
+
+  | Scene | ATE (m) | RPE (m) | Chamfer (m) | map-acc (m) | map-complete (m) | IoU |
+  |-------|--------:|--------:|------------:|------------:|-----------------:|----:|
+  | controlled_wall | 0.483 | 0.055 | 0.187 | 0.251 | 0.123 | 1.000 |
+  | street_canyon   | 0.857 | 0.117 | 3.734 | 2.125 | 5.344 | 0.261 |
+
+  **A-vs-B (the two models bracket reality):** model A (geometric bbox ray-cast) gives
+  **crisp, precise points and excellent localization** (street ATE 0.026 m, map-acc
+  0.25 m) but **poor coverage** (street completeness 17 m, IoU 0.16). Model B (diffuse
+  EM physics) gives **dense coverage** (controlled IoU 1.0; street completeness 5.3 m,
+  chamfer 3.7 m — both far better than A) but **noisier points** (street map-acc 2.1 m)
+  and **worse localization** (street ATE 0.86 m), because diffuse returns scatter off
+  many vertices and blur ICP correspondences. Interpretation for the paper: the
+  geometric abstraction is optimistic on precision/odometry and pessimistic on coverage;
+  the physics proxy is the opposite. A real LiDAR sits between them — so the WiFi-vs-LiDAR
+  comparison should report **both** as the LiDAR envelope, not a single baseline.
 - **Branch 3 — `paper2-lidar-kitti` (model C)** — KITTI ingest + external-validity run.
 
 ## Next step
