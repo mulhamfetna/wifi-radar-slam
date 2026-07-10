@@ -15,11 +15,12 @@ SEQ = "04"
 ROOT = "data/kitti"
 DT = 0.1                      # KITTI velodyne is 10 Hz
 MAX_FRAMES = 271
+SCAN_VOXEL = 0.4             # downsample dense KITTI scans so brute-force ICP is tractable
 
 
 def main() -> None:
     files = sorted(glob.glob(f"{ROOT}/sequences/{SEQ}/velodyne/*.bin"))[:MAX_FRAMES]
-    scans = [load_velodyne_scan(f) for f in files]
+    scans = [load_velodyne_scan(f, voxel=SCAN_VOXEL) for f in files]
     n = len(scans)
     poses = open(f"{ROOT}/poses/{SEQ}.txt").read()
     calib = open(f"{ROOT}/sequences/{SEQ}/calib.txt").read()

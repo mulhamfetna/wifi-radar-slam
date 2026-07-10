@@ -13,6 +13,16 @@ def test_velodyne_scan_slices_z_band(tmp_path):
     assert np.allclose(np.sort(scan.points[:, 0]), [1.0, 3.0])
 
 
+def test_velodyne_scan_voxel_downsamples(tmp_path):
+    # 3 in-band points, two within one 0.5 m voxel -> downsample collapses them
+    pts = np.array([[0.01, 0.0, 0.0, 0.1], [0.02, 0.01, 0.0, 0.2],
+                    [9.0, 9.0, 0.0, 0.3]], dtype=np.float32)
+    f = tmp_path / "000000.bin"
+    pts.tofile(f)
+    assert len(load_velodyne_scan(str(f))) == 3               # no downsample by default
+    assert len(load_velodyne_scan(str(f), voxel=0.5)) == 2    # two collapse into one cell
+
+
 def test_gt_trajectory_identity_calib():
     # two frames: identity rotation, translations along world x then z.
     # Tr = identity rotation, zero offset -> velo origin == pose translation.

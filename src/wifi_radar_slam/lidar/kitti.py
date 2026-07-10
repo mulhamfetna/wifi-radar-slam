@@ -8,14 +8,24 @@ from __future__ import annotations
 import numpy as np
 from .pointcloud import Scan
 from .slam_icp import _rigid_2d, _apply
+from .sensor_sionna import _voxel_downsample
 
 
-def load_velodyne_scan(path: str, z_lo: float = -0.5, z_hi: float = 0.5) -> Scan:
+def load_velodyne_scan(path: str, z_lo: float = -0.5, z_hi: float = 0.5,
+                       voxel: float | None = None) -> Scan:
     """Read a KITTI velodyne .bin (N x [x,y,z,reflectance]) and slice a horizontal
-    band into a 2D BEV Scan (points already in the sensor-local velodyne frame)."""
+    band into a 2D BEV Scan (points already in the sensor-local velodyne frame).
+
+    `voxel` (m), if set, downsamples the sliced points to one per cell — KITTI scans
+    are ~10k points/frame after slicing, which makes brute-force ICP NN very slow, so
+    the SLAM run passes a voxel size; loaders/tests default to no downsampling.
+    """
     pts = np.fromfile(path, dtype=np.float32).reshape(-1, 4)
     band = (pts[:, 2] >= z_lo) & (pts[:, 2] <= z_hi)
-    return Scan(pts[band, :2].astype(float))
+    xy = pts[band, :2].astype(float)
+    if voxel is not None:
+        xy = _voxel_downsample(xy, voxel)
+    return Scan(xy)
 
 
 def _parse_pose_matrices(text: str) -> np.ndarray:
