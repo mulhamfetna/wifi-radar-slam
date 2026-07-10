@@ -138,13 +138,26 @@ Branch sequence off `paper2-wifi-vs-lidar`:
   the KITTI runner logs per-frame frame/scan/map + live ETA and loads scans across all
   cores (`multiprocessing.Pool`). No more blind waiting.
 
+## WiFi-vs-LiDAR comparison (RQ3) — DONE
+Full head-to-head table (both scenes, six metrics, same GT): **`../../docs/results-paper2.md`**.
+Milestone tagged **`paper2-v0.1.0`**.
+
+Emerging answer (RQ1): **WiFi is a viable drop-in for localization/odometry** — realistic
+commodity-CSI WiFi (joint 2-D MUSIC) localizes to **2.7 cm ATE** on the controlled scene,
+*better* than both LiDAR models (A 0.102 m, B 0.483 m), and ~9 cm on the street. **Mapping
+is where LiDAR still dominates** — LiDAR-B reaches IoU 1.0 (controlled) / completeness 5.3 m
+(street), while WiFi mapping is coverage-bounded (realistic IoU ≈ 0). So WiFi replaces LiDAR
+for the trajectory half at a fraction of the cost (RQ5, TBD); the mapping half needs
+enhancement — fusion (RQ4), deep learning (RQ2), or multi-pass. Real-LiDAR anchor: KITTI
+seq-04 aligned ATE 1.16 m / 394 m (~0.3 % drift).
+
 ## Next step
-**Assemble the full WiFi-vs-LiDAR comparison table** (paper 2's RQ3 core): pull the
-paper-1 WiFi oracle + realistic joint-MUSIC numbers beside the LiDAR **A/B envelope**
-(both scenes), with the KITTI ATE as the real-LiDAR anchor. That table is the natural
-point to tag a first paper-2 milestone. Later sub-projects (fusion, DL enhancement,
-cost model, venue) each get their own
-brainstorming → spec → plan cycle; do not start them before design approval.
+Pick the next sub-project (each its own brainstorming → spec → plan cycle; do not start
+before design approval):
+- **RQ5 cost model** — quantify the WiFi-package-vs-one-LiDAR cost gap (the central value
+  proposition; cheapest to do, strong standalone result).
+- **RQ4 fusion** — WiFi+LiDAR side-by-side; does it lift mapping/accuracy significantly?
+- **RQ2 deep-learning enhancement** — can DL close the WiFi mapping-coverage gap?
 
 ## Do-not-mix reminders
 - Paper 1 is frozen (`v0.7.1` / `paper1-submitted`); do not alter its *content* when
