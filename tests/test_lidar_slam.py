@@ -21,3 +21,17 @@ def test_recovers_straight_trajectory_from_scans():
     assert est_map.shape[0] > 0
     # mapped points sit on the wall (x ~ 6)
     assert np.abs(est_map[:, 0].mean() - 6.0) < 0.5
+
+
+def test_progress_callback_invoked_per_frame():
+    rng = np.random.default_rng(0)
+    wall = np.array([[6.0, y] for y in np.linspace(-4, 4, 40)])
+    n, dt, speed = 5, 0.1, 3.0
+    gt = np.array([[speed * dt * f, 0.0, 0.0] for f in range(n)])
+    velocity = np.tile([speed, 0.0], (n, 1))
+    scans = [Scan(wall - gt[f, :2]) for f in range(n)]
+    seen = []
+    run_lidar_slam(scans, velocity, dt, rng, init_pose=gt[0],
+                   progress=lambda f, nn, ns, nm: seen.append((f, nn, ns, nm)))
+    assert [s[0] for s in seen] == [1, 2, 3, 4]          # one call per frame after 0
+    assert all(s[1] == n and s[2] > 0 and s[3] > 0 for s in seen)
