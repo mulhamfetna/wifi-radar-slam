@@ -49,8 +49,15 @@ def icp_align(source: np.ndarray, target: np.ndarray,
 
 def run_lidar_slam(scans, velocity, timestep_s: float, rng,
                    init_pose=None, voxel: float = 0.5, progress=None):
-    """Scan-to-map ICP SLAM: constant-velocity prediction corrected by ICP against
-    a voxel-downsampled accumulated map. Returns (est_traj (n,3), est_map (M,2)).
+    """Scan-to-map ICP SLAM: motion prediction corrected by ICP against a
+    voxel-downsampled accumulated map. Returns (est_traj (n,3), est_map (M,2)).
+
+    Motion prior for each frame's ICP init: if `velocity` is given (n,2), predict
+    `est[f-1] + velocity[f]*dt` (used by the sim runs, where scans and velocity share
+    one world frame). If `velocity is None`, use a **frame-agnostic adaptive
+    constant-velocity** model — repeat the previous *estimated* motion
+    `est[f-1] + (est[f-1]-est[f-2])` — which is correct in the SLAM's own frame even
+    when the ground-truth trajectory lives in a different frame (e.g. real KITTI).
 
     `progress`, if given, is called after each frame as
     `progress(frame_index, n_frames, n_scan_points, n_map_cells)` for live logging.
@@ -70,10 +77,17 @@ def run_lidar_slam(scans, velocity, timestep_s: float, rng,
 
     _accumulate(scans[0].to_world(est[0]))
     for f in range(1, n):
-        vx, vy = velocity[f]
-        pred = (est[f - 1, 0] + vx * timestep_s,
-                est[f - 1, 1] + vy * timestep_s,
-                est[f - 1, 2])
+        if velocity is not None:
+            vx, vy = velocity[f]
+            pred = (est[f - 1, 0] + vx * timestep_s,
+                    est[f - 1, 1] + vy * timestep_s,
+                    est[f - 1, 2])
+        elif f >= 2:                                    # adaptive constant velocity
+            pred = (2 * est[f - 1, 0] - est[f - 2, 0],
+                    2 * est[f - 1, 1] - est[f - 2, 1],
+                    est[f - 1, 2])
+        else:                                           # first step: no motion prior
+            pred = (est[f - 1, 0], est[f - 1, 1], est[f - 1, 2])
         target = np.array(list(map_cells.values()))
         src = scans[f].points
         if len(src) >= 3 and target.shape[0] >= 3:

@@ -47,8 +47,9 @@ def main() -> None:
     poses = open(f"{ROOT}/poses/{SEQ}.txt").read()
     calib = open(f"{ROOT}/sequences/{SEQ}/calib.txt").read()
     gt = load_gt_trajectory(poses, calib)[:n]
-    vel = np.zeros((n, 2))
-    vel[1:] = (gt[1:] - gt[:-1]) / DT      # GT-differenced velocity prior (as in sim)
+    # Adaptive constant-velocity motion model (velocity=None): frame-agnostic, correct
+    # in the SLAM's own velodyne frame. (A GT-differenced prior would be in the camera
+    # (x,z) frame, mismatched to the velodyne frame the SLAM runs in.)
 
     t_slam = time.time()
 
@@ -59,8 +60,8 @@ def main() -> None:
             log.info("frame %d/%d  scan=%d map=%d  elapsed=%.0fs  ETA=%.0fs",
                      f, nn, ns, nm, el, eta)
 
-    est, _ = run_lidar_slam(scans, vel, DT, np.random.default_rng(0),
-                            init_pose=(gt[0, 0], gt[0, 1], 0.0), progress=progress)
+    est, _ = run_lidar_slam(scans, None, DT, np.random.default_rng(0),
+                            init_pose=(0.0, 0.0, 0.0), progress=progress)
     log.info("SLAM done in %.1fs", time.time() - t_slam)
 
     # Global aligned ATE accumulates drift over the whole drive; RPE (per-frame,
