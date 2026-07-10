@@ -109,16 +109,41 @@ Branch sequence off `paper2-wifi-vs-lidar`:
   geometric abstraction is optimistic on precision/odometry and pessimistic on coverage;
   the physics proxy is the opposite. A real LiDAR sits between them — so the WiFi-vs-LiDAR
   comparison should report **both** as the LiDAR envelope, not a single baseline.
-- **Branch 3 — `paper2-lidar-kitti` (model C)** — KITTI ingest + external-validity run.
+- **Branch 3 — `paper2-lidar-kitti` (model C) — DONE (results in), pending merge.**
+  Real-LiDAR external-validity anchor: our shared ICP SLAM run on **KITTI odometry
+  seq 04** (271 frames, 394 m). Pure loaders (`kitti.py`: velodyne `.bin` → 2D BEV Scan
+  via z-slice; poses + `Tr` calib → BEV `(x,z)` GT; 2D rigid alignment) test locally;
+  `fetch_kitti.py` pulls only seq 04 (~0.5 GB) from KITTI's public S3 via `remotezip`
+  range requests (avoids the 84 GB full-velodyne zip); `data/kitti/` is gitignored.
+  Plan: `../../docs/superpowers/plans/2026-07-10-paper2-lidar-kitti-modelC.md`.
+
+  **Model-C result** (amd server, 9.5 s; `data/kitti_results.json`):
+  **RPE = 0.154 m/frame, aligned ATE = 1.16 m over 271 frames / 394 m ≈ 0.3 % drift.**
+  This is real-LiDAR-plausible (SOTA KITTI odometry is ~0.1–0.5 % drift), confirming our
+  ICP+metrics back-end behaves like real LiDAR — which validates the A/B sim results are
+  produced by a sound pipeline, not an artefact of the simulator. (An early attempt gave
+  ATE 36 m: the GT-differenced velocity prior was in the KITTI camera `(x,z)` frame,
+  mismatched to the velodyne frame the SLAM runs in; the frame-agnostic **adaptive
+  constant-velocity** motion model fixed it — see shared-code note below.)
+
+### Shared-code improvements landed with C (benefit A/B too; results unchanged)
+- **KD-tree ICP** (`slam_icp.icp_align`): brute-force O(scan·map) nearest-neighbour →
+  `scipy.spatial.cKDTree` queried at `workers=-1` (all cores). **Exact NN**, so A/B/C
+  metrics are unchanged, but the full KITTI run went from stalling >1 h (and OOM-risk on
+  the growing map) to **9.5 s**. scipy is already a core dependency.
+- **Adaptive constant-velocity motion model** (`run_lidar_slam(velocity=None)`): predict
+  each ICP init from the previous *estimated* motion — frame-agnostic (correct even when
+  GT lives in a different frame). Sim runs keep the explicit-velocity path (unaffected).
+- **Progress logging**: `run_lidar_slam` takes a `progress(f, n, n_scan, n_map)` callback;
+  the KITTI runner logs per-frame frame/scan/map + live ETA and loads scans across all
+  cores (`multiprocessing.Pool`). No more blind waiting.
 
 ## Next step
-Branch 3 (`paper2-lidar-kitti`, model C — KITTI external validity) against the shared
-ICP SLAM: ingest a KITTI odometry sequence, run our `run_lidar_slam` on real LiDAR
-scans, and compare ATE against KITTI ground-truth poses — a cross-check that our
-idealized models (A/B) behave like real LiDAR. C is NOT an in-scene rival baseline
-(different world, no shared GT, no fusion). After C, assemble the full WiFi-vs-LiDAR
-comparison table (place the WiFi oracle/realistic rows beside the A/B LiDAR envelope).
-Later sub-projects (fusion, DL enhancement, cost model, venue) each get their own
+**Assemble the full WiFi-vs-LiDAR comparison table** (paper 2's RQ3 core): pull the
+paper-1 WiFi oracle + realistic joint-MUSIC numbers beside the LiDAR **A/B envelope**
+(both scenes), with the KITTI ATE as the real-LiDAR anchor. That table is the natural
+point to tag a first paper-2 milestone. Later sub-projects (fusion, DL enhancement,
+cost model, venue) each get their own
 brainstorming → spec → plan cycle; do not start them before design approval.
 
 ## Do-not-mix reminders
