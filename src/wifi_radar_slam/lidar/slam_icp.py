@@ -43,3 +43,38 @@ def icp_align(source: np.ndarray, target: np.ndarray,
             break
         x, y, yaw = nx, ny, nyaw
     return x, y, yaw
+
+
+def run_lidar_slam(scans, velocity, timestep_s: float, rng,
+                   init_pose=None, voxel: float = 0.5):
+    """Scan-to-map ICP SLAM: constant-velocity prediction corrected by ICP against
+    a voxel-downsampled accumulated map. Returns (est_traj (n,3), est_map (M,2))."""
+    n = len(scans)
+    est = np.zeros((n, 3))
+    if init_pose is not None:
+        est[0, 0], est[0, 1] = float(init_pose[0]), float(init_pose[1])
+        est[0, 2] = float(init_pose[2]) if len(init_pose) > 2 else 0.0
+
+    map_cells: dict[tuple[int, int], np.ndarray] = {}
+
+    def _accumulate(world_pts: np.ndarray) -> None:
+        for p in world_pts:
+            key = (int(round(p[0] / voxel)), int(round(p[1] / voxel)))
+            map_cells.setdefault(key, p)                # first point wins the cell
+
+    _accumulate(scans[0].to_world(est[0]))
+    for f in range(1, n):
+        vx, vy = velocity[f]
+        pred = (est[f - 1, 0] + vx * timestep_s,
+                est[f - 1, 1] + vy * timestep_s,
+                est[f - 1, 2])
+        target = np.array(list(map_cells.values()))
+        src = scans[f].points
+        if len(src) >= 3 and target.shape[0] >= 3:
+            est[f] = icp_align(src, target, init=pred)
+        else:                                           # too sparse -> dead-reckon
+            est[f] = pred
+        _accumulate(scans[f].to_world(est[f]))
+
+    est_map = np.array(list(map_cells.values())) if map_cells else np.empty((0, 2))
+    return est, est_map
