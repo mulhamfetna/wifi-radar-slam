@@ -16,7 +16,8 @@ import numpy as np
 
 from wifi_radar_slam.lidar.kitti import (load_velodyne_scan, load_gt_trajectory,
                                         align_2d_ate)
-from wifi_radar_slam.lidar.slam_icp import run_lidar_slam
+from wifi_radar_slam.lidar.slam_icp import run_lidar_slam, _rigid_2d, _apply
+from wifi_radar_slam.eval.metrics import rpe
 
 SEQ = "04"
 ROOT = "data/kitti"
@@ -60,11 +61,20 @@ def main() -> None:
 
     est, _ = run_lidar_slam(scans, vel, DT, np.random.default_rng(0),
                             init_pose=(gt[0, 0], gt[0, 1], 0.0), progress=progress)
-    ate = align_2d_ate(est, gt)
     log.info("SLAM done in %.1fs", time.time() - t_slam)
-    out = {"sequence": SEQ, "frames": n, "aligned_ate_m": ate,
+
+    # Global aligned ATE accumulates drift over the whole drive; RPE (per-frame,
+    # drift-robust) is the scan-matching-accuracy metric. Align once, report both.
+    ate = align_2d_ate(est, gt)
+    ax, ay, ayaw = _rigid_2d(est[:, :2], gt)
+    aligned = _apply(est[:, :2], ax, ay, ayaw)
+    rpe_m = rpe(aligned, gt)
+    path_len = float(np.sum(np.linalg.norm(np.diff(gt, axis=0), axis=1)))
+    out = {"sequence": SEQ, "frames": n, "path_length_m": round(path_len, 1),
+           "aligned_ate_m": ate, "rpe_m": rpe_m,
            "slam_seconds": round(time.time() - t_slam, 1)}
-    log.info("[model C] KITTI seq %s: aligned ATE = %.3f m over %d frames", SEQ, ate, n)
+    log.info("[model C] KITTI seq %s: RPE = %.3f m/frame, aligned ATE = %.2f m "
+             "over %d frames (%.0f m path)", SEQ, rpe_m, ate, n, path_len)
     with open("data/kitti_results.json", "w") as fh:
         json.dump(out, fh, indent=2)
     log.info("saved -> data/kitti_results.json")
