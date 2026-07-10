@@ -34,5 +34,8 @@ tmp/
 # fetched real-CSI samples (belong to CSIKit; use experiments/fetch_real_csi.sh)
 data/real/
 
+# KITTI external-validity data (branch 3, model C) — large, fetched on demand
+data/kitti/
+
 # generated dataset artifacts (attach to releases; regenerate via experiments/make_dataset.py)
 data/*.npz
