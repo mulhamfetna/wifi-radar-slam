@@ -32,11 +32,35 @@ modules expected: a **LiDAR baseline** (point-cloud SLAM in the same simulated
 scenes), a **WiFi/LiDAR fusion** path, and a **cost model**. This is an extension, not
 replication: same substrate, new comparative + cost + fusion research questions.
 
+## Progress
+
+### Sub-project 1 — LiDAR baseline & comparison substrate (in progress)
+Design: `../../docs/superpowers/specs/2026-07-10-paper2-lidar-baseline-design.md`.
+Decision: build three LiDAR models, each on its own branch, and let results decide the
+defensible baseline. **A** (geometric mesh ray-cast) and **B** (Sionna optical rays)
+are head-to-head in-scene baselines; **C** (KITTI real LiDAR) is an external-validity
+cross-check, not a rival. Comparison plane is **2D BEV** — LiDAR reuses the WiFi
+metrics unchanged.
+
+Branch sequence off `paper2-wifi-vs-lidar`:
+- **Branch 0 — `paper2-lidar-harness` — DONE, merged.** Shared substrate
+  `src/wifi_radar_slam/lidar/`: `LidarConfig` (+ `OUSTER_OS1` datasheet preset,
+  120 m / ±3 cm / 360°), `Scan` container, point-to-point 2D `icp_align`, scan-to-map
+  `run_lidar_slam` → `(traj, map)`, `ReferenceSensor` (analytic ray-cast) + the
+  `make_sensor(built, cfg, rng) -> (pose -> Scan)` seam, and `run_lidar` emitting the
+  six WiFi-comparable metrics (ATE, RPE, Chamfer, map-acc, map-completeness, IoU).
+  NumPy-only, no Sionna. 11 new tests (45 pass / 2 Sionna skips). Plan:
+  `../../docs/superpowers/plans/2026-07-10-paper2-lidar-harness.md`.
+- **Branch 1 — `paper2-lidar-geo` (model A)** — next. Mesh ray-cast sensor against the
+  Sionna/Mitsuba scene meshes, plugged into the `make_sensor` seam.
+- **Branch 2 — `paper2-lidar-sionna` (model B)** — Sionna optical-ray proxy.
+- **Branch 3 — `paper2-lidar-kitti` (model C)** — KITTI ingest + external-validity run.
+
 ## Next step
-Run a dedicated **brainstorming cycle** to design paper 2's experiments (LiDAR model
-choice, comparison metrics, fusion approach, DL enhancement, cost methodology, target
-venue), then a spec and implementation plan. Do not start experiments before that
-design is approved.
+Write branch 1's plan (model A — geometric mesh ray-cast) against the `make_sensor`
+seam and `run_lidar` runner from branch 0, then implement. Later sub-projects (fusion,
+DL enhancement, cost model, venue) each get their own brainstorming → spec → plan
+cycle; do not start them before design approval.
 
 ## Do-not-mix reminders
 - Paper 1 is frozen (`v0.7.1` / `paper1-submitted`); do not alter its *content* when
