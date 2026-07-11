@@ -1,4 +1,6 @@
-from wifi_radar_slam.cost import load_cost_data
+import pytest
+from wifi_radar_slam.cost import (load_cost_data, wifi_package_cost, lidar_envelope,
+                                  cost_ratio)
 
 COST_YAML = "data/cost_data.yaml"
 
@@ -33,3 +35,42 @@ def test_every_price_entry_is_sourced_and_dated():
         assert e["low"] <= e["high"]
         assert e["source"] and isinstance(e["source"], str)   # text citation, no fabricated URLs
         assert e["date"]
+
+
+def test_wifi_package_cost_headline_and_deployed():
+    d = load_cost_data(COST_YAML)
+    lo, hi = wifi_package_cost(d)                       # default rx=pi_nexmon + antennas
+    exp_lo = d["wifi"]["receivers"]["pi_nexmon"]["low"] + d["wifi"]["antennas"]["low"]
+    exp_hi = d["wifi"]["receivers"]["pi_nexmon"]["high"] + d["wifi"]["antennas"]["high"]
+    assert (lo, hi) == (exp_lo, exp_hi)
+    # low-end receiver is cheaper
+    assert wifi_package_cost(d, rx="esp32")[0] < lo
+    # deployed-AP sensitivity adds n_aps * ap_unit
+    ap = d["wifi"]["ap_unit"]
+    lo3, hi3 = wifi_package_cost(d, n_aps=3)
+    assert lo3 == exp_lo + 3 * ap["low"]
+    assert hi3 == exp_hi + 3 * ap["high"]
+
+
+def test_unknown_receiver_raises():
+    d = load_cost_data(COST_YAML)
+    with pytest.raises(KeyError):
+        wifi_package_cost(d, rx="not_a_receiver")
+
+
+def test_lidar_envelope_ordered_and_flagged():
+    d = load_cost_data(COST_YAML)
+    tiers = lidar_envelope(d)
+    assert len(tiers) == 5
+    keys = [t["key"] for t in tiers]
+    assert "budget_2d" in keys and "ouster_os1" in keys
+    assert all(isinstance(t["low"], float) for t in tiers)
+
+
+def test_cost_ratio_is_a_conservative_range():
+    # WiFi $50-100 vs LiDAR $500-600:
+    #   conservative low  = cheapest LiDAR / priciest WiFi = 500/100 = 5x
+    #   optimistic  high  = priciest  LiDAR / cheapest WiFi = 600/50  = 12x
+    lo, hi = cost_ratio((50.0, 100.0), (500.0, 600.0))
+    assert lo == pytest.approx(5.0)
+    assert hi == pytest.approx(12.0)
