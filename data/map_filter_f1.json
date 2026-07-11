@@ -1,0 +1,18 @@
+{
+  "controlled_wall_heldout_frames": {
+    "rf": 0.0,
+    "mlp": 0.0
+  },
+  "street_canyon_heldout_frames": {
+    "rf": 0.3333333333333333,
+    "mlp": 0.4482758620689655
+  },
+  "train_controlled_wall_test_street_canyon": {
+    "rf": 0.15151515151515152,
+    "mlp": 0.0
+  },
+  "train_street_canyon_test_controlled_wall": {
+    "rf": 0.16666666666666666,
+    "mlp": 0.2
+  }
+}

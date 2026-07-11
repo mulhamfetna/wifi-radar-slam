@@ -199,3 +199,80 @@ coverage — an extraordinary return, and the strongest practical case in this p
 *hybrid* rather than a replacement. But fusion is **not unconditionally safe**: with a
 mismatched pair it *destroys* accuracy you already paid for. Fusion should be deployed with
 confidence-adaptive weighting, not naively.
+
+## Enhancement (RQ2) — and a correction to paper 1
+
+**Question:** is pure WiFi enough, or is deep-learning enhancement needed to reach
+LiDAR-equivalent mapping? We closed paper-1's open loop by putting a learned path
+discriminator **inside** the mapping pipeline and running a ladder:
+**0** none → **1** physics heuristic (min-excess gate) → **2** RandomForest → **3** MLP.
+The filter gates only which detections enter the **map**; localization is untouched.
+Maps are rebuilt with the model trained on the **other** scene (leakage-free).
+Scripts: `experiments/{train_map_filter,run_enhanced_map,diagnose_triangulation}.py`.
+
+### The ladder: every rung fails
+
+| Scene | Rung | IoU | map points | map-acc |
+|---|---|---:|---:|---:|
+| controlled_wall | 0 none | 0.000 | 4 | 2.04 |
+| controlled_wall | 1 heuristic | 0.000 | 4 | 2.04 |
+| controlled_wall | 2 RandomForest | 0.000 | **0** | inf |
+| controlled_wall | 3 MLP | 0.000 | **0** | inf |
+| street_canyon | 0 none | 0.000 | 2 | 3.27 |
+| street_canyon | 1 heuristic | 0.000 | 2 | 3.27 |
+| street_canyon | 2 RandomForest | 0.000 | **0** | inf |
+| street_canyon | 3 MLP | 0.000 | **0** | inf |
+
+Corrected discriminator F1 (MUSIC-observable features only): held-out frames **0.00** (RF)
+/ **0.00** (MLP) on the controlled wall, **0.33** / **0.45** on the street; **cross-scene
+0.00–0.20**. The learned rungs reject *everything* at threshold 0.5, emptying the map.
+
+### Why: the bottleneck is **estimation accuracy**, not path discrimination
+
+The diagnostic (`diagnose_triangulation.py`) runs the *same* bistatic triangulation on
+oracle vs. realistic path parameters:
+
+| Path parameters | Triangulates within 1 m of a facade | Median error |
+|---|---:|---:|
+| **Oracle** (Sionna's true delay/AoA) | **100 %** (both scenes) | 0.25–0.32 m |
+| Realistic MUSIC — controlled_wall | **1.8 %** | > 3 m |
+| Realistic MUSIC — street_canyon | **23.6 %** | 3.27 m (and **1702 of 2160** triangulations fail outright) |
+
+With **true** path parameters the geometry is essentially perfect — which is exactly why
+paper-1's *oracle* map was 0.25 m accurate. With **MUSIC-estimated** parameters, only
+2–24 % of detections can land on a facade at all.
+
+**A filter chooses which detections to keep; it cannot correct their delay/AoA values.**
+If only 2–24 % of detections are capable of producing a good map point, no classifier —
+heuristic, RandomForest, or neural network — can build a map from them. That is why every
+rung failed, why the labels are near-degenerate (0.4 % / 5.0 % positive), and why the
+learned rungs emptied the map.
+
+### RQ2 answer
+
+**No — a learned *discriminator* cannot close the WiFi mapping gap, because the gap is not a
+discrimination problem.** It is an **estimation-accuracy** problem: commodity-CSI MUSIC
+delay/AoA errors propagate through bistatic triangulation into multi-metre reflector errors.
+Selection cannot repair estimation.
+
+**This corrects paper 1.** Paper 1 concluded that realistic mapping is floored by *path
+discrimination* and that this discrimination is *learnable* (F1 ≈ 0.9) — implying a learned
+filter would fix the map. Two problems: (a) that discriminator used **`elevation`**, which a
+single-ULA 2-D (delay–azimuth) front-end **cannot measure** — an oracle feature, so F1 ≈ 0.9
+was optimistic; and (b) more fundamentally, it classified **true Sionna paths**, not **MUSIC
+detections**. Perfect selection among *noisy* detections still yields a bad map. The
+inference "discrimination is learnable ⇒ mapping is fixable" **does not hold**.
+
+### What this does *not* show
+
+It does **not** show that deep learning cannot help — only that **classification-based
+filtering of estimated paths** cannot. The correct DL formulation must **bypass or repair the
+estimation stage**: either regress corrected path parameters, or learn **CSI → geometry
+end-to-end** (the literature precedent — a transformer reconstructing 3-D point clouds from
+CSI at ~1 cm ICP RMSE, and U-Net/ViT recovering outdoor geometry from RF propagation; see
+`docs/literature-paper2.md`). That is the honest next direction, stated as future work rather
+than claimed as a result.
+
+**Consequence for the paper's thesis.** WiFi's mapping gap is *not* cheaply patchable. That
+makes **RQ4 fusion the practical recommendation**: adding WiFi to a LiDAR costs ~0.5 % more
+and improves localization 36–79 %, while the LiDAR supplies the map coverage WiFi cannot.
