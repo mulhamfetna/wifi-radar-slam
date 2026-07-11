@@ -1,0 +1,78 @@
+{
+  "controlled_wall": {
+    "0_none": {
+      "ate": 0.0805194920315599,
+      "rpe": 0.011682911614217183,
+      "chamfer": 6.133073944847441,
+      "map_accuracy": 2.039850337193803,
+      "map_completeness": 10.226297552501078,
+      "iou": 0.0,
+      "n_map_points": 4
+    },
+    "1_heuristic": {
+      "ate": 0.0805194920315599,
+      "rpe": 0.011682911614217183,
+      "chamfer": 6.133073944847441,
+      "map_accuracy": 2.039850337193803,
+      "map_completeness": 10.226297552501078,
+      "iou": 0.0,
+      "n_map_points": 4
+    },
+    "2_random_forest": {
+      "ate": 0.0805194920315599,
+      "rpe": 0.011682911614217183,
+      "chamfer": Infinity,
+      "map_accuracy": Infinity,
+      "map_completeness": Infinity,
+      "iou": 0.0,
+      "n_map_points": 0
+    },
+    "3_mlp": {
+      "ate": 0.0805194920315599,
+      "rpe": 0.011682911614217183,
+      "chamfer": Infinity,
+      "map_accuracy": Infinity,
+      "map_completeness": Infinity,
+      "iou": 0.0,
+      "n_map_points": 0
+    }
+  },
+  "street_canyon": {
+    "0_none": {
+      "ate": 0.2805019178720304,
+      "rpe": 0.01192246190806018,
+      "chamfer": 19.09807160998507,
+      "map_accuracy": 3.2705530636938214,
+      "map_completeness": 34.92559015627632,
+      "iou": 0.0,
+      "n_map_points": 2
+    },
+    "1_heuristic": {
+      "ate": 0.2805019178720304,
+      "rpe": 0.01192246190806018,
+      "chamfer": 19.09807160998507,
+      "map_accuracy": 3.2705530636938214,
+      "map_completeness": 34.92559015627632,
+      "iou": 0.0,
+      "n_map_points": 2
+    },
+    "2_random_forest": {
+      "ate": 0.2805019178720304,
+      "rpe": 0.01192246190806018,
+      "chamfer": Infinity,
+      "map_accuracy": Infinity,
+      "map_completeness": Infinity,
+      "iou": 0.0,
+      "n_map_points": 0
+    },
+    "3_mlp": {
+      "ate": 0.2805019178720304,
+      "rpe": 0.01192246190806018,
+      "chamfer": Infinity,
+      "map_accuracy": Infinity,
+      "map_completeness": Infinity,
+      "iou": 0.0,
+      "n_map_points": 0
+    }
+  }
+}
