@@ -192,13 +192,38 @@ depends on the **ambient-AP premise** holding. LiDAR rows are priced at the OS1 
 $150 solid-state tier we never simulated would be apples-to-oranges. The budget 2D scanner
 is a price floor, not a peer.
 
+## Fusion (RQ4) — DONE
+Spec: `../../docs/superpowers/specs/2026-07-11-paper2-fusion-design.md`; results in
+`../../docs/results-paper2.md` ("Fusion (RQ4)") + `data/fusion_results.json`.
+Code: `src/wifi_radar_slam/fusion.py` (tight PF + loose baseline);
+`configs/street_metal_music.yaml` (new realistic-WiFi street config).
+
+**Symmetric fusion, not the literature's shape.** Prior work demotes WiFi to loop closure;
+our RQ3 shows WiFi is the better *localizer*, so we fused symmetrically:
+`weight = w_wifi(bistatic) × w_lidar(scan-match)`, output map = union.
+
+**Answer: fusion helps CONDITIONALLY — the condition is sensor parity.** Tight fusion beats
+**both** solo modalities in **3 of 4** configs (controlled/B **0.044** vs WiFi 0.081 / LiDAR
+0.212; street/B **0.175** vs 0.281 / 0.844 — both ~79 % better than the LiDAR). But it
+**degrades the stronger sensor under large accuracy mismatch**: street/A, LiDAR alone 0.027 →
+fused 0.218 (**8× regression**), because equal-confidence weighting lets a 10×-worse WiFi pull
+the filter off LiDAR's good solution. Reported rather than hidden by tuning `sigma`; the
+honest fix — **confidence-adaptive weighting** — is future work.
+
+**Mapping.** The union **adds coverage where LiDAR is incomplete** (street IoU 0.149→0.177 A,
+0.262→0.309 B) but **slightly pollutes an already-good map** (controlled 0.977/1.0 → 0.913;
+map-acc 0.25→0.33): noisy realistic-CSI reflectors fill gaps, they don't sharpen detail.
+
+**Cost verdict.** WiFi is a **+0.2–1.2 %** addition to an OS1-class LiDAR, so **when fusion
+helps it is essentially free** (~4.8× better $·m value; 36–79 % ATE gain for ~0.5 % more
+money) — the strongest practical case in the paper for a **hybrid** rather than a
+replacement. When it hurts, no price justifies it.
+
 ## Next step
-Pick the next sub-project (each its own brainstorming → spec → plan cycle; do not start
-before design approval). Both are now *motivated directly by the RQ5 mapping-value gap*:
-- **RQ4 fusion** — WiFi+LiDAR side-by-side; does it lift mapping/accuracy significantly?
-  (Literature anchors: fusion beats single modality — WiFi-only 2.7 m → 0.88 m fused.)
-- **RQ2 deep-learning enhancement** — can DL close the WiFi mapping-coverage gap?
-  (Precedent: transformer CSI→3D point cloud; U-Net/ViT RF→outdoor geometry.)
+**RQ2 — deep-learning enhancement** (the final research question): can DL close the WiFi
+mapping-coverage gap (realistic-CSI IoU ≈ 0)? Its own brainstorming → spec → plan cycle;
+do not start before design approval. Precedent from the literature review: transformer
+CSI→3D point cloud (ICP RMSE ~0.01 m); U-Net/CLIP-ViT RF→outdoor geometry; RF-Pose.
 
 ## Do-not-mix reminders
 - Paper 1 is frozen (`v0.7.1` / `paper1-submitted`); do not alter its *content* when
