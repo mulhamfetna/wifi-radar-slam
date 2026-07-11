@@ -228,25 +228,40 @@ code `src/wifi_radar_slam/map_filter.py` + `run_slam(map_filter=...)` hook.
 not a discrimination problem.** Every ladder rung (none / heuristic / RandomForest / MLP)
 leaves **IoU 0.000** on both scenes; the learned rungs reject everything and **empty the map**.
 
-**Why (decisive diagnostic, `experiments/diagnose_triangulation.py`).** Running the *same*
-bistatic triangulation on oracle vs realistic path parameters:
-- **Oracle delay/AoA → 100 %** of detections triangulate within 1 m of a facade (median
-  0.25–0.32 m). The geometry is perfect when the parameters are right.
-- **MUSIC-estimated → only 1.8 %** (controlled) / **23.6 %** (street), median 3.27 m, and
-  **1702 of 2160** street triangulations fail outright.
+**Why — the floor has THREE components** (`experiments/isolate_mapping_floor.py`,
+`data/mapping_floor_isolation.json`). A first diagnostic (oracle vs MUSIC params) conflated
+two causes; the isolation experiment matches every MUSIC detection to its nearest **true**
+Sionna path and, for genuine facade matches, triangulates the **same path** with true vs
+MUSIC parameters — so any degradation is **pure estimation error, discrimination held
+perfect**:
 
-**A filter CHOOSES detections; it cannot CORRECT their delay/AoA.** If only 2–24 % of
-detections can produce a good map point, no classifier can build a map from them. The
-bottleneck is **estimation accuracy**, not path selection.
+1. **Phantom detections (~89 %, DOMINANT).** 89.2 % (controlled) / 89.5 % (street) of MUSIC
+   detections match **no real propagation path at all** — estimator artefacts. *You cannot
+   discriminate among real paths when most detections are not real paths.* Neither paper 1
+   nor our first analysis identified this.
+2. **Estimation bias.** Controlled: a **6.45 m median range bias** ruins even correctly
+   identified facade paths (true params 100 % within 1 m → MUSIC params **2.4 %**). That
+   dwarfs the 0.94 m resolution limit at 160 MHz — a *bias*, not a resolution bound. Street:
+   estimates of genuine facade paths are usable (**76.7 %** within 1 m).
+3. **Discrimination failures (2–8 %).** Paper 1's mechanism — real, but the **smallest**.
 
-**Correction to paper 1.** Paper 1 concluded mapping is floored by *path discrimination* and
-that this is *learnable* (F1 ≈ 0.9), implying a learned filter would fix the map. Two flaws:
-(a) that discriminator used **`elevation`**, which a single-ULA 2-D front-end **cannot
-measure** — an oracle feature (our corrected F1 on MUSIC-observable features: **0.00–0.45**
-held-out, **0.00–0.20** cross-scene); (b) it classified **true Sionna paths**, not **MUSIC
-detections**. The inference "discrimination is learnable ⇒ mapping is fixable" **does not
-hold**. (Paper 1 is submitted and frozen — this is a correction to carry into paper 2 and any
-paper-1 revision, NOT an edit to the frozen submission.)
+**RQ2 answer.** A filter *selects*; it can neither *invent* the real paths 89 % of detections
+lack, nor *correct* the range bias. The usable 2–9 % also proved **not separable** from the
+phantom majority using MUSIC-observable features. Hence every rung failed.
+
+**Refinement/correction to paper 1.** Its inference "discrimination is learnable (F1 ≈ 0.9)
+⇒ mapping is fixable" **does not hold**: (a) discrimination is the *smallest* of the three
+mechanisms; (b) the F1 used **`elevation`**, unmeasurable by a single-ULA 2-D front-end —
+corrected F1 on observable features is **0.00–0.45** held-out, **0.00–0.20** cross-scene;
+(c) it classified **true paths**, not **MUSIC detections**. Paper 1's *empirical* results
+(oracle map, the 60 GHz/aperture null result) **stand** — this is a refinement of its
+*interpretation*. Paper 1 is submitted and frozen: **fold this into its revision** when
+reviews arrive (user decision), and cite the corrected version from paper 2. Do NOT edit the
+frozen submission.
+
+**Silver lining.** The street's 76.7 % (correctly matched facade paths triangulate within
+1 m) shows the geometry **is** recoverable if phantoms and bias are fixed — the ceiling is set
+by the **front-end**, not the physics. That is where a learned method must act.
 
 **What it does not show.** Not that DL cannot help — only that **classification-based
 filtering of estimated paths** cannot. The correct formulation must bypass/repair the

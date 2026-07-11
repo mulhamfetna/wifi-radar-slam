@@ -227,51 +227,80 @@ Corrected discriminator F1 (MUSIC-observable features only): held-out frames **0
 / **0.00** (MLP) on the controlled wall, **0.33** / **0.45** on the street; **cross-scene
 0.00–0.20**. The learned rungs reject *everything* at threshold 0.5, emptying the map.
 
-### Why: the bottleneck is **estimation accuracy**, not path discrimination
+### Why: the floor has THREE components, and discrimination is the smallest
 
-The diagnostic (`diagnose_triangulation.py`) runs the *same* bistatic triangulation on
-oracle vs. realistic path parameters:
+A first diagnostic (`diagnose_triangulation.py`) showed oracle path parameters triangulate
+within 1 m of a facade **100 %** of the time (median 0.25–0.32 m) while MUSIC detections
+manage only 1.8 % / 23.6 %. But that comparison **conflates two causes** — MUSIC differs from
+oracle both in *which paths it reports* and in *how accurately it estimates them*.
 
-| Path parameters | Triangulates within 1 m of a facade | Median error |
+The decisive experiment (`isolate_mapping_floor.py`, `data/mapping_floor_isolation.json`)
+separates them: every MUSIC detection is matched to its nearest **true** Sionna path; for
+those that match a genuine single-bounce facade path, the **same path** is triangulated twice
+— once with the **true** delay/AoA and once with **MUSIC's estimate**. Any degradation is
+then **pure estimation error, with discrimination held perfect**.
+
+| | controlled_wall | street_canyon |
 |---|---:|---:|
-| **Oracle** (Sionna's true delay/AoA) | **100 %** (both scenes) | 0.25–0.32 m |
-| Realistic MUSIC — controlled_wall | **1.8 %** | > 3 m |
-| Realistic MUSIC — street_canyon | **23.6 %** | 3.27 m (and **1702 of 2160** triangulations fail outright) |
+| Matched a **true facade** path | 8.6 % | 2.0 % |
+| Matched a **non-facade** real path (*discrimination failure*) | 2.2 % | 8.4 % |
+| **No plausible match to ANY real path** (*phantom*) | **89.2 %** | **89.5 %** |
 
-With **true** path parameters the geometry is essentially perfect — which is exactly why
-paper-1's *oracle* map was 0.25 m accurate. With **MUSIC-estimated** parameters, only
-2–24 % of detections can land on a facade at all.
+| Triangulating the *same* matched facade paths | TRUE params | MUSIC params | MUSIC range error |
+|---|---:|---:|---:|
+| controlled_wall | **100 %** within 1 m | **2.4 %** (med 3.56 m) | **6.45 m** median |
+| street_canyon | **100 %** within 1 m | **76.7 %** (med 0.68 m) | 2.11 m median |
 
-**A filter chooses which detections to keep; it cannot correct their delay/AoA values.**
-If only 2–24 % of detections are capable of producing a good map point, no classifier —
-heuristic, RandomForest, or neural network — can build a map from them. That is why every
-rung failed, why the labels are near-degenerate (0.4 % / 5.0 % positive), and why the
-learned rungs emptied the map.
+**Three mechanisms, in order of importance:**
+
+1. **Phantom detections (~89 % — dominant).** Nearly nine in ten MUSIC detections correspond
+   to **no real propagation path at all** — they are estimator artefacts (sidelobes,
+   mis-associations, noise peaks). *You cannot discriminate among real paths when most
+   detections are not real paths.* This is the mechanism neither paper 1 nor our first
+   analysis identified.
+2. **Estimation bias.** On the controlled wall a **6.45 m median range bias** destroys
+   triangulation even for correctly identified facade paths (100 % → **2.4 %** within 1 m).
+   That dwarfs the 0.94 m resolution limit at 160 MHz, so it is a **bias**, not a resolution
+   bound. (Paper 1 observed this range bias but did not connect it to the mapping floor.) On
+   the street, by contrast, estimates of genuine facade paths are usable (76.7 % within 1 m).
+3. **Discrimination failures (2–8 %).** MUSIC picks real but non-facade paths (LOS / floor /
+   multi-bounce). This *is* paper 1's mechanism — it is real, but it is the **smallest** of
+   the three.
 
 ### RQ2 answer
 
-**No — a learned *discriminator* cannot close the WiFi mapping gap, because the gap is not a
-discrimination problem.** It is an **estimation-accuracy** problem: commodity-CSI MUSIC
-delay/AoA errors propagate through bistatic triangulation into multi-metre reflector errors.
-Selection cannot repair estimation.
+**No — a learned discriminator cannot close the WiFi mapping gap.** A filter *selects* among
+detections; it can neither *invent* the real paths that 89 % of detections fail to
+correspond to, nor *correct* the range bias that ruins the rest. The usable signal (2–9 % of
+detections) also proved **not separable** from the phantom majority using MUSIC-observable
+per-detection features — which is exactly why every rung (heuristic, RandomForest, MLP)
+failed and the learned rungs emptied the map.
 
-**This corrects paper 1.** Paper 1 concluded that realistic mapping is floored by *path
-discrimination* and that this discrimination is *learnable* (F1 ≈ 0.9) — implying a learned
-filter would fix the map. Two problems: (a) that discriminator used **`elevation`**, which a
-single-ULA 2-D (delay–azimuth) front-end **cannot measure** — an oracle feature, so F1 ≈ 0.9
-was optimistic; and (b) more fundamentally, it classified **true Sionna paths**, not **MUSIC
-detections**. Perfect selection among *noisy* detections still yields a bad map. The
-inference "discrimination is learnable ⇒ mapping is fixable" **does not hold**.
+**Refinement/correction to paper 1.** Paper 1 concluded that realistic mapping is floored by
+*path discrimination*, and that this discrimination is *learnable* (F1 ≈ 0.9) — implying a
+learned filter would fix the map. That inference **does not hold**, for three reasons:
+(a) discrimination among real paths addresses only the **smallest** slice (2–8 %) of the
+failure, the dominant one being phantom detections (~89 %) and range bias;
+(b) the reported F1 used **`elevation`**, which a single-ULA 2-D (delay–azimuth) front-end
+**cannot measure** — an oracle feature, so F1 ≈ 0.9 is optimistic (our corrected F1 on
+observable features: 0.00–0.45 held-out, 0.00–0.20 cross-scene);
+(c) it classified **true Sionna paths**, not **MUSIC detections** — a different task.
+Paper 1 is submitted and frozen; this correction is to be folded into its revision and is
+reported here as a refinement, not a repudiation — its *empirical* results (the oracle map,
+the 60 GHz/aperture null result) stand.
 
 ### What this does *not* show
 
 It does **not** show that deep learning cannot help — only that **classification-based
-filtering of estimated paths** cannot. The correct DL formulation must **bypass or repair the
-estimation stage**: either regress corrected path parameters, or learn **CSI → geometry
-end-to-end** (the literature precedent — a transformer reconstructing 3-D point clouds from
-CSI at ~1 cm ICP RMSE, and U-Net/ViT recovering outdoor geometry from RF propagation; see
-`docs/literature-paper2.md`). That is the honest next direction, stated as future work rather
-than claimed as a result.
+filtering of estimated paths** cannot. The isolation experiment in fact points to where a
+learned method *must* act: **suppress phantom detections and correct the range bias at the
+estimator**, or bypass the estimator entirely and learn **CSI → geometry end-to-end** (the
+literature precedent — a transformer reconstructing 3-D point clouds from CSI at ~1 cm ICP
+RMSE, and U-Net/ViT recovering outdoor geometry from RF propagation; see
+`docs/literature-paper2.md`). Notably, the street result (76.7 % of *correctly matched*
+facade paths triangulate within 1 m) shows the geometry is recoverable **if** the phantom and
+bias problems are solved — so the ceiling is set by the front-end, not by the physics. That
+is the honest next direction, stated as future work rather than claimed as a result.
 
 **Consequence for the paper's thesis.** WiFi's mapping gap is *not* cheaply patchable. That
 makes **RQ4 fusion the practical recommendation**: adding WiFi to a LiDAR costs ~0.5 % more

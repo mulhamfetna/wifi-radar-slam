@@ -1,0 +1,27 @@
+{
+  "_note": "Isolates DISCRIMINATION vs ESTIMATION vs PHANTOM as the WiFi mapping floor. For MUSIC detections matched to a true single-bounce facade path, the same path is triangulated with TRUE vs MUSIC-estimated delay/AoA -- so any degradation is PURE estimation error, with discrimination held perfect. Script: experiments/isolate_mapping_floor.py",
+  "controlled_wall": {
+    "n_music_detections": 1080,
+    "matched_true_facade_pct": 8.6,
+    "matched_non_facade_pct": 2.2,
+    "no_plausible_match_pct": 89.2,
+    "music_range_error_median_m": 6.45,
+    "music_azimuth_error_median_deg": 0.46,
+    "triangulation_within_1m_true_params_pct": 100.0,
+    "triangulation_within_1m_music_params_pct": 2.4,
+    "triangulation_median_true_params_m": 0.26,
+    "triangulation_median_music_params_m": 3.56
+  },
+  "street_canyon": {
+    "n_music_detections": 2160,
+    "matched_true_facade_pct": 2.0,
+    "matched_non_facade_pct": 8.4,
+    "no_plausible_match_pct": 89.5,
+    "music_range_error_median_m": 2.11,
+    "music_azimuth_error_median_deg": 2.63,
+    "triangulation_within_1m_true_params_pct": 100.0,
+    "triangulation_within_1m_music_params_pct": 76.7,
+    "triangulation_median_true_params_m": 0.29,
+    "triangulation_median_music_params_m": 0.68
+  }
+}
