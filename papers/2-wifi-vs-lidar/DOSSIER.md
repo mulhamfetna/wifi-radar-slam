@@ -32,6 +32,24 @@ modules expected: a **LiDAR baseline** (point-cloud SLAM in the same simulated
 scenes), a **WiFi/LiDAR fusion** path, and a **cost model**. This is an extension, not
 replication: same substrate, new comparative + cost + fusion research questions.
 
+## Literature & novelty (deep-research 2026-07-11)
+Full synthesis: **`../../docs/literature-paper2.md`** (5 angles → 20 sources → 25
+adversarially-verified claims; cost data sourced but not vote-verified).
+
+**Novelty gap (high confidence):** no published work demonstrates commodity-CSI WiFi as
+a *validated drop-in LiDAR replacement* for **on-vehicle/outdoor automotive SLAM** with a
+head-to-head WiFi-vs-LiDAR accuracy comparison. Nearest: **P2SLAM** (standalone WiFi-CSI
+SLAM but indoor, vs *visual* SLAM) and **radio-fingerprint SLAM** (outdoor/on-vehicle but
+RSS-not-CSI, slow UGV, best accuracy needs LiDAR fusion). All other WiFi-in-SLAM work uses
+WiFi to *augment* camera/LiDAR. Paper 2 occupies the open cell.
+
+RQ anchors from the review: **RQ4 fusion** — prior work shows fusion > single modality
+(WiFi-only 2.7 m → 0.88 m fused; EKF fusion 0.24–0.38 m vs WiFi 1.34 m vs LiDAR 0.62–2.88 m).
+**RQ2 DL** — precedent for RF→geometry (transformer CSI→3D point cloud; U-Net/ViT RF→outdoor
+geometry; RF-Pose through-wall). **RQ5 cost** — the WiFi-vs-LiDAR cost comparison itself
+appears novel; sourced prices: WiFi-CSI RX $5–15 (ESP32) / $35–75 (Pi+nexmon) vs LiDAR
+~$99 (RPLIDAR A1) / $200–600 (solid-state) / ~$75–80 k (legacy spinning).
+
 ## Progress
 
 ### Sub-project 1 — LiDAR baseline & comparison substrate (in progress)
