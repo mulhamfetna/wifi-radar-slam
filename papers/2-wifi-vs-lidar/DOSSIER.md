@@ -169,13 +169,36 @@ for the trajectory half at a fraction of the cost (RQ5, TBD); the mapping half n
 enhancement — fusion (RQ4), deep learning (RQ2), or multi-pass. Real-LiDAR anchor: KITTI
 seq-04 aligned ATE 1.16 m / 394 m (~0.3 % drift).
 
+## Cost model (RQ5) — DONE
+Spec: `../../docs/superpowers/specs/2026-07-11-paper2-cost-model-design.md`; results in
+`../../docs/results-paper2.md` ("Cost (RQ5)"); data `data/cost_data.yaml` (sourced prices,
+each citation + date) → `data/cost_results.json`. Milestone tagged **`paper2-v0.2.0`**.
+
+**Headline.** WiFi package (ambient-free: Pi4+nexmon + antennas) **$40–95** vs the
+**Ouster OS1 our A/B models actually simulate ($8–24 k) = 84–600× cheaper**; ~800–2000×
+vs legacy spinning. **Localization value** (price × ATE): WiFi **1–9 $·m** vs LiDAR
+**212–2448 $·m** — *two to three orders of magnitude better accuracy per dollar*.
+
+**The decisive asymmetry.** **WiFi cannot buy map coverage at any price** — realistic-CSI
+IoU ≈ 0, so $/IoU is **infinite**, while LiDAR converts money into coverage
+(8 k–147 k $/IoU). This is the honest boundary of the drop-in-replacement claim and the
+direct motivation for RQ2 (DL) and RQ4 (fusion).
+
+**Honest caveats (in the docs).** The cost advantage is *not* unconditional: vs the
+cheapest emerging automotive solid-state ($100–200) the gap narrows to **1.1–5×**, and with
+**3 self-deployed APs** WiFi can be **more expensive** (0.3–1.5×). The dramatic story
+depends on the **ambient-AP premise** holding. LiDAR rows are priced at the OS1 tier
+(the sensor whose params produced our measured accuracy) — pricing OS1-grade accuracy at a
+$150 solid-state tier we never simulated would be apples-to-oranges. The budget 2D scanner
+is a price floor, not a peer.
+
 ## Next step
 Pick the next sub-project (each its own brainstorming → spec → plan cycle; do not start
-before design approval):
-- **RQ5 cost model** — quantify the WiFi-package-vs-one-LiDAR cost gap (the central value
-  proposition; cheapest to do, strong standalone result).
+before design approval). Both are now *motivated directly by the RQ5 mapping-value gap*:
 - **RQ4 fusion** — WiFi+LiDAR side-by-side; does it lift mapping/accuracy significantly?
+  (Literature anchors: fusion beats single modality — WiFi-only 2.7 m → 0.88 m fused.)
 - **RQ2 deep-learning enhancement** — can DL close the WiFi mapping-coverage gap?
+  (Precedent: transformer CSI→3D point cloud; U-Net/ViT RF→outdoor geometry.)
 
 ## Do-not-mix reminders
 - Paper 1 is frozen (`v0.7.1` / `paper1-submitted`); do not alter its *content* when
