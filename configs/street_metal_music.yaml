@@ -1,0 +1,25 @@
+run_name: street_metal_music
+seed: 42
+snr_db: 20.0
+sensing_mode: music
+world_aoa: true
+joint_estimation: true     # joint 2-D delay-angle MUSIC (correct association)
+map_min_support: 5
+rf:
+  carrier_hz: 5.2e9
+  bandwidth_hz: 160.0e6    # WiFi's strongest realistic setting (do not strawman it)
+  n_subcarriers: 128
+  n_rx_antennas: 4
+  antenna_spacing_frac: 0.5
+trajectory:
+  length_m: 60.0
+  speed_mps: 5.0
+  timestep_s: 0.05
+  shape: straight
+scene:
+  name: street_canyon_metal
+  ap_positions:
+    - [-25.0, -6.0, 5.0]
+    - [0.0, 6.0, 5.0]
+    - [25.0, -6.0, 5.0]
+  targets: []
