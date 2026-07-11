@@ -57,3 +57,85 @@ def fuse_loose(wifi_traj, wifi_map, lidar_traj, lidar_map, voxel: float = 0.5):
              for m in (wifi_map, lidar_map) if np.asarray(m).size]
     merged = np.vstack(parts) if parts else np.empty((0, 2))
     return traj, _voxel_downsample(merged, voxel)
+
+
+def run_fused_slam(detections, scans, ap_positions, velocity, timestep_s: float, rng,
+                   n_particles: int = 200, init_pose=None, map_min_support: int = 1,
+                   map_min_excess_m: float = 0.0, sigma_lidar: float = 0.5,
+                   scan_subsample: int = 100, voxel: float = 0.5):
+    """Tight WiFi+LiDAR fusion: one particle filter, two independent likelihoods.
+
+    weight = w_wifi(bistatic reprojection) x w_lidar(scan match vs the accumulated
+    LiDAR map). The scan-match target is the LiDAR map ONLY -- WiFi reflectors are too
+    noisy under realistic CSI to be a registration target. The OUTPUT map is the union
+    of WiFi-triangulated reflectors and LiDAR points.
+    """
+    n_frames = len(detections)
+    particles = np.zeros((n_particles, 3))
+    if init_pose is not None:
+        particles[:, 0] = init_pose[0]
+        particles[:, 1] = init_pose[1]
+        particles[:, 2] = init_pose[2] if len(init_pose) > 2 else 0.0
+    weights = np.ones(n_particles) / n_particles
+    est_traj = np.zeros((n_frames, 3))
+    wifi_points: list[np.ndarray] = []
+    lidar_cells: dict[tuple[int, int], np.ndarray] = {}
+
+    def _accumulate_lidar(world_pts: np.ndarray) -> None:
+        for p in world_pts:
+            key = (int(round(p[0] / voxel)), int(round(p[1] / voxel)))
+            lidar_cells.setdefault(key, p)
+
+    pos_noise = 0.05
+    for f in range(n_frames):
+        if f > 0:
+            vx, vy = velocity[f]
+            particles[:, 0] += vx * timestep_s + rng.normal(0, pos_noise, n_particles)
+            particles[:, 1] += vy * timestep_s + rng.normal(0, pos_noise, n_particles)
+
+        updated = False
+
+        dets = detections[f]                       # --- WiFi bistatic likelihood ---
+        if dets.shape[0] > 0:
+            mean_pose = np.average(particles, axis=0, weights=weights)
+            for path_len, aoa, ap_i in dets:
+                ap_xy = np.asarray(ap_positions[int(ap_i)])[:2]
+                refl = _triangulate_bistatic(mean_pose[:2], ap_xy, path_len, aoa,
+                                             min_excess_m=map_min_excess_m)
+                if refl is None:
+                    continue
+                wifi_points.append(refl)
+                pr = np.array([_reproject_bistatic(p[:2], ap_xy, refl) for p in particles])
+                err = (pr[:, 0] - path_len) ** 2 + (pr[:, 1] - aoa) ** 2
+                weights *= np.exp(-0.5 * err / (0.5 ** 2))
+            updated = True
+
+        scan = scans[f]                            # --- LiDAR scan-match likelihood ---
+        if len(scan) > 0 and len(lidar_cells) >= 3:
+            target = np.array(list(lidar_cells.values()))
+            pts = scan.points
+            if scan_subsample and pts.shape[0] > scan_subsample:
+                pts = pts[rng.choice(pts.shape[0], scan_subsample, replace=False)]
+            weights *= _lidar_likelihood(particles, pts, cKDTree(target), sigma_lidar)
+            updated = True
+
+        if updated:
+            weights += 1e-300
+            weights /= weights.sum()
+            neff = 1.0 / np.sum(weights ** 2)
+            if neff < n_particles / 2:
+                idx = rng.choice(n_particles, n_particles, p=weights)
+                particles = particles[idx]
+                weights = np.ones(n_particles) / n_particles
+
+        est_traj[f] = np.average(particles, axis=0, weights=weights)
+        if len(scan) > 0:
+            _accumulate_lidar(scan.to_world(est_traj[f]))
+
+    wifi_map = (_cluster(np.array(wifi_points), min_support=map_min_support)
+                if wifi_points else np.empty((0, 2)))
+    lidar_map = (np.array(list(lidar_cells.values())) if lidar_cells
+                 else np.empty((0, 2)))
+    parts = [m for m in (wifi_map, lidar_map) if m.size]
+    est_map = _voxel_downsample(np.vstack(parts), voxel) if parts else np.empty((0, 2))
+    return est_traj, est_map
