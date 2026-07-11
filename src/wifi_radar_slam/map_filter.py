@@ -77,3 +77,19 @@ class HeuristicFilter:
         if X.shape[0] == 0:
             return np.zeros(0, dtype=bool)
         return X[:, 1] >= self.min_excess_m       # column 1 == excess_m
+
+
+class SklearnFilter:
+    """Rungs 2-3 (learned): wrap a fitted sklearn classifier (RandomForest or MLP) in
+    the same contract as HeuristicFilter, so run_slam treats every rung identically."""
+
+    def __init__(self, model, threshold: float = 0.5):
+        self.model = model
+        self.threshold = float(threshold)
+
+    def __call__(self, dets, pose, ap_positions) -> np.ndarray:
+        X = music_features(dets, pose, ap_positions)
+        if X.shape[0] == 0:
+            return np.zeros(0, dtype=bool)
+        proba = self.model.predict_proba(X)[:, 1]
+        return proba >= self.threshold
