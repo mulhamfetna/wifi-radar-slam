@@ -1,6 +1,7 @@
+import math
 import pytest
 from wifi_radar_slam.cost import (load_cost_data, wifi_package_cost, lidar_envelope,
-                                  cost_ratio)
+                                  cost_ratio, cost_normalized)
 
 COST_YAML = "data/cost_data.yaml"
 
@@ -74,3 +75,27 @@ def test_cost_ratio_is_a_conservative_range():
     lo, hi = cost_ratio((50.0, 100.0), (500.0, 600.0))
     assert lo == pytest.approx(5.0)
     assert hi == pytest.approx(12.0)
+
+
+def test_cost_normalized_accuracy_is_price_times_error():
+    # $50-100 package at 0.03 m ATE -> 1.5-3.0 $.m (lower is better)
+    lo, hi = cost_normalized((50.0, 100.0), 0.03, mode="accuracy")
+    assert lo == pytest.approx(1.5)
+    assert hi == pytest.approx(3.0)
+
+
+def test_cost_normalized_coverage_is_price_per_iou():
+    lo, hi = cost_normalized((50.0, 100.0), 0.5, mode="coverage")
+    assert lo == pytest.approx(100.0)
+    assert hi == pytest.approx(200.0)
+
+
+def test_zero_iou_means_no_mapping_value_at_any_price():
+    # WiFi-realistic IoU ~ 0 -> infinite $ per IoU point (not a crash)
+    lo, hi = cost_normalized((50.0, 100.0), 0.0, mode="coverage")
+    assert math.isinf(lo) and math.isinf(hi)
+
+
+def test_unknown_mode_raises():
+    with pytest.raises(ValueError):
+        cost_normalized((50.0, 100.0), 0.5, mode="nonsense")

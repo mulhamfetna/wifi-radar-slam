@@ -52,3 +52,22 @@ def cost_ratio(wifi_range, lidar_range) -> tuple[float, float]:
     w_lo, w_hi = float(wifi_range[0]), float(wifi_range[1])
     l_lo, l_hi = float(lidar_range[0]), float(lidar_range[1])
     return l_lo / w_hi, l_hi / w_lo
+
+
+def cost_normalized(price_range, metric_value: float, mode: str) -> tuple[float, float]:
+    """Overlay price on an RQ3 metric so cost is never read without accuracy.
+
+    mode="accuracy": price * ATE   -> $.m  (lower is better; cheap AND accurate wins)
+    mode="coverage": price / IoU   -> $ per IoU point (lower is better).
+                     IoU <= 0 returns inf: no mapping value at any price (the
+                     WiFi-realistic case), which is a result, not an error.
+    """
+    lo, hi = float(price_range[0]), float(price_range[1])
+    v = float(metric_value)
+    if mode == "accuracy":
+        return lo * v, hi * v
+    if mode == "coverage":
+        if v <= 0.0:
+            return float("inf"), float("inf")
+        return lo / v, hi / v
+    raise ValueError(f"unknown mode {mode!r}; use 'accuracy' or 'coverage'")
