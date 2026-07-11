@@ -1,0 +1,68 @@
+{
+  "wifi_package_usd": {
+    "headline": [
+      40.0,
+      95.0
+    ],
+    "esp32": [
+      10.0,
+      35.0
+    ],
+    "deployed_3ap": [
+      130.0,
+      335.0
+    ]
+  },
+  "lidar_tiers": [
+    {
+      "key": "legacy_spinning",
+      "low": 75000.0,
+      "high": 80000.0,
+      "automotive_grade": true,
+      "ratio_vs_wifi_headline": [
+        789.4736842105264,
+        2000.0
+      ]
+    },
+    {
+      "key": "ouster_os1",
+      "low": 8000.0,
+      "high": 24000.0,
+      "automotive_grade": true,
+      "ratio_vs_wifi_headline": [
+        84.21052631578948,
+        600.0
+      ]
+    },
+    {
+      "key": "mid_solid_state",
+      "low": 500.0,
+      "high": 600.0,
+      "automotive_grade": true,
+      "ratio_vs_wifi_headline": [
+        5.2631578947368425,
+        15.0
+      ]
+    },
+    {
+      "key": "cheap_solid_state",
+      "low": 100.0,
+      "high": 200.0,
+      "automotive_grade": true,
+      "ratio_vs_wifi_headline": [
+        1.0526315789473684,
+        5.0
+      ]
+    },
+    {
+      "key": "budget_2d",
+      "low": 99.0,
+      "high": 99.0,
+      "automotive_grade": false,
+      "ratio_vs_wifi_headline": [
+        1.0421052631578946,
+        2.475
+      ]
+    }
+  ]
+}
