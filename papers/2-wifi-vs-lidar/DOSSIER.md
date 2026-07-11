@@ -219,11 +219,52 @@ helps it is essentially free** (~4.8× better $·m value; 36–79 % ATE gain for
 money) — the strongest practical case in the paper for a **hybrid** rather than a
 replacement. When it hurts, no price justifies it.
 
+## Learned enhancement (RQ2) — DONE (decisive NEGATIVE result + a correction to paper 1)
+Spec: `../../docs/superpowers/specs/2026-07-11-paper2-learned-map-filter-design.md`;
+results in `../../docs/results-paper2.md` ("Enhancement (RQ2)");
+code `src/wifi_radar_slam/map_filter.py` + `run_slam(map_filter=...)` hook.
+
+**Answer: NO — a learned discriminator cannot close the WiFi mapping gap, because the gap is
+not a discrimination problem.** Every ladder rung (none / heuristic / RandomForest / MLP)
+leaves **IoU 0.000** on both scenes; the learned rungs reject everything and **empty the map**.
+
+**Why (decisive diagnostic, `experiments/diagnose_triangulation.py`).** Running the *same*
+bistatic triangulation on oracle vs realistic path parameters:
+- **Oracle delay/AoA → 100 %** of detections triangulate within 1 m of a facade (median
+  0.25–0.32 m). The geometry is perfect when the parameters are right.
+- **MUSIC-estimated → only 1.8 %** (controlled) / **23.6 %** (street), median 3.27 m, and
+  **1702 of 2160** street triangulations fail outright.
+
+**A filter CHOOSES detections; it cannot CORRECT their delay/AoA.** If only 2–24 % of
+detections can produce a good map point, no classifier can build a map from them. The
+bottleneck is **estimation accuracy**, not path selection.
+
+**Correction to paper 1.** Paper 1 concluded mapping is floored by *path discrimination* and
+that this is *learnable* (F1 ≈ 0.9), implying a learned filter would fix the map. Two flaws:
+(a) that discriminator used **`elevation`**, which a single-ULA 2-D front-end **cannot
+measure** — an oracle feature (our corrected F1 on MUSIC-observable features: **0.00–0.45**
+held-out, **0.00–0.20** cross-scene); (b) it classified **true Sionna paths**, not **MUSIC
+detections**. The inference "discrimination is learnable ⇒ mapping is fixable" **does not
+hold**. (Paper 1 is submitted and frozen — this is a correction to carry into paper 2 and any
+paper-1 revision, NOT an edit to the frozen submission.)
+
+**What it does not show.** Not that DL cannot help — only that **classification-based
+filtering of estimated paths** cannot. The correct formulation must bypass/repair the
+estimation stage (end-to-end CSI→geometry; literature precedent in `docs/literature-paper2.md`).
+Future work, not claimed.
+
+## Status: all 5 research questions answered
+RQ1 (drop-in?) · RQ2 (DL enhancement) · RQ3 (accuracy) · RQ4 (fusion) · RQ5 (cost).
+
+**Thesis.** Ambient WiFi is a viable **drop-in replacement for LiDAR *localization*** — it
+matches or beats LiDAR at **84–600× lower cost** — but **not for mapping**, and the mapping
+gap is **not cheaply patchable** (RQ2). The practical recommendation is therefore the
+**hybrid**: adding WiFi to an existing LiDAR costs **~0.5 % more** and improves localization
+**36–79 %** (RQ4), with the LiDAR supplying the coverage WiFi cannot.
+
 ## Next step
-**RQ2 — deep-learning enhancement** (the final research question): can DL close the WiFi
-mapping-coverage gap (realistic-CSI IoU ≈ 0)? Its own brainstorming → spec → plan cycle;
-do not start before design approval. Precedent from the literature review: transformer
-CSI→3D point cloud (ICP RMSE ~0.01 m); U-Net/CLIP-ViT RF→outdoor geometry; RF-Pose.
+Assemble paper 2's manuscript (own cycle), reusing the paper-1 IEEEtran scaffold in
+`../1-wifi-radar-slam/`. Do not start before design approval.
 
 ## Do-not-mix reminders
 - Paper 1 is frozen (`v0.7.1` / `paper1-submitted`); do not alter its *content* when
