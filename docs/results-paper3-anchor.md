@@ -1,140 +1,147 @@
 # Paper 3 · Sub-project 2 — the radar credibility anchor
 
-**Status: 🔴 GATE NOT PASSED — work in progress, paused 2026-07-12.**
-**Branch:** `paper3-sub2-anchor` (not merged, not tagged — correctly, since the gate has not passed).
+**Status: 🔴 GATE FAILED — and the root cause is architectural, not a bug.**
+**Branch:** `paper3-sub2-anchor` — deliberately **not merged, not tagged**.
 
-This file is the running record of the credibility gate. It is deliberately written *before* the
-gate passes, because the debugging trail is itself a result: it says precise, quantified things
-about why point-based ICP struggles on spinning radar.
-
----
-
-## The setup
-
-| | |
-|---|---|
-| Data | **Boreas** `boreas-2020-11-26-13-58`, 2,500 scans, **5,008 m**, 4 Hz Navtech spinning radar |
-| Why Boreas, not Oxford | Boreas is anonymous public HTTPS; Oxford requires a registration that cannot be automated |
-| Back-end | `lidar/slam_icp.run_lidar_slam` — **unchanged**, as the whole argument requires |
-| Front-end | k-strongest per azimuth (CFEAR-class) |
-| Scoring | KITTI protocol, standard 100–800 m lengths (valid: the sequence is km-scale) |
-| Ground truth | `applanix/radar_poses.csv`, joined to scans **by filename** (`GPSTime` *is* the PNG name) |
-
-**Yaw convention verified, not assumed:** mean |heading − course of travel| = **1.5°**. Boreas
-`heading` is the maths convention. This was checked first, precisely because sub-project 1 was
-burned three times by assumed conventions.
-
-## Cited SOTA — with the caveats that make them honest
-
-| Method | Drift | Dataset | Caveat |
-|---|---|---|---|
-| **CFEAR** | **1.09 %** | Oxford | The **tuned** figure (**1.16 %** untuned). Radar-only, point-based. **Our real reference point.** |
-| **DRO** | 0.26 % | Boreas | **Gyro-aided**, and a *direct-intensity* method that extracts no points at all. **Not an apples-to-apples bound for us**, and must never be presented as one. |
+The gate did its job. It was built to answer one question before we invested in the ablation —
+*is our shared back-end a credible radar baseline?* — and the answer is **no**, for a reason that
+is now precisely characterised.
 
 ---
 
-## Gate runs so far — all FAILED
+## The finding
 
-| Run | Front-end | Drift (trans) | Rot | Verdict |
+> **Our shared point-to-point scan-to-map ICP back-end cannot estimate rotation from spinning-radar
+> point clouds — at all. The registration cost is FLAT in yaw.**
+
+This is not a tuning problem, not a convergence problem, and not an initialisation problem. Six
+independent hypotheses were tested and killed. The evidence:
+
+**1. The cost function does not have its minimum at the true yaw.** Sweeping yaw across ±8° around
+the truth on the sharpest turning frames (true yaw change ~11°/frame), holding translation fixed:
+
+| frame | true Δyaw | cost at truth | cost at its minimum | where the minimum actually is |
 |---|---|---|---|---|
-| 1 | k=12, 100 m, no range NMS | 57.4 % | 21.4 °/100 m | FAIL |
-| 2 | k=12, 100 m, **range NMS** | 88.1 % | 15.9 °/100 m | FAIL |
-| 3 | **k=40, 50 m**, range NMS | **84.9 %** | 15.7 °/100 m | FAIL |
+| 151 | +11.90° | 0.3933 | 0.3850 | **−6.0°** from truth |
+| 150 | +11.69° | 0.3966 | 0.3886 | **+6.0°** |
+| 149 | +11.20° | 0.3900 | 0.3839 | **+8.0°** |
+| 147 | +10.93° | 0.3890 | 0.3789 | **−8.0°** |
+| 148 | +10.91° | 0.3895 | 0.3858 | **+2.0°** |
+| 146 | +10.85° | 0.3755 | 0.3723 | **−8.0°** |
 
-Thresholds (fixed in advance, never moved): **< 5 % PASS · 5–10 % MARGINAL · > 10 % FAIL.**
+The cost varies by ~2% over a ±8° span and its minimum sits at **random** offsets. There is no
+rotational signal to descend.
 
----
+**2. ICP therefore recovers essentially ZERO rotation.** Correlation between the yaw *error* and the
+*true* yaw change: **−0.992**. The estimate simply stays wherever the initial guess put it. (True
+per-frame yaw change: std 2.26°. Yaw error: std 2.42°. Nearly identical — the definition of
+recovering nothing.)
 
-## What the debugging established — three real findings, each measured
+**3. It is not the point density.** Contrast (cost at ±6° ÷ cost at truth; > 1.3 would mean a real
+minimum) measured across the whole front-end range:
 
-### 1. The k-strongest front-end was picking bins, not targets *(fixed)*
+| front-end | pts/scan | contrast | |
+|---|---|---|---|
+| k=2 | 800 | 0.94 | FLAT |
+| k=4 | 1,600 | 0.96 | FLAT |
+| k=12 | 4,800 | 1.03 | FLAT |
+| k=40 | 16,000 | 1.01 | FLAT |
+| k=12, 3 m sep | 4,797 | 1.03 | FLAT |
+| k=4, 5 m sep | 1,598 | 0.97 | FLAT |
 
-A radar target is **extended**: a wall lights up a run of adjacent range bins. So the "k strongest
-bins" were, overwhelmingly, k samples of **one** target. Measured on real data: the 12 picks in an
-azimuth spanned a median of **0.7 m**, and **96 % of consecutive picks sat < 0.15 m apart**. A
-nominal 4,800-point cloud carried only ~400 independent measurements, each smeared into a short
-**radial streak** — and point-to-point ICP slides along such streaks almost for free.
-
-Handed the *exact* frame-to-frame motion as its starting guess, ICP still converged **0.62 m** away
-from it, on a 2 m step. Enforcing 1 m of range separation (non-maximum suppression) cut that to
-**0.13 m**. Fixed in `radar/kstrongest.py` (`min_separation_m`), with a regression test.
-
-### 2. Radar's noise is ANISOTROPIC, and that is what wrecks yaw
-
-Range is accurate (0.06 m) but **cross-range error grows with range**: the 0.9° beam gives ±1.6 m
-of tangential error at 100 m. **Yaw is estimated from tangential displacement — exactly the noisy
-direction — and point-to-point ICP weights every direction equally.**
-
-Measured per-frame yaw error (scan-to-scan, moving frames):
-
-| front-end | yaw err std | implied random-walk drift |
-|---|---|---|
-| k=12, 100 m | **5.35°** | ~38 °/100 m |
-| k=12, 50 m | 3.99° | ~28 °/100 m |
-| **k=40, 50 m** | **0.46°** | **~3 °/100 m** |
-| k=40, 30 m | 0.52° | ~4 °/100 m |
-
-More returns per azimuth average the noise down; cropping range removes the worst of it. **This is
-precisely why CFEAR uses a point-to-LINE metric on oriented surface points** rather than
-point-to-point — it projects error onto surface normals and so ignores the noisy tangential
-component.
-
-### 3. Scan-to-scan WORKS. Scan-to-map is what fails.
-
-| registration | per-frame translation error |
-|---|---|
-| scan-to-**scan**, GT init | 0.31 m |
-| scan-to-**scan**, constant-velocity init | **0.24 m** (the motion model is fine — exonerated) |
-| scan-to-**map** (what the back-end does) | **1.22 m** |
-
-And the accumulated map *actively hurts*, monotonically — measured at k=12/100 m:
-
-| map | per-frame error |
-|---|---|
-| unbounded global (current back-end) | 1.22 m |
-| 50-frame window | 0.86 m |
-| 25-frame window | 0.57 m |
-| **10-frame window** | **0.43 m** |
-
-Radar's cross-range error means each frame's far returns land in slightly different places, so an
-unbounded map that never forgets **smears into a cloud**; the back-end's first-point-wins voxels
-never average it out. CFEAR registers against a **sliding local map**, not a global one.
-
-### Things investigated and EXONERATED (recorded so nobody re-runs them)
-
-- **The noise floor / `z_min`.** The prime suspect, and wrong: the 12 picks have median power 72–78
-  against a noise floor of 9 (p99 = 64). **0 % of picks are near noise.**
-- **Motion compensation.** Neither translational nor full translation+rotation compensation changes
-  the yaw error (std 4.87 / 4.87 / 4.82°). *(Kept anyway — it is physically correct, and the
-  249 ms sweep at 15 m/s really does smear a scan by 3.7 m.)*
-- **The yaw convention.** Verified at 1.5°.
-- **The motion model.** Constant-velocity init is as good as GT init (0.24 vs 0.31 m).
+**Every density is flat.**
 
 ---
 
-## ⏭ Where to resume
+## Hypotheses tested and KILLED (recorded so nobody re-runs them)
 
-**The open contradiction:** scan-to-scan yaw error is now **0.46°** (k=40/50 m) — good enough for
-~3 °/100 m — yet the full scan-to-**map** SLAM still drifts 85 %. The window sweep that showed the
-global map is the culprit was run with the **old, bad front-end (k=12/100 m)**. It must be redone
-with the corrected one.
+| # | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| 1 | The noise floor — `z_min=0` admits noise | **WRONG** | The 12 picks have median power 72–78 vs a noise floor of 9 (p99 = 64). **0 %** of picks are near noise. |
+| 2 | Motion distortion (249 ms sweep) | **WRONG** | Translation-only *and* full translation+rotation compensation leave yaw error unchanged (4.87 / 4.87 / 4.82°). |
+| 3 | The yaw convention | **WRONG** | Verified: mean \|heading − course of travel\| = **1.5°**. |
+| 4 | The motion model | **WRONG** | Constant-velocity init ≈ GT init on translation. Extrapolating yaw makes it **worse** (3.34° vs 1.87°) — the yaw rate is too noisy. |
+| 5 | The accumulated map | **PARTLY** — but not the cause | With the old front-end, a shorter window helped (1.22 → 0.43 m). With the corrected front-end, *no* window helps: global 84.9 %, window=1 59.3 %, window=10 83.4 %. |
+| 6 | The registration **metric** (point-to-line, as CFEAR uses) | **WRONG as I implemented it** | Yaw std 2.55° vs 2.41° — no help. *Because* local PCA normals on a cloud strung along 400 fixed azimuth rays return the **ray** direction, not the surface normal. |
 
-**Next step, concretely:** re-run the map-window sweep (`window ∈ {1, 3, 5, 10, 20}`) with
-**k=40, max_range 50 m, NMS on**, over the full 2,500 frames, and report drift for each. Diagnostic
-scripts are in the session scratchpad (`win_sweep.py`, `yaw_diag.py`, `mc_diag.py`).
+### One real bug WAS found and fixed along the way
 
-**Then the decision, which is the user's to make:**
+**k-strongest was picking bins, not targets.** A radar target is *extended*: a wall lights up a run
+of adjacent range bins, so the "12 strongest bins" were 12 samples of **one** wall (median spread
+0.7 m; 96 % of consecutive picks < 0.15 m apart). The 4,800-point cloud held only ~400 independent
+measurements, each a short **radial streak**. Fixed with range non-maximum suppression
+(`min_separation_m`), with a regression test. It improved translation markedly — but it did not
+touch rotation, because rotation was never there to begin with.
 
-- **(a)** If a bounded local-map window fixes it → add `map_window` to `run_lidar_slam` as an
-  **optional parameter defaulting to `None` (= today's exact behaviour, so paper 2 stays
-  bit-identical)**, and use a finite window for **every sensor** in paper 3. That keeps the
-  "one back-end for every sensor" argument fully intact — the constraint is *identical across
-  sensors*, not *frozen forever*.
-- **(b)** If it does not → the honest finding is that **point-to-point ICP is the wrong registration
-  metric for spinning radar** (finding 2 above says why, quantitatively). The options are then to
-  implement a point-to-line metric (a real back-end change, applied to all sensors), or to accept a
-  MARGINAL/FAIL verdict and **bound the paper's claims**: radar would be *understated*, making any
-  WiFi-vs-radar gap we report a **lower bound**.
+### ⚠️ A measurement trap I fell into, recorded honestly
 
-**Do not tag or merge this branch until the gate passes or the paper's claims are explicitly
-bounded.** A FAIL is a real outcome, not something to tune around.
+I initially concluded that `k=40, 50 m` was much better because it cut the yaw error from 5.35° to
+0.46° **when ICP was given a perfect initial guess**. That conclusion was **wrong**, and the reason
+matters: a flatter cost makes ICP *move less*, so a method that returns its input unchanged scores
+perfectly on a perfect-init test. **I was measuring stillness, not accuracy.** The commit that set
+`K=40, MAX_RANGE_M=50` rests on that flawed measurement and should be revisited, not trusted.
+
+---
+
+## Why radar breaks point-to-point ICP (the mechanism)
+
+Radar's noise is **anisotropic**: range is accurate (0.06 m) but cross-range error grows with range
+— a 0.9° beam gives ±1.6 m of tangential error at 100 m. **Rotation is read from tangential
+displacement — exactly the noisy direction** — and point-to-point ICP weights every direction
+equally. On top of that, the returns lie along **400 fixed azimuth rays**, identical in every scan,
+so nearest-neighbour correspondences have no distinctive structure to lock onto.
+
+This is precisely why **CFEAR** — the SOTA baseline — does none of what we do. It compresses each
+scan into a few hundred **oriented surface points** (grid cells → mean + covariance → a normal),
+and registers **point-to-line** on *those*. The normals are what make yaw observable. My
+point-to-line attempt failed because I computed normals on the raw ray-strung cloud, where PCA
+returns the ray direction, not the surface.
+
+---
+
+## Gate runs (thresholds fixed in advance: < 5 % PASS · 5–10 % MARGINAL · > 10 % FAIL)
+
+| Run | Front-end | Drift | Rot | Verdict |
+|---|---|---|---|---|
+| 1 | k=12, 100 m, no NMS | 57.4 % | 21.4 °/100 m | FAIL |
+| 2 | k=12, 100 m, NMS | 88.1 % | 15.9 °/100 m | FAIL |
+| 3 | k=40, 50 m, NMS | 84.9 % | 15.7 °/100 m | FAIL |
+
+Setup: **Boreas** `boreas-2020-11-26-13-58`, 2,500 scans, **5,008 m**, 4 Hz Navtech. GT joined to
+scans by filename. Yaw convention verified (1.5°). Back-end used **unchanged**, as the argument
+requires.
+
+**Cited SOTA, with the caveats that keep them honest:** CFEAR **1.09 %** (IEEE T-RO 39(2), 2023 —
+the *tuned* figure; 1.16 % untuned; Oxford, not Boreas). DRO **0.26 %** (arXiv 2504.20339, Boreas)
+— but **gyro-aided** and *direct-intensity*, therefore **not** an apples-to-apples bound for a
+point-based radar-only method like ours.
+
+---
+
+## What this means for the paper — the decision is the user's
+
+The gate has done exactly what it was built to do: it stopped us **before** the ablation was built
+on sand. Three ways forward.
+
+**A. Implement CFEAR-class registration** (oriented surfels + point-to-line) as an option in the
+shared back-end, applied identically to every sensor. Substantial work — effectively a sub-project.
+Keeps the paper exactly as designed, and would very likely improve LiDAR and WiFi too. The
+"one back-end for every sensor" argument survives intact, so long as the default stays
+point-to-point so paper 2 remains bit-identical.
+
+**B. Restructure paper 3 around what the substrate can actually do.** Note that **RQ1 — the
+headline — does not need SLAM at all.** "Is the ≈89 % phantom ceiling universal to RF sensing?" is
+answered from the detection chain against ground-truth geometry, using GT poses. So are the map
+metrics and most of the 2×2 ablation. Only **RQ3 (head-to-head SLAM accuracy)** requires a working
+radar odometry. Paper 3 could report RQ1/RQ2/RQ4 in full and either drop RQ3 or state plainly that
+our shared point-based back-end cannot do radar odometry — **which is itself a defensible, cited
+finding**, and is exactly why CFEAR exists.
+
+**C. Report the FAIL and bound the claims** — keep RQ3 but state that radar is *understated* by our
+back-end, making any WiFi-vs-radar SLAM gap a **lower bound**. Weakest option: a reviewer who knows
+the radar literature will ask why we did not simply use a point-to-line metric.
+
+**Recommendation: B, possibly with A later.** B is honest, preserves the paper's actual headline,
+and costs nothing we have not already built. A is the ambitious path and is a real contribution to
+the shared substrate, but it is a sub-project in its own right and should be chosen deliberately,
+not slipped in to rescue a gate.
