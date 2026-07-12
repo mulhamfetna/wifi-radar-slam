@@ -92,3 +92,54 @@ def test_mismatched_grid_shapes_are_rejected():
     az, rg = grids()
     with pytest.raises(ValueError):
         k_strongest(np.zeros((3, 7)), rg, az, k=1)
+
+
+# --- non-maximum suppression in range -------------------------------------------
+
+def test_the_k_picks_are_distinct_targets_not_one_target_sampled_k_times():
+    # THE BUG THIS GUARDS. A radar target is EXTENDED: it lights up many adjacent range
+    # bins. Taking the "k strongest bins" therefore returns k samples of ONE target -- a
+    # short radial streak -- rather than k targets. Measured on real Boreas data: 96 % of
+    # consecutive picks sat < 0.15 m apart, so a nominal 4,800-point cloud carried only
+    # ~400 independent measurements, each smeared into a streak pointing away from the
+    # sensor. Point-to-point ICP slides along those streaks almost for free, and it landed
+    # 0.62 m off a 2 m frame step even when handed the exact answer as its starting guess.
+    # With 1 m separation enforced, that error fell to 0.13 m.
+    az = np.array([0.0])
+    rg = (np.arange(400) + 0.5) * 0.05                  # 5 cm bins, like a real radar
+    power = np.zeros((1, 400))
+    power[0, 100:112] = [90, 95, 99, 97, 93, 88, 84, 80, 77, 75, 73, 71]   # ONE extended target
+    power[0, 300] = 60                                                     # a second, weaker one
+
+    # without separation (the old behaviour): all 12 picks land on the first target's flank,
+    # and the genuine second target is never seen at all
+    naive = k_strongest(power, rg, az, k=12, min_range_m=1.0, min_separation_m=0.0)
+    r_naive = np.sort(np.linalg.norm(naive.points, axis=1))
+    assert r_naive.max() - r_naive.min() < 1.0          # a 0.6 m streak, one target
+    assert not np.any(np.abs(r_naive - rg[300]) < 0.1)  # the real second target is MISSED
+
+    # with separation: the two distinct targets are both found
+    fixed = k_strongest(power, rg, az, k=12, min_range_m=1.0, min_separation_m=1.0)
+    r_fixed = np.sort(np.linalg.norm(fixed.points, axis=1))
+    assert len(fixed) == 2
+    assert np.abs(r_fixed[0] - rg[102]) < 0.1           # the peak of the extended target
+    assert np.abs(r_fixed[1] - rg[300]) < 0.1           # and the second target
+
+
+def test_separation_keeps_the_strongest_of_each_cluster():
+    az = np.array([0.0])
+    rg = (np.arange(200) + 0.5) * 0.05
+    power = np.zeros((1, 200))
+    power[0, 50:55] = [10, 90, 40, 20, 15]       # the peak of this cluster is bin 51
+    scan = k_strongest(power, rg, az, k=1, min_range_m=1.0, min_separation_m=1.0)
+    assert len(scan) == 1
+    assert np.abs(np.linalg.norm(scan.points[0]) - rg[51]) < 1e-6
+
+
+def test_zero_separation_is_the_old_behaviour():
+    az, rg = grids()
+    power = np.zeros((len(az), len(rg)))
+    power[:, 30] = 5.0
+    a = k_strongest(power, rg, az, k=1, min_separation_m=0.0)
+    b = k_strongest(power, rg, az, k=1)
+    assert np.allclose(a.points, b.points)

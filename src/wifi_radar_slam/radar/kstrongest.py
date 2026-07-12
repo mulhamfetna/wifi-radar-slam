@@ -19,25 +19,52 @@ identically to every ablation cell.
 """
 from __future__ import annotations
 import numpy as np
+from scipy.ndimage import maximum_filter1d
+
 from ..lidar.pointcloud import Scan
+
+# Minimum range separation between two returns in the same azimuth, in metres. Below this
+# they are two samples of ONE extended target, not two targets. See k_strongest.
+DEFAULT_MIN_SEPARATION_M = 1.0
 
 
 def k_strongest(power: np.ndarray, ranges: np.ndarray, azimuths: np.ndarray,
                 k: int = 12, min_range_m: float = 2.0,
-                max_range_m: float | None = None, z_min: float = 0.0) -> Scan:
-    """Keep the k strongest range bins in each azimuth -> a sensor-local Scan.
+                max_range_m: float | None = None, z_min: float = 0.0,
+                min_separation_m: float = DEFAULT_MIN_SEPARATION_M) -> Scan:
+    """Keep the k strongest DISTINCT returns in each azimuth -> a sensor-local Scan.
 
     Args:
-        power:       (n_azimuth, n_range) real power / intensity.
-        ranges:      (n_range,) range of each bin, metres.
-        azimuths:    (n_azimuth,) bearing of each row, radians (+x forward, +y at +90 deg).
-        k:           returns kept per azimuth.
-        min_range_m: blind zone -- a monostatic radar hears itself at short range.
-        max_range_m: gate beyond this (None -> no upper gate).
-        z_min:       absolute power floor; bins at or below it are never returned.
+        power:            (n_azimuth, n_range) real power / intensity.
+        ranges:           (n_range,) range of each bin, metres.
+        azimuths:         (n_azimuth,) bearing of each row, radians (+x forward, +y at +90).
+        k:                returns kept per azimuth.
+        min_range_m:      blind zone -- a monostatic radar hears itself at short range.
+        max_range_m:      gate beyond this (None -> no upper gate).
+        z_min:            absolute power floor; bins at or below it are never returned.
+        min_separation_m: two returns closer than this in range are the SAME target; only the
+                          stronger survives. 0 disables the suppression.
 
     Returns a Scan in the sensor-local frame. Points are an ordinary polar -> Cartesian
     projection: the geometry is monostatic, so the measured range is an honest round trip.
+
+    WHY THE SEPARATION IS LOAD-BEARING -- this cost us the credibility gate once.
+
+    A radar target is EXTENDED: a wall lights up a run of adjacent range bins. So the k
+    strongest *bins* are, overwhelmingly, k samples of ONE target rather than k targets.
+    Measured on real Boreas data: the 12 picks in an azimuth spanned a median of just 0.7 m,
+    and 96 % of consecutive picks sat under 0.15 m apart. A nominal 4,800-point cloud
+    therefore carried only ~400 independent measurements, each smeared into a short RADIAL
+    STREAK pointing away from the sensor.
+
+    Point-to-point ICP handles that badly: it can slide along a radial streak almost for
+    free, and its correspondences get dominated by matching duplicates to duplicates. Handed
+    the exact frame-to-frame motion as its starting guess, it still converged 0.62 m away
+    from it -- on a 2 m step. Enforcing 1 m of separation cut that to 0.13 m, and it is the
+    difference between a radar baseline that tracks and one that does not.
+
+    This is also what the name has always promised. CFEAR keeps the strongest RETURNS per
+    azimuth; returns are targets, not ADC bins.
     """
     power = np.asarray(power, dtype=float)
     ranges = np.asarray(ranges, dtype=float).ravel()
@@ -56,6 +83,15 @@ def k_strongest(power: np.ndarray, ranges: np.ndarray, azimuths: np.ndarray,
     p = power[:, gate]
     r_gated = ranges[gate]
 
+    if min_separation_m > 0 and r_gated.size > 1:
+        # Non-maximum suppression along range: a bin survives only if it is the strongest
+        # within +/- min_separation_m of itself, so what reaches the top-k below is a set of
+        # distinct target PEAKS, not a run of samples off one target's flank.
+        bin_m = float(np.median(np.diff(r_gated)))
+        w = max(int(round(min_separation_m / max(bin_m, 1e-9))), 1)
+        peak = p >= maximum_filter1d(p, size=2 * w + 1, axis=1, mode="nearest")
+        p = np.where(peak, p, -np.inf)
+
     kk = int(min(k, p.shape[1]))
     # argpartition puts the kk largest of each row in the last kk slots -- O(n) per row, and
     # we do not care about their order among themselves.
@@ -64,7 +100,7 @@ def k_strongest(power: np.ndarray, ranges: np.ndarray, azimuths: np.ndarray,
     cols = idx.ravel()
     vals = p[rows, cols]
 
-    keep = vals > z_min
+    keep = np.isfinite(vals) & (vals > z_min)                # -inf = suppressed by NMS
     if not keep.any():
         return Scan.empty()
     rows, cols = rows[keep], cols[keep]
