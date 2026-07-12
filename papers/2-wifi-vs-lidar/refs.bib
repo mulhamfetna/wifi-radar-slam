@@ -1,0 +1,386 @@
+% ============================================================================
+%  WiFi-as-Radar for Automotive SLAM — Reference library (Round 1, verified)
+%  Compiled 2026-07-04. Keys grouped by thread.
+%  Access: OA = open-access; PAYWALL = paywalled (author copy noted in `note`).
+%  NOTE: entries marked "VERIFY" have unconfirmed authors/venue pending Round 2.
+% ============================================================================
+
+% ---------------------------------------------------------------------------
+% Thread 1 — Passive WiFi radar
+% ---------------------------------------------------------------------------
+
+@article{chetty2012ttwifi,
+  author  = {Chetty, Kevin and Smith, Graeme E. and Woodbridge, Karl},
+  title   = {Through-the-Wall Sensing of Personnel Using Passive Bistatic
+             {WiFi} Radar at Standoff Distances},
+  journal = {IEEE Transactions on Geoscience and Remote Sensing},
+  volume  = {50},
+  number  = {4},
+  pages   = {1218--1226},
+  year    = {2012},
+  doi     = {10.1109/TGRS.2011.2164411},
+  url     = {https://ieeexplore.ieee.org/document/6020778}
+}
+
+@article{phamsu2021beacon,
+  author  = {Pham, Duc Su},
+  title   = {Ambiguity Function Analysis of {WiFi} Beacon Transmissions for
+             Passive Bistatic Radar},
+  journal = {Journal of Military Science and Technology (JMST)},
+  number  = {71},
+  year    = {2021},
+  url     = {https://online.jmst.info/index.php/jmst/article/view/97}
+}
+
+@article{yildirim2021superres,
+  author  = {Yildirim, Aysenur and Griffiths, Hugh and others},
+  title   = {Super-resolution passive radars based on {802.11ax} {Wi-Fi} signals
+             for human movement detection},
+  journal = {IET Radar, Sonar \& Navigation},
+  volume  = {15},
+  number  = {4},
+  pages   = {323--339},
+  year    = {2021},
+  doi     = {10.1049/rsn2.12038},
+  url     = {https://ietresearch.onlinelibrary.wiley.com/doi/full/10.1049/rsn2.12038}
+}
+
+@article{li2021standalone,
+  author  = {Li, Wenda and Piechocki, Robert J. and Woodbridge, Karl and
+             Tang, Chong and Chetty, Kevin},
+  title   = {Passive {WiFi} Radar for Human Sensing Using a Stand-Alone
+             Access Point},
+  journal = {IEEE Transactions on Geoscience and Remote Sensing},
+  volume  = {59},
+  number  = {3},
+  pages   = {1986--1998},
+  year    = {2021},
+  doi     = {10.1109/TGRS.2020.3006387},
+  url     = {https://discovery.ucl.ac.uk/id/eprint/10103371}
+}
+
+@misc{wang2025csipower,
+  author       = {Wang and Zhang and Wu and Chen and Xu and Guo},
+  title        = {Bistatic Passive Sensing via {CSI} Power},
+  howpublished = {arXiv preprint arXiv:2511.22144},
+  year         = {2025},
+  url          = {https://arxiv.org/abs/2511.22144}
+}
+
+% ---------------------------------------------------------------------------
+% Automotive analogue (load-bearing prior art -- uses 5G, not WiFi)
+% ---------------------------------------------------------------------------
+
+@article{maksymiuk2024movingpr,
+  author  = {Maksymiuk, Rafal and others},
+  title   = {{5G}-based passive radar on a moving platform---Detection and imaging},
+  journal = {IET Radar, Sonar \& Navigation},
+  year    = {2024},
+  doi     = {10.1049/rsn2.12559},
+  url     = {https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/rsn2.12559}
+}
+
+% ---------------------------------------------------------------------------
+% Thread 2 — WiFi CSI sensing / imaging / 3D reconstruction
+% ---------------------------------------------------------------------------
+
+@inproceedings{zhao2018rfpose,
+  author    = {Zhao, Mingmin and Li, Tianhong and Abu Alsheikh, Mohammad and
+               Tian, Yonglong and Zhao, Hang and Torralba, Antonio and
+               Katabi, Dina},
+  title     = {Through-Wall Human Pose Estimation Using Radio Signals},
+  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2018},
+  url       = {https://rfpose.csail.mit.edu/}
+}
+
+@inproceedings{zhao2018rfpose3d,
+  author    = {Zhao, Mingmin and Tian, Yonglong and Zhao, Hang and
+               Abu Alsheikh, Mohammad and Li, Tianhong and Hristov, Rumen and
+               Kabelac, Zachary and Katabi, Dina and Torralba, Antonio},
+  title     = {{RF}-Based {3D} Skeletons},
+  booktitle = {Proceedings of the ACM SIGCOMM Conference},
+  year      = {2018},
+  doi       = {10.1145/3230543.3230579}
+}
+
+@inproceedings{yan2024personinwifi3d,
+  author    = {Yan, Yichao and others},
+  title     = {Person-in-{WiFi} {3D}: End-to-End Multi-Person {3D} Pose
+               Estimation with {Wi-Fi}},
+  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2024},
+  url       = {https://openaccess.thecvf.com/content/CVPR2024/papers/Yan_Person-in-WiFi_3D_End-to-End_Multi-Person_3D_Pose_Estimation_with_Wi-Fi_CVPR_2024_paper.pdf}
+}
+
+@inproceedings{wang2019personinwifi,
+  author    = {Wang, Fei and Zhou, Sanping and Panev, Stanislav and
+               Han, Jinsong and Huang, Dong},
+  title     = {Person-in-{WiFi}: Fine-grained Person Perception using {WiFi}},
+  booktitle = {IEEE/CVF International Conference on Computer Vision (ICCV)},
+  year      = {2019},
+  url       = {https://www.ri.cmu.edu/app/uploads/2019/09/Person_in_WiFi_ICCV2019.pdf}
+}
+
+@misc{widepth2025,
+  title        = {Wi-Depth: Depth Reconstruction of Moving Objects from {WiFi} {CSI}},
+  howpublished = {arXiv preprint arXiv:2503.06458},
+  year         = {2025},
+  url          = {https://arxiv.org/abs/2503.06458}
+}
+
+@misc{latentcsi2025,
+  title        = {Latent{CSI}: {CSI}-to-Image Synthesis via a Pretrained
+                  Latent Diffusion Model},
+  howpublished = {arXiv preprint arXiv:2506.10605},
+  year         = {2025},
+  url          = {https://arxiv.org/abs/2506.10605}
+}
+
+% ---------------------------------------------------------------------------
+% Thread 3 — WiFi/RF-based SLAM & multipath-assisted localization
+% ---------------------------------------------------------------------------
+
+@article{gentner2016channelslam,
+  author  = {Gentner, Christian and Jost, Thomas and Wang, Wei and
+             Zhang, Siwei and Dammann, Armin and Fiebig, Uwe-Carsten},
+  title   = {Multipath Assisted Positioning with Simultaneous Localization
+             and Mapping},
+  journal = {IEEE Transactions on Wireless Communications},
+  volume  = {15},
+  number  = {9},
+  pages   = {6104--6117},
+  year    = {2016},
+  doi     = {10.1109/TWC.2016.2578336}
+}
+
+@article{ulmschneider2017multipath,
+  author  = {Ulmschneider, Markus and Gentner, Christian and others},
+  title   = {Multipath Assisted Positioning for Pedestrians using {LTE} Signals},
+  journal = {Mobile Information Systems},
+  volume  = {2017},
+  pages   = {9170746},
+  year    = {2017},
+  doi     = {10.1155/2017/9170746},
+  url     = {https://www.hindawi.com/journals/misy/2017/9170746/}
+}
+
+@misc{gounis2026slamcomms,
+  author       = {Gounis and Tegos, Sotiris A. and Tyrovolas, Dimitrios and
+                  Diamantoulakis, Panagiotis D. and Karagiannidis, George K.},
+  title        = {When {SLAM} Meets Wireless Communications: A Survey},
+  howpublished = {arXiv preprint arXiv:2602.06995},
+  year         = {2026},
+  url          = {https://arxiv.org/abs/2602.06995}
+}
+
+% ---------------------------------------------------------------------------
+% Thread 4 — ISAC / IEEE 802.11bf / mmWave (VERIFIED, Round 2, 2026-07-04)
+% Key result: sub-7 GHz WiFi is bandwidth-limited (dR = c/2B: ~3.75 m at 40 MHz,
+% ~0.94 m at 160 MHz) vs ~8.5 cm at 60 GHz 802.11ad. Only mmWave reaches radar grade.
+% ---------------------------------------------------------------------------
+
+@article{overview2024ieee80211bf,
+  title   = {An Overview on {IEEE} {802.11bf}: {WLAN} Sensing},
+  journal = {IEEE Communications Surveys \& Tutorials},
+  year    = {2024},
+  url     = {https://arxiv.org/abs/2310.17661}
+}
+
+@article{kumari2018adradar,
+  author  = {Kumari, Preeti and Choi, Junil and Gonz{\'a}lez-Prelcic, Nuria and
+             Heath, Robert W.},
+  title   = {{IEEE} {802.11ad}-Based Radar: An Approach to Joint Vehicular
+             Communication-Radar System},
+  journal = {IEEE Transactions on Vehicular Technology},
+  volume  = {67},
+  number  = {4},
+  pages   = {3012--3027},
+  year    = {2018},
+  doi     = {10.1109/TVT.2017.2774762},
+  url     = {https://arxiv.org/abs/1702.05833}
+}
+
+@misc{han2022adimaging,
+  author       = {Han and Choi, Junil and Heath, Robert W.},
+  title        = {Radar Imaging Based on {IEEE} {802.11ad} Waveform in {V2I}
+                  Communications},
+  howpublished = {arXiv preprint arXiv:2208.02473},
+  year         = {2022},
+  url          = {https://arxiv.org/abs/2208.02473}
+}
+
+@misc{zhang2021jcassurvey,
+  author       = {Zhang and others},
+  title        = {Joint Communication and Sensing ({JCAS}): a survey},
+  howpublished = {arXiv preprint arXiv:2102.12780},
+  year         = {2021},
+  url          = {https://arxiv.org/abs/2102.12780}
+}
+
+@article{liu2022isac,
+  author  = {Liu, Fan and Cui, Yuanhao and Masouros, Christos and Xu, Jie and
+             Han, Tony Xiao and Eldar, Yonina C. and Buzzi, Stefano},
+  title   = {Integrated Sensing and Communications: Toward Dual-Functional
+             Wireless Networks for {6G} and Beyond},
+  journal = {IEEE Journal on Selected Areas in Communications},
+  volume  = {40},
+  number  = {6},
+  pages   = {1728--1767},
+  year    = {2022},
+  doi     = {10.1109/JSAC.2022.3156632}
+}
+
+@article{xiong2023scfundamental,
+  author  = {Xiong, Yifeng and Liu, Fan and Cui, Yuanhao and Yuan, Weijie and
+             Han, Tony Xiao and Caire, Giuseppe},
+  title   = {On the Fundamental Tradeoff of Integrated Sensing and Communications
+             Under {Gaussian} Channels},
+  journal = {IEEE Transactions on Information Theory},
+  volume  = {69},
+  number  = {9},
+  pages   = {5723--5751},
+  year    = {2023},
+  doi     = {10.1109/TIT.2023.3284449}
+}
+
+% ---------------------------------------------------------------------------
+% Additional RF-SLAM sources — CONFIRMED (2026-07). Modern multipath-based SLAM
+% (virtual-anchor line) from the Graz/Lund groups; extends Channel-SLAM (R12).
+% ---------------------------------------------------------------------------
+
+% NOTE: arXiv:2601.20547 (a Round-1 harness source) DOES NOT EXIST — malformed/
+% hallucinated ID, confirmed non-resolvable 2026-07. Dropped from the library.
+
+@article{leitinger2024mpslamcoop,
+  author  = {Leitinger, Erik and Wielandner, Lukas and Venus, Alexander and
+             Witrisal, Klaus},
+  title   = {Multipath-based {SLAM} with Cooperation and Map Fusion in {MIMO}
+             Systems},
+  journal = {arXiv preprint arXiv:2405.02126},
+  year    = {2024},
+  url     = {https://arxiv.org/abs/2405.02126}
+}
+
+@article{li2024bpmpslam,
+  author  = {Li, Xuhong and Cai, Xuesong and Leitinger, Erik and Tufvesson,
+             Fredrik},
+  title   = {A Belief Propagation Algorithm for Multipath-based {SLAM} with
+             Multiple Map Features: A mm{W}ave {MIMO} Application},
+  journal = {arXiv preprint arXiv:2403.10095},
+  year    = {2024},
+  url     = {https://arxiv.org/abs/2403.10095}
+}
+
+% Bonus adjacent sources surfaced during verification (not yet claim-verified):
+%   arXiv:2404.15375  MIMO MP-SLAM for Non-Ideal Reflective Surfaces (Graz)
+%   arXiv:2203.08264  Neural RF-SLAM from CSI with virtual anchors (very relevant)
+
+% ---------------------------------------------------------------------------
+% Datasets / toolkits
+% ---------------------------------------------------------------------------
+
+@misc{csikit,
+  author       = {{Gi-z}},
+  title        = {{CSIKit}: {WiFi} {CSI} parsing and processing toolkit},
+  howpublished = {\url{https://github.com/Gi-z/CSIKit}}
+}
+
+@misc{awesomecsi,
+  author       = {{NTU MARS}},
+  title        = {Awesome-{WiFi}-{CSI}-Sensing},
+  howpublished = {\url{https://github.com/NTUMARS/Awesome-WiFi-CSI-Sensing}}
+}
+
+% ---------------------------------------------------------------------------
+% Paper-2 additions. Author lists / venues VERIFIED against the primary sources
+% (arXiv abstract pages and the RA-L PDF), not reconstructed from memory.
+% ---------------------------------------------------------------------------
+
+@article{arun2022p2slam,
+  author  = {Arun, Aditya and Ayyalasomayajula, Roshan and Hunter, William and Bharadia, Dinesh},
+  title   = {{P2SLAM}: Bearing Based {WiFi} {SLAM} for Indoor Robots},
+  journal = {IEEE Robotics and Automation Letters},
+  volume  = {7},
+  number  = {2},
+  year    = {2022}
+}
+
+@article{liu2023radiofingerprintslam,
+  author  = {Liu, Ran and Lau, Billy Pik Lik and Ismail, Khairuldanial and Chathuranga, Achala and Yuen, Chau and Yang, Simon X. and Guan, Yong Liang and Mao, Shiwen and Tan, U-Xuan},
+  title   = {Exploiting Radio Fingerprints for Simultaneous Localization and Mapping},
+  journal = {IEEE Pervasive Computing},
+  year    = {2023},
+  note    = {arXiv:2305.13635}
+}
+
+@inproceedings{ismail2022wifilidarslam,
+  author    = {Ismail, Khairuldanial and Liu, Ran and Qin, Zhenghong and Athukorala, Achala and Lau, Billy Pik Lik and Shalihan, Muhammad and Yuen, Chau and Tan, U-Xuan},
+  title     = {Efficient {WiFi} {LiDAR} {SLAM} for Autonomous Robots in Large Environments},
+  booktitle = {IEEE Int. Conf. on Automation Science and Engineering (CASE)},
+  year      = {2022},
+  note      = {arXiv:2206.08733}
+}
+
+@misc{arun2022viwid,
+  author = {Arun, Aditya and Hunter, William and Ayyalasomayajula, Roshan and Bharadia, Dinesh},
+  title  = {{ViWiD}: Leveraging {WiFi} for Robust and Resource-Efficient {SLAM}},
+  year   = {2022},
+  note   = {arXiv:2209.08091}
+}
+
+@misc{maatta2024csipointcloud,
+  author = {M{\"a}{\"a}tt{\"a}, Tuomas and Sharifipour, Sasan and Bordallo L{\'o}pez, Miguel and {\'A}lvarez Casado, Constantino},
+  title  = {Spatio-Temporal {3D} Point Clouds from {WiFi-CSI} Data via Transformer Networks},
+  year   = {2024},
+  note   = {arXiv:2410.16303}
+}
+
+@misc{geng2022denseposewifi,
+  author = {Geng, Jiaqi and Huang, Dong and De la Torre, Fernando},
+  title  = {{DensePose} From {WiFi}},
+  year   = {2022},
+  note   = {arXiv:2301.00250}
+}
+
+@misc{li2025ekfwifilidarimu,
+  author = {Li, Zeyi and Tang, Zhe and Kim, Kyeong Soo and Li, Sihao and Smith, Jeremy S.},
+  title  = {{EKF}-Based Fusion of {Wi-Fi}/{LiDAR}/{IMU} for Indoor Localization and Navigation},
+  year   = {2025},
+  note   = {arXiv:2509.23118}
+}
+
+@inproceedings{geiger2012kitti,
+  author    = {Geiger, Andreas and Lenz, Philip and Urtasun, Raquel},
+  title     = {Are We Ready for Autonomous Driving? The {KITTI} Vision Benchmark Suite},
+  booktitle = {IEEE Conf. on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2012}
+}
+
+@misc{fetna2026wifiradar,
+  author = {Fetna, Mulham},
+  title  = {Ambient {WiFi} as a Radar Replacement for Automotive {SLAM}: A Physics-Based Feasibility Study},
+  year   = {2026},
+  note   = {Submitted. Artifacts: \url{https://doi.org/10.5281/zenodo.21247288}}
+}
+
+@misc{slamtec_rplidar_a1,
+  title = {{RPLIDAR} {A1} 360{\textdegree} Laser Range Scanner},
+  author = {{Slamtec}},
+  year  = {2026},
+  note  = {Vendor product page, \url{https://www.slamtec.com/en/Lidar/A1}}
+}
+
+@misc{nexmon_csi,
+  title  = {{nexmon\_csi}: Channel State Information Extraction on Broadcom {WiFi} Chips},
+  author = {{Secure Mobile Networking Lab}},
+  year   = {2026},
+  note   = {\url{https://github.com/seemoo-lab/nexmon_csi}}
+}
+
+@misc{espressif_esp32,
+  title  = {{ESP32} Series {SoC} --- {CSI} via {ESP-IDF}},
+  author = {{Espressif Systems}},
+  year   = {2026},
+  note   = {Vendor product page, \url{https://www.espressif.com/en/products/socs/esp32}}
+}
