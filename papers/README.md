@@ -9,8 +9,8 @@ not mix. Layout and conventions are set by
 ## Papers
 | Folder | Paper | Status |
 |--------|-------|--------|
-| `1-wifi-radar-slam/` | Ambient WiFi as a Radar Replacement for Automotive SLAM (IEEE IoT-J) | **Submitted 2026-07-08**, frozen at tag `v0.7.1` / branch `paper1-submitted` |
-| `2-wifi-vs-lidar/` | WiFi sensing as a drop-in LiDAR replacement for SLAM (accuracy/cost/fusion vs LiDAR) | In progress on branch `paper2-wifi-vs-lidar` |
+| `1-wifi-radar-slam/` | Ambient WiFi as a Radar Replacement for Automotive SLAM (IEEE IoT-J) | **Submitted 2026-07-08**; submitted state frozen at `v0.7.1` / `paper1-submitted`. **ERRATUM disclosed 2026-07-12** — corrected manuscript on `main` |
+| `2-wifi-vs-lidar/` | Can Ambient WiFi Replace LiDAR for Automotive SLAM? Localization Yes, Mapping No — and Why (IEEE IoT-J) | **Complete, FROZEN** at `paper2-v1.0.0` / `paper2-held`. **HELD** — not submitted until paper 1 resolves (see its `DOSSIER.md`) |
 
 ## Conventions
 - **Shared code stays on `main`.** Both papers `import wifi_radar_slam`. Paper-specific
