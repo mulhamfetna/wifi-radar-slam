@@ -44,6 +44,16 @@ def figure_data():
     return {"rq3": rq3, "cost": cost, "fusion": fus, "ceiling": iso}
 
 
+def _save(fig, path, **kw):
+    """Write a BYTE-REPRODUCIBLE PDF.
+
+    matplotlib stamps a CreationDate into the PDF, so re-running the script (as the
+    test does) would dirty the working tree on every run even though the content is
+    identical. Setting CreationDate to None makes the artifact deterministic.
+    """
+    fig.savefig(path, metadata={"CreationDate": None}, **kw)
+
+
 def _label_bars(ax, bars, fmt="{:.2f}"):
     for b in bars:
         h = b.get_height()
@@ -71,7 +81,7 @@ def fig2_rq3(d):
         ax.grid(axis="y")
     axes[0].legend(frameon=False, ncol=3, loc="upper left")
     fig.tight_layout()
-    fig.savefig(f"{OUT}/paper2_fig2.pdf")
+    _save(fig, f"{OUT}/paper2_fig2.pdf")
     plt.close(fig)
 
 
@@ -108,7 +118,7 @@ def fig3_cost(d):
     ax.legend(frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.28), ncol=2)
     ax.grid(axis="x")
     fig.tight_layout()
-    fig.savefig(f"{OUT}/paper2_fig3.pdf")
+    _save(fig, f"{OUT}/paper2_fig3.pdf")
     plt.close(fig)
 
 
@@ -172,7 +182,7 @@ def fig4_cost_normalized(d):
     axes[0].legend(frameon=False, ncol=3, loc="upper center",
                    bbox_to_anchor=(1.1, -0.18))
     fig.tight_layout()
-    fig.savefig(f"{OUT}/paper2_fig4.pdf", bbox_inches="tight")
+    _save(fig, f"{OUT}/paper2_fig4.pdf", bbox_inches="tight")
     plt.close(fig)
 
 
@@ -203,7 +213,7 @@ def fig5_fusion(d):
     ax.grid(axis="y")
     ax.legend(frameon=False, ncol=3, loc="upper left")
     fig.tight_layout()
-    fig.savefig(f"{OUT}/paper2_fig5.pdf")
+    _save(fig, f"{OUT}/paper2_fig5.pdf")
     plt.close(fig)
 
 
@@ -251,7 +261,7 @@ def fig6_ceiling(d):
     axes[1].legend(frameon=False, fontsize=6, loc="upper center",
                    bbox_to_anchor=(0.5, -0.14), ncol=1)
     fig.tight_layout()
-    fig.savefig(f"{OUT}/paper2_fig6.pdf", bbox_inches="tight")
+    _save(fig, f"{OUT}/paper2_fig6.pdf", bbox_inches="tight")
     plt.close(fig)
 
 
