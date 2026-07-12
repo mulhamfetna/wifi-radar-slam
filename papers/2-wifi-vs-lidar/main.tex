@@ -534,4 +534,66 @@ collapses success from $100\%$ to $2.4\%$.}
 \label{fig:ceiling}
 \end{figure*}
 
+\section{Discussion and Limitations}\label{sec:discussion}
+
+\textbf{This is a simulation study.} Every WiFi and LiDAR result is ray-traced. The one
+real-data element is the KITTI anchor of Section~\ref{sec:lidar}, which validates the SLAM
+back-end but not the channel model. A ray tracer is a model of propagation, not propagation;
+the phantom-detection rate in particular is a property of MUSIC operating on \emph{simulated}
+CSI, and confirming it on real vehicular CSI is the single most valuable next measurement.
+
+\textbf{The comparison plane is 2-D.} Reducing LiDAR to a horizontal ring is what makes the
+comparison apples-to-apples --- both sensors, one plane, one ground truth --- but it also
+denies LiDAR its third dimension. A 3-D LiDAR would map strictly better than the models here;
+since LiDAR already wins mapping decisively, this understates rather than overstates its
+advantage, and does not threaten our conclusion.
+
+\textbf{The cost claim rests on the ambient-AP premise.} It is an assumption about the world,
+not a measurement, and Section~\ref{sec:cost} shows the conclusion inverts without it.
+
+\textbf{The LiDAR envelope brackets; it does not reproduce a specific unit.} We price LiDAR at
+the tier whose parameters we simulate, and deliberately do not credit the accuracy of a
+mid-range spinning sensor to the price of a budget solid-state one.
+
+\textbf{Fusion is not yet safe to deploy naively.} The equal-confidence weighting that helps
+in three configurations harms in the fourth.
+
+\section{Future Work}
+
+The results point at three concrete next steps. \emph{At the front-end}, where the ceiling
+actually sits: suppress phantom detections and correct the range bias --- a learned
+\emph{regressor} on the estimator's output, or an end-to-end CSI\,$\rightarrow$\,geometry
+model of the kind already successful in RF sensing \cite{maatta2024csipointcloud}, rather
+than a classifier over estimated paths. \emph{In fusion}: confidence-adaptive weighting, so
+that a weak sensor cannot drag down a strong one. \emph{In validation}: real on-vehicle CSI,
+to test whether the phantom rate survives contact with a real channel.
+
+\section{Conclusion}
+
+Ambient WiFi can replace LiDAR for one half of SLAM and not the other, and the boundary is
+sharp. For \emph{localization} it is a genuine drop-in --- more accurate than either LiDAR
+model we tested on the controlled scene, at 84--600$\times$ lower sensor cost, which is two
+to three orders of magnitude better accuracy per dollar. For \emph{mapping} it fails
+completely, and no price buys coverage it cannot produce.
+
+That failure is not, as previously supposed, a matter of choosing the right propagation paths.
+It is a front-end limit: roughly $89\%$ of commodity-CSI detections correspond to no real path
+at all, and a range \emph{bias} well beyond the resolution limit corrupts most of the rest.
+A learned discriminator therefore cannot lift the map --- a heuristic, a random forest and a
+neural network fail identically --- and any method that hopes to must act on the estimator, not
+on its output.
+
+The practical recommendation that follows is a hybrid rather than a replacement: WiFi is a
+$0.5\%$ addition to the cost of a LiDAR that improves its localization by $36$--$79\%$, so long
+as the two sensors are of comparable accuracy. The cheapest useful thing to do with ambient
+WiFi is not to remove the LiDAR --- it is to help it.
+
+\section*{Reproducibility}
+All code, configurations, result artifacts, and the scripts that generate every figure in this
+paper are released openly. Each quantitative claim is reproduced from a committed data file; the
+mapping between paper sections and artifacts is tabulated in the repository.
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
 \end{document}
