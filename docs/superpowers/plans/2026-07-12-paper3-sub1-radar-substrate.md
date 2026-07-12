@@ -6,6 +6,8 @@
 
 **Architecture:** A new `radar/` package mirrors the structure of `lidar/`. `processing.py` holds the *entire* signal chain as pure NumPy/SciPy with no Sionna import, so it is fully unit-testable on this laptop. `sensor.py` holds the only Sionna-dependent piece — a monostatic transmitter co-located with the vehicle receiver, with diffuse scattering enabled — which extracts ray-traced paths and hands `(delay, complex amplitude, azimuth)` triples to the pure chain. The chain emits a `lidar.pointcloud.Scan`, so the **existing scan-to-map ICP back-end is reused byte-for-byte**. `eval/drift.py` adds the KITTI-style drift metric that radar-odometry reviewers expect.
 
+**Test runner:** `.venv/bin/python -m pytest` (a bare `python3` has no venv and cannot import the package).
+
 **Tech Stack:** Python 3, NumPy, SciPy (`scipy.ndimage` for CFAR, already a hard dependency), Sionna RT 2.0.1 (server-only), pytest.
 
 **Branch:** `paper3-sub1-radar-substrate`, off `paper3-wifi-vs-radar`.
@@ -254,7 +256,7 @@ def test_config_is_frozen():
 
 ```bash
 cd /mnt/data/projects/wifi-radar
-python3 -m pytest tests/test_radar_config.py -v
+.venv/bin/python -m pytest tests/test_radar_config.py -v
 ```
 
 Expected: collection error — `ModuleNotFoundError: No module named 'wifi_radar_slam.radar'`.
@@ -388,7 +390,7 @@ WIFI_5G2_160M = RadarConfig(carrier_hz=5.2e9, bandwidth_hz=160e6, **_COMMON)
 - [ ] **Step 4: Run the tests and watch them pass**
 
 ```bash
-python3 -m pytest tests/test_radar_config.py -v
+.venv/bin/python -m pytest tests/test_radar_config.py -v
 ```
 
 Expected: 9 passed.
@@ -526,7 +528,7 @@ def test_coherent_integration_scales_noise_by_sqrt_n_chirps():
 - [ ] **Step 2: Run the test and watch it fail**
 
 ```bash
-python3 -m pytest tests/test_radar_processing.py -v
+.venv/bin/python -m pytest tests/test_radar_processing.py -v
 ```
 
 Expected: collection error — `ModuleNotFoundError: No module named 'wifi_radar_slam.radar.processing'`.
@@ -618,7 +620,7 @@ def beat_matrix(taus, amps, azimuths, cfg, rng=None) -> np.ndarray:
 - [ ] **Step 4: Run the tests and watch them pass**
 
 ```bash
-python3 -m pytest tests/test_radar_processing.py -v
+.venv/bin/python -m pytest tests/test_radar_processing.py -v
 ```
 
 Expected: 8 passed.
@@ -706,7 +708,7 @@ def test_windowing_suppresses_sidelobes():
 - [ ] **Step 2: Run the tests and watch them fail**
 
 ```bash
-python3 -m pytest tests/test_radar_processing.py -v
+.venv/bin/python -m pytest tests/test_radar_processing.py -v
 ```
 
 Expected: `ImportError: cannot import name 'range_fft'`.
@@ -735,7 +737,7 @@ def range_fft(beat: np.ndarray, cfg) -> np.ndarray:
 - [ ] **Step 4: Run the tests and watch them pass**
 
 ```bash
-python3 -m pytest tests/test_radar_processing.py -v
+.venv/bin/python -m pytest tests/test_radar_processing.py -v
 ```
 
 Expected: 12 passed.
@@ -818,7 +820,7 @@ def test_beamform_is_symmetric_in_azimuth():
 - [ ] **Step 2: Run the tests and watch them fail**
 
 ```bash
-python3 -m pytest tests/test_radar_processing.py -v
+.venv/bin/python -m pytest tests/test_radar_processing.py -v
 ```
 
 Expected: `ImportError: cannot import name 'azimuth_beamform'`.
@@ -857,7 +859,7 @@ def azimuth_beamform(rf: np.ndarray, cfg) -> np.ndarray:
 - [ ] **Step 4: Run the tests and watch them pass**
 
 ```bash
-python3 -m pytest tests/test_radar_processing.py -v
+.venv/bin/python -m pytest tests/test_radar_processing.py -v
 ```
 
 Expected: 16 passed.
@@ -880,7 +882,7 @@ def steering_matrix(cfg) -> np.ndarray:
 ```
 
 ```bash
-python3 -m pytest tests/test_radar_processing.py -v
+.venv/bin/python -m pytest tests/test_radar_processing.py -v
 ```
 
 Expected: 16 passed.
@@ -983,7 +985,7 @@ def test_cluster_detections_on_an_empty_mask_returns_empty_arrays():
 - [ ] **Step 2: Run the tests and watch them fail**
 
 ```bash
-python3 -m pytest tests/test_radar_processing.py -v
+.venv/bin/python -m pytest tests/test_radar_processing.py -v
 ```
 
 Expected: `ImportError: cannot import name 'cfar_2d'`.
@@ -1058,7 +1060,7 @@ def cluster_detections(mask: np.ndarray, ra_map: np.ndarray, cfg):
 - [ ] **Step 4: Run the tests and watch them pass**
 
 ```bash
-python3 -m pytest tests/test_radar_processing.py -v
+.venv/bin/python -m pytest tests/test_radar_processing.py -v
 ```
 
 Expected: 22 passed.
@@ -1175,7 +1177,7 @@ def test_a_multi_bounce_ray_becomes_a_ghost_at_the_wrong_range():
 - [ ] **Step 2: Run the tests and watch them fail**
 
 ```bash
-python3 -m pytest tests/test_radar_processing.py -v
+.venv/bin/python -m pytest tests/test_radar_processing.py -v
 ```
 
 Expected: `ImportError: cannot import name 'detections_to_scan'`.
@@ -1230,7 +1232,7 @@ def radar_scan(taus, amps, azimuths, cfg, rng=None) -> Scan:
 - [ ] **Step 4: Run the tests and watch them pass**
 
 ```bash
-python3 -m pytest tests/test_radar_processing.py -v
+.venv/bin/python -m pytest tests/test_radar_processing.py -v
 ```
 
 Expected: 29 passed.
@@ -1238,7 +1240,7 @@ Expected: 29 passed.
 - [ ] **Step 5: Run the full suite — nothing existing may break**
 
 ```bash
-python3 -m pytest -q
+.venv/bin/python -m pytest -q
 ```
 
 Expected: 85 prior tests + the new radar tests, all passing, 0 failures.
@@ -1343,7 +1345,7 @@ def test_sensor_module_imports_without_sionna():
 - [ ] **Step 2: Run the tests and watch them fail**
 
 ```bash
-python3 -m pytest tests/test_radar_sensor.py -v
+.venv/bin/python -m pytest tests/test_radar_sensor.py -v
 ```
 
 Expected: `ModuleNotFoundError: No module named 'wifi_radar_slam.radar.sensor'`.
@@ -1463,7 +1465,7 @@ def radar_sensor(built, cfg, rng) -> "SionnaRadarSensor":
 - [ ] **Step 4: Run the tests and watch them pass**
 
 ```bash
-python3 -m pytest tests/test_radar_sensor.py -v
+.venv/bin/python -m pytest tests/test_radar_sensor.py -v
 ```
 
 Expected: 6 passed.
@@ -1592,7 +1594,7 @@ def test_per_length_breakdown_is_reported():
 - [ ] **Step 2: Run the tests and watch them fail**
 
 ```bash
-python3 -m pytest tests/test_drift.py -v
+.venv/bin/python -m pytest tests/test_drift.py -v
 ```
 
 Expected: `ModuleNotFoundError: No module named 'wifi_radar_slam.eval.drift'`.
@@ -1710,7 +1712,7 @@ def drift(gt: np.ndarray, est_traj: np.ndarray,
 - [ ] **Step 4: Run the tests and watch them pass**
 
 ```bash
-python3 -m pytest tests/test_drift.py -v
+.venv/bin/python -m pytest tests/test_drift.py -v
 ```
 
 Expected: 8 passed.
@@ -1728,7 +1730,7 @@ Signature becomes `drift(est_traj, gt, lengths=..., step=10)`. Update every call
 `tests/test_drift.py` (they currently pass `gt` first).
 
 ```bash
-python3 -m pytest tests/test_drift.py -v
+.venv/bin/python -m pytest tests/test_drift.py -v
 ```
 
 Expected: 8 passed.
@@ -1916,7 +1918,7 @@ of them are re-derivable without the server.
 - [ ] **Step 5: Run the full suite one last time**
 
 ```bash
-python3 -m pytest -q
+.venv/bin/python -m pytest -q
 ```
 
 Expected: all tests pass (85 prior + ~43 new).
