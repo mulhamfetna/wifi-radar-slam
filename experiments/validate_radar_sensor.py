@@ -54,15 +54,21 @@ def main() -> None:
         paths = sensor.solver(sensor.scene, max_depth=3, samples_per_src=ns,
                               diffuse_reflection=diffuse, seed=1)
         tau_raw = np.asarray(paths.tau.numpy())
-        a_raw = np.asarray(paths.a.numpy())
         phi_raw = np.asarray(paths.phi_r.numpy())
-        n_valid = int(np.count_nonzero(np.asarray(paths.valid.numpy())))
+        # paths.a is a TUPLE (real, imag), not a tensor -- confirmed here, not assumed
+        re_t, im_t = paths.a
+        a_raw = np.asarray(re_t.numpy())
+        valid_raw = np.asarray(paths.valid.numpy())
+        # count only OUR transmitter's paths: the scene also carries the WiFi APs
+        n_valid = int(np.count_nonzero(valid_raw[0, sensor.tidx]))
         counts[f"diffuse_{diffuse}"] = n_valid
         print(f"\n--- diffuse_reflection={diffuse} ---")
-        print(f"  tau   shape {tau_raw.shape}")
-        print(f"  a     shape {a_raw.shape}  dtype {a_raw.dtype}")
+        print(f"  tau   shape {tau_raw.shape}   (n_rx, n_tx, n_paths)")
+        print(f"  a     shape {a_raw.shape} x2  (tuple of real, imag)")
         print(f"  phi_r shape {phi_raw.shape}")
-        print(f"  valid paths: {n_valid}")
+        print(f"  n_tx={tau_raw.shape[1]} (our radar_tx is index {sensor.tidx}; "
+              f"the rest are the scene's WiFi APs)")
+        print(f"  valid paths for radar_tx: {n_valid}")
 
         if diffuse:                       # what our _extract actually pulls out
             tau, a, phi = sensor._extract(paths)

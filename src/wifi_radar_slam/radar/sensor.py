@@ -133,19 +133,36 @@ class SionnaRadarSensor:
                            seed=int(self.rng.integers(1, 2 ** 31 - 1)))
 
     def _extract(self, paths):
-        """Pull (tau, complex amplitude, world azimuth) out of a Sionna Paths object.
+        """Pull (tau, complex amplitude, world azimuth) for OUR transmitter out of `paths`.
 
-        The exact array layouts are confirmed empirically by
-        experiments/validate_radar_sensor.py -- they cannot be checked without Sionna.
+        Layouts confirmed on the server (Sionna RT 2.0.1) -- they cannot be checked without
+        the simulator, and guessing them wrong is silent:
+            paths.tau / phi_r / valid : (n_rx, n_tx, n_paths)
+            paths.a                   : a TUPLE (real, imag) of tensors, each
+                                        (n_rx, n_rx_ant, n_tx, n_tx_ant, n_paths)
+
+        Two things this must get right:
+
+        * INDEX OUR TRANSMITTER. The scene also carries the WiFi APs as transmitters, so
+          n_tx is 4, not 1. Flattening the array would mix the APs' *bistatic* paths into
+          our *monostatic* radar's ray set -- silently, and catastrophically for a sensor
+          whose entire geometry premise is that TX and RX are co-located.
+
+        * TAKE ONE AMPLITUDE PER PATH, at the array's reference element. Sionna returns a
+          gain per RX antenna for the *scene's* 4-element WiFi array, but the radar's
+          aperture is our own 16-element virtual MIMO ULA -- a different array entirely.
+          The ray tracer's job is to give us each path's gain and angle of arrival; the
+          array response is then synthesized from that angle by `beat_matrix`. Using
+          Sionna's per-antenna gains instead would impose the *WiFi* array's geometry on
+          the radar and quietly destroy the aperture we are trying to model.
         """
-        tau = np.asarray(paths.tau.numpy())
-        a = np.asarray(paths.a.numpy())
-        phi = np.asarray(paths.phi_r.numpy())
-        # paths.a is returned as a leading (real, imag) pair; everything else is squeezed
-        # down to a per-path vector for this single TX / single RX pair.
-        if a.ndim > 1 and a.shape[0] == 2:
-            a = a[0] + 1j * a[1]
-        return tau.ravel(), np.asarray(a).ravel(), phi.ravel()
+        tau = np.asarray(paths.tau.numpy())[0, self.tidx]           # (n_paths,)
+        phi = np.asarray(paths.phi_r.numpy())[0, self.tidx]         # (n_paths,)
+        valid = np.asarray(paths.valid.numpy())[0, self.tidx]       # (n_paths,)
+        re, im = paths.a                                            # tuple of tensors
+        a = (np.asarray(re.numpy())[0, 0, self.tidx, 0]
+             + 1j * np.asarray(im.numpy())[0, 0, self.tidx, 0])     # (n_paths,) at element 0
+        return tau[valid], a[valid], phi[valid]
 
     def __call__(self, pose) -> Scan:
         yaw = float(pose[2]) if len(pose) > 2 else 0.0
