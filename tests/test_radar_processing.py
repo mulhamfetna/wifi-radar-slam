@@ -2,7 +2,7 @@ import dataclasses
 import numpy as np
 import pytest
 from wifi_radar_slam.radar.config import RadarConfig
-from wifi_radar_slam.radar.processing import beat_matrix, range_fft
+from wifi_radar_slam.radar.processing import beat_matrix, range_fft, azimuth_beamform
 
 C = 299792458.0
 
@@ -150,3 +150,52 @@ def test_windowing_suppresses_sidelobes():
     peak = int(np.argmax(windowed))
     far = np.r_[0:max(peak - 10, 0), min(peak + 11, cfg.n_range):cfg.n_range]
     assert (windowed[far].max() / windowed[peak]) < (raw[far].max() / raw[peak])
+
+
+# --- azimuth beamforming --------------------------------------------------------
+
+def _ra_map(cfg, ranges, azimuths, amps=None, rng=None):
+    amps = amps if amps is not None else [1.0 + 0j] * len(ranges)
+    b = beat_matrix([tau_of(r) for r in ranges], amps, azimuths, cfg, rng=rng)
+    return azimuth_beamform(range_fft(b, cfg), cfg)
+
+
+def test_beamform_shape_and_realness():
+    cfg = cfg_small()
+    ra = _ra_map(cfg, [20.0], [0.0])
+    assert ra.shape == (cfg.n_azimuth, cfg.n_range)
+    assert np.isrealobj(ra)
+    assert np.all(ra >= 0)
+
+
+def test_beamform_peak_lands_on_the_true_range_and_azimuth():
+    # THE end-to-end check for the whole front half of the chain.
+    cfg = cfg_small()
+    R, th = 25.0, np.deg2rad(20.0)
+    ra = _ra_map(cfg, [R], [th])
+    j, i = np.unravel_index(int(np.argmax(ra)), ra.shape)
+    assert cfg.range_bins()[i] == pytest.approx(R, abs=cfg.range_resolution_m)
+    # an 8-element half-wavelength ULA has a coarse beam (~13 deg at boresight, worse
+    # off-boresight), so allow a beamwidth of slack
+    assert np.rad2deg(cfg.azimuth_grid()[j]) == pytest.approx(20.0, abs=8.0)
+
+
+def test_beamform_separates_two_targets_at_the_same_range():
+    cfg = cfg_small()
+    ra = _ra_map(cfg, [25.0, 25.0], [np.deg2rad(-40.0), np.deg2rad(40.0)])
+    i = int(np.argmin(np.abs(cfg.range_bins() - 25.0)))
+    col = ra[:, i]
+    az = np.rad2deg(cfg.azimuth_grid())
+    left = col[az < 0].max()
+    right = col[az > 0].max()
+    middle = col[np.abs(az) < 10].max()
+    assert left > 3 * middle and right > 3 * middle     # two lobes, a null between
+
+
+def test_beamform_is_symmetric_in_azimuth():
+    # A sign error in sin(theta) would mirror every map left-right and put every
+    # reflector on the wrong side of the road. Catch it here, not downstream.
+    cfg = cfg_small()
+    up = _ra_map(cfg, [25.0], [np.deg2rad(30.0)])
+    dn = _ra_map(cfg, [25.0], [np.deg2rad(-30.0)])
+    assert np.allclose(up, dn[::-1, :], atol=1e-9)

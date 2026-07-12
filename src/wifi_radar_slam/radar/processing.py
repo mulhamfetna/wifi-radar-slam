@@ -97,3 +97,27 @@ def range_fft(beat: np.ndarray, cfg) -> np.ndarray:
     """
     w = np.hanning(cfg.n_samples)
     return np.fft.fft(beat * w[None, :], axis=1)[:, : cfg.n_range]
+
+
+def steering_matrix(cfg) -> np.ndarray:
+    """(n_azimuth, n_rx) conventional ULA steering vectors over the azimuth grid."""
+    m = np.arange(cfg.n_rx)
+    th = cfg.azimuth_grid()
+    return np.exp(2j * np.pi * cfg.rx_spacing_frac * m[None, :] * np.sin(th)[:, None])
+
+
+def azimuth_beamform(rf: np.ndarray, cfg) -> np.ndarray:
+    """Conventional (Bartlett) beamforming across the array -> a range-azimuth power map.
+
+    Returns (cfg.n_azimuth, cfg.n_range), real and non-negative.
+
+    Deliberately NOT a superresolution beamformer (MUSIC/Capon). Papers 1-2 used MUSIC on
+    WiFi, and the whole point of this ablation is to hold the *detection algorithm* fixed
+    across cells so that any difference between them is **physical** -- carrier, bandwidth,
+    geometry -- and not an artifact of a different estimator. FFT+CFAR is also what real
+    automotive radar actually runs. MUSIC-on-WiFi survives separately as the 5th reference
+    row, which is precisely where the superresolution-vs-FFT axis becomes visible instead
+    of silently confounded with the physics.
+    """
+    A = steering_matrix(cfg)                 # (n_azimuth, n_rx)
+    return np.abs(A.conj() @ rf) ** 2        # (n_azimuth, n_range)
