@@ -1,0 +1,92 @@
+# Sourced hardware prices for the paper-2 cost model (RQ5).
+# Every entry carries low/high (USD), a text `source` citation and a `date`.
+# `verified: false` marks a price taken from press/market reporting that must be
+# re-checked against a primary vendor page before submission (see docs/literature-paper2.md).
+currency: USD
+
+wifi:
+  receivers:
+    esp32:
+      low: 5
+      high: 15
+      source: "Espressif ESP32 SoC; CSI capture via ESP-IDF (vendor product page)"
+      source_url: "https://www.espressif.com/en/products/socs/esp32"
+      date: "2026-07"
+      verified: true
+      note: "low-end CSI node"
+    pi_nexmon:
+      low: 35
+      high: 75
+      source: "Raspberry Pi 4 + nexmon_csi firmware patch (seemoo-lab/nexmon_csi)"
+      source_url: "https://github.com/seemoo-lab/nexmon_csi"
+      date: "2026-07"
+      verified: true
+      note: "headline commodity CSI receiver used by the paper"
+    intel5300:
+      low: 20
+      high: 40
+      source: "Intel 5300 NIC (Halperin linux-80211n-csitool); used-market price"
+      date: "2026-07"
+      verified: false
+      note: "legacy commodity NIC; the classic CSI platform"
+  antennas:
+    low: 5
+    high: 20
+    source: "2-3x commodity 2.4/5 GHz antennas (retail)"
+    date: "2026-07"
+    verified: false
+    note: "vehicle-side receive antennas"
+  ap_unit:
+    low: 30
+    high: 80
+    source: "Commodity consumer WiFi access point (retail)"
+    date: "2026-07"
+    verified: false
+    note: "ONLY counted in the deployed-AP sensitivity; ambient APs are free in the headline"
+
+lidar_tiers:
+  - key: legacy_spinning
+    name: "Legacy high-end spinning (Velodyne HDL-64 class)"
+    low: 75000
+    high: 80000
+    automotive_grade: true
+    source: "Velodyne HDL-64E historical list price, widely reported"
+    date: "2024"
+    verified: false
+    note: "the grade that actually delivers full 3D mapping"
+  - key: ouster_os1
+    name: "Mid/high spinning (Ouster OS1) -- THE SENSOR OUR A/B MODELS SIMULATE"
+    low: 8000
+    high: 24000
+    automotive_grade: true
+    source: "Ouster OS1 market/list pricing (mid-range spinning LiDAR)"
+    date: "2025"
+    verified: false
+    note: "A/B were measured at OUSTER_OS1 params (120 m, +/-3 cm, 360 deg). The cost-normalized table MUST use this tier for LiDAR rows, so measured performance is priced at the sensor that produces it."
+  - key: mid_solid_state
+    name: "Mid solid-state automotive (Luminar Halo / series solid-state)"
+    low: 500
+    high: 600
+    automotive_grade: true
+    source: "Electronic Design, '$500 Price Point' (automotive solid-state LiDAR)"
+    date: "2026"
+    verified: false
+  - key: cheap_solid_state
+    name: "Cheap solid-state automotive (MicroVision Movia S / Hesai)"
+    low: 100
+    high: 200
+    automotive_grade: true
+    source: "AOL/press, '$200 Lidar Could Reshuffle Auto Sensor Economics' (Movia S ~$200 production, $100 long-term goal)"
+    date: "2025"
+    verified: false
+    note: "volume ADAS target; $100 is a stated long-term goal, not current unit price"
+  - key: budget_2d
+    name: "Budget 2D scanner (Slamtec RPLIDAR A1)"
+    low: 99
+    high: 99
+    automotive_grade: false
+    source: "Slamtec RPLIDAR A1 vendor product page"
+    source_url: "https://www.slamtec.com/en/Lidar/A1"
+    date: "2026-07"
+    verified: true
+    note: "2D INDOOR-grade -- a price FLOOR, not a fair automotive peer. Never compare mapping quality against this tier."

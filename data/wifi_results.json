@@ -1,0 +1,11 @@
+{
+  "_note": "Frozen paper-1 WiFi results (docs/results-v1.md, submitted IoT-J v0.7.1). Do not recompute: these must match the published paper. 'realistic' IoU is ~0; street realistic mapping was characterized qualitatively (not tabulated), so only ATE is given there.",
+  "controlled_wall": {
+    "oracle":    {"ate": 0.045, "rpe": 0.007, "chamfer": 0.51, "map_accuracy": 0.25, "map_completeness": 0.77, "iou": 0.79},
+    "realistic": {"ate": 0.027, "chamfer": 4.1, "map_accuracy": 4.8, "map_completeness": 3.5, "iou": 0.0}
+  },
+  "street_canyon": {
+    "oracle":    {"ate": 0.116, "rpe": 0.007, "chamfer": 12.3, "map_accuracy": 0.30, "map_completeness": 24.4, "iou": 0.077},
+    "realistic": {"ate": 0.09, "iou": 0.0}
+  }
+}

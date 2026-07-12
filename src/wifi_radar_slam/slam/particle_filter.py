@@ -49,7 +49,7 @@ def _reproject_bistatic(pose_xy, ap_xy, refl):
 
 def run_slam(detections, ap_positions, velocity, timestep_s, rng,
              n_particles: int = 200, init_pose=None, map_min_support: int = 1,
-             map_min_excess_m: float = 0.0):
+             map_min_excess_m: float = 0.0, map_filter=None):
     n_frames = len(detections)
     particles = np.zeros((n_particles, 3))                 # x, y, yaw
     if init_pose is not None:                              # known start (e.g. GPS prior)
@@ -72,14 +72,20 @@ def run_slam(detections, ap_positions, velocity, timestep_s, rng,
         dets = detections[f]
         if dets.shape[0] > 0:
             mean_pose = np.average(particles, axis=0, weights=weights)
-            for path_len, aoa, ap_i in dets:
+            # RQ2: an optional learned/heuristic filter gates which detections enter the
+            # MAP. Rejected detections still update the particle weights, so localization
+            # is unaffected (map_filter=None -> identical to the original behaviour).
+            keep = (map_filter(dets, mean_pose, ap_positions)
+                    if map_filter is not None else None)
+            for j, (path_len, aoa, ap_i) in enumerate(dets):
                 ap_xy = np.asarray(ap_positions[int(ap_i)])[:2]
                 refl = _triangulate_bistatic(mean_pose[:2], ap_xy, path_len, aoa,
                                              min_excess_m=map_min_excess_m)
                 if refl is None:                           # direct path / degenerate
                     continue
-                mapped_points.append(refl)
-                # weight update: bistatic consistency of each particle
+                if keep is None or keep[j]:
+                    mapped_points.append(refl)
+                # weight update: bistatic consistency of each particle (ALWAYS)
                 pr = np.array([_reproject_bistatic(p[:2], ap_xy, refl) for p in particles])
                 err = (pr[:, 0] - path_len) ** 2 + (pr[:, 1] - aoa) ** 2
                 weights *= np.exp(-0.5 * err / (0.5 ** 2))
