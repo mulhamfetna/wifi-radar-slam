@@ -71,6 +71,28 @@ point differently in the two geometries:
 That difference *is* the geometry ablation (A→B). It must be reported as a mechanism, not
 hidden inside a helper function.
 
+## The two front-ends (decided 2026-07-12, after building the substrate)
+
+Sub-project 1 measured something that changes the design: under CA-CFAR the radar yields only
+**~1–5 detections per frame** — far too sparse for scan-to-map ICP. This is not a bug. CFAR
+hunts *point targets in noise*, but a diffusely-scattering street canyon returns a
+**continuum**: the local background a wall cell is compared against *is the wall*. Notably
+**CFEAR — the SOTA radar-odometry baseline we anchor against — does not use CFAR at all**; it
+takes the **k-strongest returns per azimuth bin**, precisely because radar targets are
+*extended*, not point-like.
+
+So the paper carries **two front-ends**, each doing the job it is actually good at:
+
+| Front-end | Used for | Why |
+|---|---|---|
+| **CA-CFAR** | the **phantom rate** (RQ1) | A calibrated detection-theoretic threshold is what makes "this detection corresponds to no real path" a meaningful statement, and it is the honest analogue of WiFi's MUSIC peak-picking. |
+| **k-strongest per azimuth** | **SLAM / odometry** (RQ3) and the credibility anchor | Dense enough for scan-to-map ICP, and it is what the SOTA anchor actually runs — so our back-end is comparable to CFEAR/DRO rather than a strawman. |
+
+**Both are applied identically to every ablation cell (A–D).** That is non-negotiable: a
+front-end that varied across cells would be confounded with the very physics the ablation
+isolates. Reporting both is also a contribution in itself — it makes the
+*detector-vs-extractor* axis visible instead of hiding it inside a design choice.
+
 ## The ablation (RQ2), and why the detection chain must be held fixed
 
 Radar differs from our WiFi on three axes **simultaneously**. To decompose them, we vary one at
