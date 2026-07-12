@@ -123,3 +123,113 @@ credible 4D/automotive-radar baseline must report a **spread**, not a headline.
 4. **Report drift %**, and treat the radar baseline against CFEAR/DRO numbers.
 5. **The ghost-rate comparison may be the real contribution:** the first quantification of
    phantom rate in *both* modalities, with a shared instrument.
+
+---
+
+# Radar simulation methodology (second research pass, 2026-07-12)
+
+105 agents, 0 errors. **Thread A (simulation) is well answered. Thread B (cost) returned
+zero verified claims for the second time.**
+
+## 🔑 The design-critical finding: beat-signal vs path-extraction is a FALSE dichotomy
+
+Ray tracers emit **paths**; the beat signal is synthesised *from* those paths. They are stages
+of one pipeline, not rival methods. And crucially (verbatim from the synthesis):
+
+> "skipping the beat stage gives you ideal, infinitely-resolved delays/angles and **buys you
+> nothing for free** — thermal noise, window sidelobes, range/Doppler bin quantization,
+> **CFAR behaviour and the resulting false-alarm/ghost statistics** must all be added
+> downstream if you want them."
+
+**Consequence for paper 3, and it is decisive.** Our best idea is to compare the *phantom
+rate* of WiFi against radar with a shared instrument. If we extract radar paths directly (the
+obvious move — it is what our WiFi *oracle* does), **radar produces zero ghosts by
+construction**, and the comparison is rigged in radar's favour and scientifically worthless.
+
+**Therefore the radar baseline MUST implement the full chain:**
+`ray-traced paths → FMCW beat signal → windowed range-Doppler FFT → CFAR → detections`,
+because that is where radar's ghosts are born — exactly as WiFi's phantoms are born in MUSIC.
+Anything less is not a fair comparison. This is the methodological core of the paper.
+
+## Sionna RT has NO radar layer — the radar model is our contribution
+
+A verifier ran `pdftotext | grep` over all 5,238 lines of the Sionna RT technical report:
+**zero** occurrences of `radar`, `RCS`, `ISAC`, `sensing`, `monostatic`, `bistatic`, or
+`range-Doppler`. The RT API surface has no radar/CFAR/RCS/point-cloud module, and there is no
+first-party radar example. **A 77 GHz FMCW model on Sionna must be entirely user-built** — a
+risk *and* an opportunity (it is a contribution, not a library call).
+
+What Sionna *does* give us natively (`rt/api/paths.html`) is exactly the tuple a radar needs:
+`tau` (delays), `a` (complex amplitudes), `theta_t/phi_t` (AoD), `theta_r/phi_r` (AoA), and
+per-path `doppler` — plus `cir()` / `cfr()` for time-evolving responses.
+
+## ⚠️ Five gotchas that "silently corrupt a radar pipeline"
+
+1. **`normalize_delays=True` is the DEFAULT** on `cir()`/`cfr()`/`taps()` — it zeroes the
+   first-path delay and **destroys absolute range**. Must pass `normalize_delays=False`.
+   **Checked 2026-07-12: papers 1 & 2 are SAFE** — they read `paths.tau` directly (which is
+   absolute; verified LOS delay × c == true AP→RX distance to 3 dp). But the radar chain uses
+   `cfr()`, so this *will* bite paper 3 if forgotten.
+2. **Amplitudes are solved at the scene's single carrier** → frequency-flat across a 4 GHz
+   sweep (~5 % fractional bandwidth at 77 GHz). No material/antenna/RCS dispersion in-band.
+3. **Time evolution is synthetic**: geometry is frozen and only phase rotates, so delays are
+   constant across slow time — **no range migration, no path birth/death within the CPI**.
+   NVIDIA's own Mobility tutorial warns it is "only accurate over very short time spans";
+   sanity-check against a 128–256-chirp frame at vehicular speed rather than assuming.
+4. **`doppler` is ZERO** unless velocity vectors are assigned to scene objects/radio devices.
+5. **Co-located TX/RX (i.e. monostatic) has a documented angle-convention change**
+   (NVlabs/sionna-rt issue #5).
+
+## THE dominant pitfall — and we already discovered it independently
+
+Corroborated by four sources (two vendors + a peer-reviewed radar group): **purely specular
+surface models fail for monostatic 77 GHz radar** — at non-perpendicular incidence the energy
+is mirrored away from the co-located RX and **real targets become invisible**.
+
+- Altair WinProp's official 77 GHz example, verbatim: *"edge diffraction is weak at 77 GHz and
+  reflections are only observed from perpendicular surfaces. Hence, **without scattering, some
+  objects might escape detection**."*
+- Schüßler et al. could not get satisfactory results even with an "imperfect metal" model, and
+  adopted a parametric **α-blend of Lambertian diffuse and specular** reflection.
+
+**We hit this exact wall in paper 2** and solved it empirically: LiDAR Model B's spike showed
+specular-monostatic → **1** return, diffuse-enabled → **8,417**. Our
+`SionnaLidarSensor` (monostatic node + `scattering_coefficient` + `diffuse_reflection=True`)
+*is* the validated practice — we can now **cite the literature for it** instead of defending
+it as a hack.
+
+## Methodological anchor (cite this)
+
+**Schüßler, Hoffmann, Bräunig, Ullmann, Ebelt, Vossiek**, *"A Realistic Radar Ray Tracing
+Simulator for Large MIMO-Arrays in Automotive Environments"*, **IEEE J. Microwaves 1(4):962–974,
+2021**, DOI 10.1109/JMW.2021.3104722 (gold OA, ~59 citations).
+- **Measurement-validated**: reproduces the ~20 dB power difference between a metallic cylinder
+  and a corner reflector in both simulation and measurement.
+- **Multipath ghosts fall out of the method inherently** (shooting-and-bouncing rays), with no
+  special handling — directly relevant to our ghost-rate comparison.
+- Material model: `t = α·t_diffuse + (1−α)·t_specular`.
+- ⚠️ **Caveat the authors state themselves:** the reflection models are "simplistic" (specular
+  + diffuse lobes, not full-wave RCS), so the 20 dB agreement holds for canonical calibration
+  targets, **not** as evidence of general RCS fidelity for arbitrary vehicles.
+
+Also useful: **MathWorks' "Simulate an Automotive 4D Imaging MIMO Radar"** is the canonical
+vendor-supported demonstration of the full beat-signal route (`radarTransceiver` → 2-D FFT →
+CFAR → virtual-array beamforming → 4-D point cloud). Its `proppaths` interface is the
+documented insertion point for ray-traced paths.
+
+## 🚨 Cost: STILL unanswered after two passes
+
+Zero pricing claims survived verification, twice: no 77 GHz radar module prices (ARS548, TI
+AWR/IWR, Oculii, Arbe, Bosch/Aptiv), no WiFi-CSI receiver prices, no published sensor cost/BOM
+comparison studies.
+
+**Diagnosis:** OEM automotive-radar pricing is negotiated B2B and is simply **not public**.
+Deep research cannot find what does not exist.
+
+**The honest path** (to be executed, not researched further):
+- Source **evaluation-board / retail** prices directly from vendor and distributor pages
+  (TI store, Mouser, DigiKey) — these *are* public and citable with dates.
+- Cite analyst/press estimates for OEM volume pricing **explicitly flagged as estimates**.
+- **State plainly in the paper that OEM automotive radar pricing is not publicly disclosed**,
+  and give the comparison as a range with that caveat. This is more defensible than a
+  confident number we cannot source.
