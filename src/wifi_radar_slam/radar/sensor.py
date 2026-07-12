@@ -118,6 +118,8 @@ class SionnaRadarSensor:
         self.solver = rt.PathSolver()
         self.tidx = list(self.scene.transmitters.keys()).index("radar_tx")
         self.rx = self.scene.receivers["veh"]
+        self.floor_ids = {o.object_id for n, o in self.scene.objects.items()
+                          if "floor" in n.lower()}
 
     def _solve(self, pose):
         """Run the ray tracer at `pose` and return the raw Sionna Paths object."""
@@ -162,7 +164,30 @@ class SionnaRadarSensor:
         re, im = paths.a                                            # tuple of tensors
         a = (np.asarray(re.numpy())[0, 0, self.tidx, 0]
              + 1j * np.asarray(im.numpy())[0, 0, self.tidx, 0])     # (n_paths,) at element 0
-        return tau[valid], a[valid], phi[valid]
+        keep = valid & ~self._touches_floor(paths)
+        return tau[keep], a[keep], phi[keep]
+
+    def _touches_floor(self, paths) -> np.ndarray:
+        """Mask of paths that bounce off the ground at any depth.
+
+        The ground is half of everything the radar hears -- we measured 89,913 of 177,171
+        first bounces landing on the floor in the street-canyon scene -- and none of it is
+        mappable. The comparison plane is a 2-D bird's-eye view of building footprints, and
+        the ground-truth map contains facades only, so a ground return has nothing to be
+        scored against: it would be charged against map accuracy as though the radar had
+        hallucinated a wall in the middle of the road.
+
+        Paper 2's LiDAR model B drops floor hits for exactly this reason. Radar drops them
+        the same way, so the two sensors' maps mean the same thing. This is a stated
+        modelling choice, not a silent one: a real automotive radar does see road clutter,
+        and suppressing it is part of what a real radar's processing does.
+        """
+        objs = np.asarray(paths.objects.numpy())[:, 0, self.tidx]        # (depth, n_paths)
+        inter = np.asarray(paths.interactions.numpy())[:, 0, self.tidx]  # (depth, n_paths)
+        if not self.floor_ids:
+            return np.zeros(objs.shape[1], dtype=bool)
+        is_floor = np.isin(objs, list(self.floor_ids))
+        return np.any((inter != 0) & is_floor, axis=0)
 
     def __call__(self, pose) -> Scan:
         yaw = float(pose[2]) if len(pose) > 2 else 0.0

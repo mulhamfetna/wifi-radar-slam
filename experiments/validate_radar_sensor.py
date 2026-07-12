@@ -28,17 +28,25 @@ from wifi_radar_slam.radar.config import RADAR_77G_4G
 from wifi_radar_slam.radar.sensor import SionnaRadarSensor, paths_to_rays
 from wifi_radar_slam.radar.processing import radar_scan
 
-CFG_PATH = "configs/street_metal_oracle.yaml"
+# Two scenes, and the asymmetric one is the point. A street canyon has walls on BOTH sides,
+# so it is left-right symmetric -- and a symmetric scene CANNOT distinguish a mirrored angle
+# convention (we measured median error 1.38 m assumed vs 1.35 m mirrored: indistinguishable).
+# The controlled single-wall scene is asymmetric, so mirroring the bearing there moves every
+# detection to the empty side of the road and the error explodes. That is what settles it.
+SCENES = {
+    "controlled_wall": "configs/controlled_oracle.yaml",     # ASYMMETRIC -> decides the convention
+    "street_canyon": "configs/street_metal_oracle.yaml",     # symmetric -> realistic clutter
+}
 
 
-def main() -> None:
-    cfg_run = load_config(CFG_PATH)
+def validate(label: str, cfg_path: str) -> dict:
+    cfg_run = load_config(cfg_path)
     built = build_scene(cfg_run)
     rng = np.random.default_rng(0)
     pose = built.trajectory[len(built.trajectory) // 2]      # mid-trajectory
     px, py = float(pose[0]), float(pose[1])
     yaw = float(pose[2]) if len(pose) > 2 else 0.0
-    print(f"scene   : {CFG_PATH}")
+    print(f"\n{'='*70}\nSCENE: {label}  ({cfg_path})\n{'='*70}")
     print(f"pose    : x={px:.2f} y={py:.2f} yaw={np.rad2deg(yaw):+.1f} deg")
 
     sensor = SionnaRadarSensor(built, RADAR_77G_4G, rng)
@@ -71,6 +79,12 @@ def main() -> None:
         print(f"  valid paths for radar_tx: {n_valid}")
 
         if diffuse:                       # what our _extract actually pulls out
+            n_floor = int(np.count_nonzero(
+                sensor._touches_floor(paths) & valid_raw[0, sensor.tidx]))
+            counts["floor_paths"] = n_floor
+            print(f"  ground-bounce paths dropped: {n_floor} "
+                  f"({100.0 * n_floor / max(n_valid, 1):.0f} % of valid) -- not mappable; "
+                  f"paper 2's LiDAR drops them the same way")
             tau, a, phi = sensor._extract(paths)
             print(f"  _extract -> tau {tau.shape}, a {a.shape} ({a.dtype}), "
                   f"phi {phi.shape}")
@@ -128,10 +142,11 @@ def main() -> None:
               f"-> nearest surface {e:5.2f} m")
 
     out = {
-        "scene": CFG_PATH,
+        "scene": label,
         "pose": [px, py, yaw],
         "valid_paths_specular": counts["diffuse_False"],
         "valid_paths_diffuse": counts["diffuse_True"],
+        "ground_bounce_paths_dropped": counts.get("floor_paths", 0),
         "n_detections": int(len(scan)),
         "err_to_nearest_surface_m": {
             "min": float(err.min()), "median": float(np.median(err)),
@@ -143,23 +158,43 @@ def main() -> None:
         "angle_convention_mirrored": mirrored,
     }
     print("\n" + json.dumps(out, indent=2))
-    os.makedirs("results", exist_ok=True)
-    with open("results/radar_substrate_validation.json", "w") as f:
-        json.dump(out, f, indent=2)
-    print("saved -> results/radar_substrate_validation.json")
 
     # THE GATE: at least one detection must land on a real surface, and the convention
     # must not be mirrored. (A high MEDIAN error is not a failure here -- ghosts are
     # expected and are the paper's subject. What must be true is that the sensor CAN see
     # a real wall, in the right place.)
-    if mirrored:
-        raise SystemExit("GATE: angle convention is mirrored. Fix paths_to_rays, re-run.")
-    if err.min() > 1.0:
-        raise SystemExit(
-            f"FAIL (gate): not one detection lands within 1 m of any real surface "
-            f"(best {err.min():.2f} m). Diagnose before building on this sensor.")
-    print(f"\nGATE PASSED: best detection is {err.min():.2f} m from a real surface; "
-          f"angle convention confirmed (not mirrored).")
+    out["gate_passed"] = bool((not mirrored) and err.min() <= 1.0)
+    return out
+
+
+def main() -> None:
+    results = {label: validate(label, path) for label, path in SCENES.items()}
+    os.makedirs("results", exist_ok=True)
+    with open("results/radar_substrate_validation.json", "w") as f:
+        json.dump(results, f, indent=2)
+    print("\n\nsaved -> results/radar_substrate_validation.json")
+
+    print(f"\n{'='*70}\nGATE\n{'='*70}")
+    # The ASYMMETRIC scene is the one that can actually settle the angle convention.
+    ctrl = results["controlled_wall"]
+    ratio = ctrl["err_mirrored_m"]["median"] / max(ctrl["err_to_nearest_surface_m"]["median"], 1e-9)
+    print(f"controlled_wall (asymmetric): median err {ctrl['err_to_nearest_surface_m']['median']:.2f} m, "
+          f"mirrored {ctrl['err_mirrored_m']['median']:.2f} m  (mirrored/assumed = {ratio:.2f}x)")
+    if ratio < 1.0:
+        raise SystemExit("GATE FAILED: on an ASYMMETRIC scene the mirrored convention fits "
+                         "BETTER. Negate the azimuth in paths_to_rays. Do NOT compensate "
+                         "downstream.")
+    if ratio < 1.5:
+        print("!! WARNING: the asymmetric scene barely separates the two conventions "
+              f"({ratio:.2f}x). The convention is NOT firmly established.")
+    for label, r in results.items():
+        print(f"{label:16s}: {r['n_detections']:4d} detections, "
+              f"best {r['err_to_nearest_surface_m']['min']:.2f} m from a real surface, "
+              f"gate={'PASS' if r['gate_passed'] else 'FAIL'}")
+    if not all(r["gate_passed"] for r in results.values()):
+        raise SystemExit("GATE FAILED on at least one scene. Diagnose before building on "
+                         "this sensor.")
+    print("\nGATE PASSED on both scenes.")
 
 
 if __name__ == "__main__":
