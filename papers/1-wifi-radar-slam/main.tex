@@ -73,7 +73,10 @@ removed by \emph{neither} a $44\times$ bandwidth increase (\SI{60}{GHz}) \emph{n
 a $4\times$ larger array: the limit is not resolution but \emph{path
 discrimination}---telling a genuine reflection from a line-of-sight or floor
 path---which commodity CSI does not provide. We show this discrimination is
-\emph{learnable} (F1~$\approx0.9$ under realistic estimation error), delineating
+\emph{learnable in principle} from per-path physical features (F1~$\approx0.9$ when an
+arrival-elevation feature is available; note that a single-ULA delay--azimuth front-end
+does not estimate elevation, so this is an upper bound rather than a commodity-CSI
+result), delineating
 precisely what passive WiFi can and cannot do for automotive SLAM. To support
 further work we release the full pipeline and \textbf{WiFiSLAM-Sim}, the first
 ray-traced outdoor/vehicular WiFi-CSI dataset with per-path labels.
@@ -140,8 +143,9 @@ discrimination} limit of commodity CSI rather than a bandwidth or aperture
 (resolution) limit, identifying the key open problem for WiFi mapping.
 \item \textbf{WiFiSLAM-Sim}, the first (ray-traced) outdoor/vehicular WiFi-CSI
 dataset with per-path labels, and a learned discriminator that predicts
-mapping-useful reflections from estimable features (F1~$\approx0.9$ at realistic
-noise)---a first concrete step on the path-discrimination problem.
+mapping-useful reflections from per-path features (F1~$\approx0.9$ at realistic noise,
+using an arrival-elevation feature that a single-ULA front-end does not measure; it is
+therefore an upper bound)---a first concrete step on the path-discrimination problem.
 \end{itemize}
 
 \begin{figure*}[t]
@@ -329,9 +333,11 @@ one parameter swept at a time about the nominal point.}
 Separate 1-D delay and 1-D angle estimates paired by sorted index mis-associate in
 multipath and scatter phantom reflectors. Joint 2-D MUSIC removes this by estimating
 each path's delay and angle together. In the controlled scene at \SI{160}{MHz},
-realistic ATE improves from \SI{0.73}{m} (sorted) to \SI{0.027}{m} (joint),
-matching the \SI{0.045}{m} oracle bound---i.e.\ \emph{realistic commodity-CSI
-localization becomes oracle-quality} in sparse multipath. The benefit is
+realistic ATE improves from \SI{0.73}{m} (sorted) to
+\SI{0.098}{m}~$\pm$~\SI{0.028}{m} (joint; mean~$\pm$~std over five seeds), a
+$\approx7\times$ gain that \emph{approaches but does not match} the
+\SI{0.049}{m}~$\pm$~\SI{0.027}{m} oracle bound. Because the pipeline is stochastic,
+we report a seed spread rather than a single run. The benefit is
 scene-dependent: in the dense street canyon (\(\sim\)19 paths, 4 antennas) the paths
 cannot be resolved and joint estimation does not help, so it is retained as an
 opt-in front-end.
@@ -392,8 +398,8 @@ work targets) and is the key next step.
 \section{Discussion}
 % ============================================================================
 The results delineate a clear boundary. \emph{Localization} from ambient
-sub-\SI{7}{GHz} WiFi is practical today: centimetre-level and, with joint
-estimation, oracle-quality from realistic CSI in favourable geometry. \emph{Mapping}
+sub-\SI{7}{GHz} WiFi is practical today: centimetre-level under oracle sensing and
+decimetre-level from realistic commodity CSI with joint estimation. \emph{Mapping}
 is fundamentally harder, but---as Sec.~\ref{sec:60ghz} shows---not for the reason
 one would expect: the realistic floor is removed by neither wider bandwidth nor
 larger aperture, so it is not a resolution limit but a \emph{path-discrimination}
@@ -424,7 +430,7 @@ at \SI{60}{GHz} and with a 16-element array (Table~\ref{tab:60ghz}).
 \toprule
 Configuration (controlled wall, joint) & accuracy (m) & ATE (m)\\
 \midrule
-sub-\SI{7}{GHz}, \SI{40}{MHz}, 4-antenna & 4.8 & 0.027\\
+sub-\SI{7}{GHz}, \SI{160}{MHz}, 4-antenna & 4.8 & 0.098\\
 \SI{60}{GHz}, \SI{1.76}{GHz}, 4-antenna & 4.8 & 0.030\\
 \SI{60}{GHz}, \SI{1.76}{GHz}, 16-antenna & 4.75 & 0.034\\
 \bottomrule

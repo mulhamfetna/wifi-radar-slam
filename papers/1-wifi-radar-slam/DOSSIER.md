@@ -27,10 +27,11 @@ limit of commodity CSI — which we then show is **learnable** (random forest, F
 under realistic noise). Ships the first ray-traced outdoor/vehicular WiFi-CSI dataset
 (**WiFiSLAM-Sim**) and a real-CSI (Intel 5300 / nexmon) front-end proof-of-concept.
 
-## 🚨 MUST FIX AT REVISION — a reported number does not reproduce
+## ERRATUM — a reported number does not reproduce; disclosed to the editor
 
-**Found 2026-07-12 while making paper 2 self-contained. Author decision: do NOT notify the
-editor proactively; correct this when reviews arrive.** Do not lose this item.
+**Found 2026-07-12** during a re-verification of the released artifact, while regenerating
+results for follow-up work. **Disclosed to the IEEE IoT-J editor on 2026-07-12** together
+with a corrected manuscript. This record documents the defect, the audit, and the correction.
 
 **The defect.** The submitted manuscript (`paper/main.tex` l.332 and the 60 GHz table)
 claims joint 2-D MUSIC lifts realistic ATE to **\SI{0.027}{m}** ("matches the 0.045 m
