@@ -26,7 +26,7 @@ paper has two pillars, decided in brainstorming:
 |---|---|
 | **RQ1** | Is the phantom ceiling universal to RF sensing, or WiFi-specific? Measure the phantom rate of *radar CFAR detections* with paper 2's isolation experiment. |
 | **RQ2** | Where does radar's advantage come from — bandwidth, monostatic geometry, or carrier? |
-| **RQ3** | Head-to-head SLAM accuracy: six metrics **plus KITTI-style drift %** (the accepted radar protocol). |
+| **RQ3** | Head-to-head SLAM accuracy: the six metrics on every cell, **plus KITTI-protocol drift %** on the real-radar anchor (the accepted radar protocol — but see *Acceptance*: standard drift is undefined on our 30–60 m simulated trajectories, so it is reported where it is valid and not where it is not). |
 | **RQ4** | Cost — honestly, and with an explicit statement of what cannot be sourced. |
 
 **Explicitly dropped (YAGNI):** WiFi+radar fusion. Paper 2 already did fusion; the two sensors
@@ -118,20 +118,37 @@ New shared package `src/wifi_radar_slam/radar/` (additive; reuses paper-2 machin
 
 ```
 radar/
-  config.py       RadarConfig: carrier, bandwidth, n_chirps, MIMO tx/rx, chirp time,
-                  max range, CFAR guard/training cells, Pfa. Presets: RADAR_77G_4G, RADAR_77G_160M
-  processing.py   PURE NumPy signal chain (locally testable, no Sionna):
-                    beat_cube(paths, cfg)  -> (n_rx, n_chirps, n_samples) complex
-                    range_doppler(cube)    -> windowed 2-D FFT
-                    cfar_2d(rd, cfg)       -> detection mask (CA-CFAR)
-                    detections_to_scan(...)-> Scan in the sensor-local BEV frame
-  sensor.py       SionnaRadarSensor: monostatic node + diffuse scattering (the paper-2
-                  SionnaLidarSensor pattern) -> paths -> processing -> Scan.
+  config.py       RadarConfig: carrier, bandwidth, chirp time, ADC samples, n_chirps
+                  (= coherent-integration factor; the scenes are static, so chirps are
+                  modelled analytically -- see below), ULA n_rx/spacing, azimuth grid,
+                  min/max range, CFAR guard/training cells, Pfa.
+                  Presets: RADAR_77G_4G, RADAR_77G_160M, WIFI_5G2_160M (cell B).
+  processing.py   PURE NumPy/SciPy signal chain (no Sionna; tested locally):
+                    beat_matrix(taus, amps, azimuths, cfg, rng) -> (n_rx, n_samples) complex
+                    range_fft(beat, cfg)          -> (n_rx, n_range) complex
+                    azimuth_beamform(rf, cfg)     -> (n_azimuth, n_range) real power
+                    cfar_2d(ra_map, cfg)          -> (n_azimuth, n_range) bool mask
+                    cluster_detections(mask, ra_map, cfg) -> (ranges, azimuths)
+                    detections_to_scan(ranges, azimuths, cfg) -> Scan  [monostatic polar->Cartesian]
+                    radar_scan(taus, amps, azimuths, cfg, rng) -> Scan  [the whole chain]
+  sensor.py       SionnaRadarSensor: monostatic TX co-located with the vehicle RX +
+                  diffuse scattering -> paths (tau, a, phi_r) -> the chain above -> Scan.
                   make_sensor seam: radar_sensor(built, cfg, rng) -> (pose -> Scan)
-eval/drift.py     KITTI-style drift %: translational error over 100-800 m sub-trajectories,
-                  rotational error deg/100 m. REQUIRED -- it is the accepted radar protocol,
-                  and ATE alone would be marked down.
+eval/drift.py     KITTI-protocol drift %: translational error over sub-trajectories
+                  (standard lengths 100-800 m) and rotational deg/100 m. `lengths` is a
+                  parameter; returns NaN / n_segments=0 when the trajectory is too short
+                  rather than fabricating a value. REQUIRED: it is the accepted radar
+                  protocol, and ATE alone would be marked down.
 ```
+
+**Why `(n_rx, n_samples)` and not an `(n_rx, n_chirps, n_samples)` range–Doppler cube.** The
+scenes are static, so every chirp in the CPI carries an identical signal and differs only in
+noise. Coherently integrating `n_chirps` chirps is therefore *analytically identical* to
+generating the signal once with the noise standard deviation divided by `sqrt(n_chirps)` — which
+is what `beat_matrix` does. This is exact here (not an approximation), is `n_chirps`× cheaper,
+and it **retires pitfall #4 outright**: we never depend on Sionna's synthetic within-CPI time
+evolution at all, so there is nothing left to validate. `n_chirps` survives in `RadarConfig` as
+precisely what it now is — the coherent-integration factor.
 
 Reused unchanged: `lidar/slam_icp.py` (the shared scan-to-map back-end), `lidar/pointcloud.Scan`,
 `eval/metrics.py` (the six metrics), `map_filter.py`, and the isolation experiment
@@ -235,7 +252,13 @@ and reconsider rather than proceeding.
 - `radar/` package: `RadarConfig`, the pure-NumPy signal chain (beat → RD-FFT → CFAR →
   detections), and a Sionna monostatic sensor on the `make_sensor` seam; pure parts unit-tested
   locally, the Sionna sensor gated.
-- `eval/drift.py`: KITTI-style drift %, unit-tested.
+- `eval/drift.py`: KITTI-protocol drift %, unit-tested. Applied with **standard 100–800 m
+  sub-sequence lengths on the real-radar anchor** (sub-project 2), where it is directly
+  comparable to the cited CFEAR/DRO rows. Our simulated trajectories are 30–60 m, so standard
+  drift is **undefined** there: the simulated cells report ATE/RPE + the four map metrics (as
+  in paper 2), and any reduced-length drift figure is labelled as such and never tabulated
+  beside a published KITTI/Oxford number. `drift()` reports NaN rather than fabricating a
+  value on a track too short to measure.
 - All five ablation cells (A–D + the MUSIC reference) produce the six metrics, drift %, **and a
   phantom rate**, on both scenes.
 - The shared back-end is anchored on a real radar benchmark, reported beside the cited
