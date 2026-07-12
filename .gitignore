@@ -36,3 +36,11 @@ data/real/
 
 # generated dataset artifacts (attach to releases; regenerate via experiments/make_dataset.py)
 data/*.npz
+
+# LaTeX build intermediates (main.pdf IS committed; these are regenerated)
+papers/**/*.aux
+papers/**/*.log
+papers/**/*.blg
+papers/**/*.out
+papers/**/*.bbl
+papers/**/*.synctex.gz
