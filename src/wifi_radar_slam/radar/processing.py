@@ -81,3 +81,19 @@ def beat_matrix(taus, amps, azimuths, cfg, rng=None) -> np.ndarray:
         beat = beat + (sigma / np.sqrt(2)) * (rng.normal(size=beat.shape)
                                               + 1j * rng.normal(size=beat.shape))
     return beat
+
+
+def range_fft(beat: np.ndarray, cfg) -> np.ndarray:
+    """Windowed FFT along fast time -> a complex range profile per array element.
+
+    Returns (cfg.n_rx, cfg.n_range); bin i is at range cfg.range_bins()[i].
+
+    The Hann window is not cosmetic. With a rectangular window, a strong target's spectral
+    sidelobes (-13 dB, decaying slowly) sit well above the noise floor and trip CFAR at
+    ranges where nothing exists -- manufacturing "ghosts" that are artifacts of our own
+    processing rather than of the physics. Since the phantom rate is this paper's headline
+    measurement, that contamination is disqualifying. Hann drops the first sidelobe to
+    -31 dB and rolls off fast, at the cost of a ~2x wider main lobe.
+    """
+    w = np.hanning(cfg.n_samples)
+    return np.fft.fft(beat * w[None, :], axis=1)[:, : cfg.n_range]

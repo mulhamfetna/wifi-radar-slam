@@ -2,7 +2,7 @@ import dataclasses
 import numpy as np
 import pytest
 from wifi_radar_slam.radar.config import RadarConfig
-from wifi_radar_slam.radar.processing import beat_matrix
+from wifi_radar_slam.radar.processing import beat_matrix, range_fft
 
 C = 299792458.0
 
@@ -106,3 +106,47 @@ def test_coherent_integration_scales_noise_by_sqrt_n_chirps():
     n1 = beat_matrix([], [], [], base, rng=np.random.default_rng(0))
     n2 = beat_matrix([], [], [], many, rng=np.random.default_rng(0))
     assert np.std(n2) == pytest.approx(np.std(n1) / 10.0, rel=1e-9)
+
+
+# --- range FFT ------------------------------------------------------------------
+
+def test_range_fft_shape():
+    cfg = cfg_small()
+    b = beat_matrix([tau_of(20.0)], [1.0 + 0j], [0.0], cfg)
+    rf = range_fft(b, cfg)
+    assert rf.shape == (cfg.n_rx, cfg.n_range)
+    assert np.iscomplexobj(rf)
+
+
+def test_range_fft_peak_lands_on_the_true_range():
+    # The end-to-end range check: put a target at 20 m, read 20 m back out.
+    cfg = cfg_small()
+    R = 20.0
+    rf = range_fft(beat_matrix([tau_of(R)], [1.0 + 0j], [0.0], cfg), cfg)
+    power = np.abs(rf).sum(axis=0)
+    peak_range = cfg.range_bins()[int(np.argmax(power))]
+    assert peak_range == pytest.approx(R, abs=cfg.range_resolution_m)
+
+
+def test_range_fft_resolves_two_targets_separated_by_more_than_a_cell():
+    cfg = cfg_small()                       # 15 cm range cells
+    rf = range_fft(beat_matrix([tau_of(20.0), tau_of(25.0)],
+                               [1.0 + 0j, 1.0 + 0j], [0.0, 0.0], cfg), cfg)
+    power = np.abs(rf).sum(axis=0)
+    bins = cfg.range_bins()
+    near20 = power[np.argmin(np.abs(bins - 20.0))]
+    near25 = power[np.argmin(np.abs(bins - 25.0))]
+    assert near20 > 0.5 * power.max() and near25 > 0.5 * power.max()
+
+
+def test_windowing_suppresses_sidelobes():
+    # A Hann window trades main-lobe width for sidelobe suppression -- essential, because
+    # a strong target's rectangular-window sidelobes would otherwise trip CFAR and
+    # masquerade as ghosts, contaminating the very rate we are measuring.
+    cfg = cfg_small()
+    b = beat_matrix([tau_of(20.0)], [1.0 + 0j], [0.0], cfg)
+    windowed = np.abs(range_fft(b, cfg)).sum(axis=0)
+    raw = np.abs(np.fft.fft(b, axis=1)[:, : cfg.n_range]).sum(axis=0)
+    peak = int(np.argmax(windowed))
+    far = np.r_[0:max(peak - 10, 0), min(peak + 11, cfg.n_range):cfg.n_range]
+    assert (windowed[far].max() / windowed[peak]) < (raw[far].max() / raw[peak])
