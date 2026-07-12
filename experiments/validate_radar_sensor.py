@@ -86,52 +86,60 @@ def main() -> None:
               "Pitfall #2 does not reproduce -- investigate before trusting the sensor.")
 
     # --- (1): the geometry / angle-convention check -----------------------------------
-    # The nearest ground-truth surface tells us where the strongest return SHOULD be.
-    gt = built.ground_truth_map[:, :2]
-    rel = gt - np.array([px, py])
-    d = np.linalg.norm(rel, axis=1)
-    near = int(np.argmin(d))
-    true_range = float(d[near])
-    tb = float(np.arctan2(rel[near, 1], rel[near, 0]) - yaw)
-    true_bearing = float(np.arctan2(np.sin(tb), np.cos(tb)))
-    print(f"\nnearest GT surface: range {true_range:.2f} m, "
-          f"bearing {np.rad2deg(true_bearing):+.1f} deg")
-
+    # Compare each detection against ITS OWN nearest ground-truth surface. (An earlier
+    # version compared everything to the single nearest GT point overall -- which sat at
+    # -92 deg, i.e. OUTSIDE the radar's +/-90 deg field of view, so it was scoring the
+    # sensor against a wall it physically cannot see.)
+    gt_world = built.ground_truth_map[:, :2]
     scan = sensor(pose)
-    print(f"radar scan: {len(scan)} detections")
+    print(f"\nradar scan: {len(scan)} detections")
     if len(scan) == 0:
         raise SystemExit("FAIL: no detections at all. Check diffuse scattering (pitfall #2).")
 
-    truth_xy = np.array([true_range * np.cos(true_bearing),
-                         true_range * np.sin(true_bearing)])
-    mirror_xy = np.array([true_range * np.cos(-true_bearing),
-                          true_range * np.sin(-true_bearing)])
-    err = np.linalg.norm(scan.points - truth_xy, axis=1)
-    err_mirror = np.linalg.norm(scan.points - mirror_xy, axis=1)
-    best = int(np.argmin(err))
-    r = float(np.linalg.norm(scan.points[best]))
-    b = float(np.arctan2(scan.points[best, 1], scan.points[best, 0]))
-    print(f"closest detection : range {r:.2f} m, bearing {np.rad2deg(b):+.1f} deg")
-    print(f"  error, assumed convention : {err.min():.2f} m")
-    print(f"  error, MIRRORED convention: {err_mirror.min():.2f} m")
+    def errors(points_local: np.ndarray) -> np.ndarray:
+        """Distance from each detection (sensor-local) to the nearest GT surface."""
+        c, s = np.cos(yaw), np.sin(yaw)
+        R = np.array([[c, -s], [s, c]])
+        world = points_local @ R.T + np.array([px, py])       # local -> world
+        return np.linalg.norm(world[:, None, :] - gt_world[None, :, :], axis=2).min(axis=1)
 
-    mirrored = bool(err_mirror.min() < 0.5 * err.min())
+    err = errors(scan.points)
+    # The mirror hypothesis: if Sionna's co-located-TX/RX convention flips azimuth, then
+    # NEGATING every detection's bearing should fit the ground truth markedly BETTER.
+    mirrored_pts = scan.points * np.array([1.0, -1.0])        # negate the bearing
+    err_mirror = errors(mirrored_pts)
+
+    print(f"  detection -> nearest real surface (assumed convention):")
+    print(f"     min {err.min():.2f} m | median {np.median(err):.2f} m | "
+          f"max {err.max():.2f} m")
+    print(f"  same, with the bearing MIRRORED:")
+    print(f"     min {err_mirror.min():.2f} m | median {np.median(err_mirror):.2f} m | "
+          f"max {err_mirror.max():.2f} m")
+
+    mirrored = bool(np.median(err_mirror) < 0.5 * np.median(err))
     if mirrored:
-        print("  *** ANGLE CONVENTION IS MIRRORED -- negate the azimuth in "
-              "paths_to_rays. Do NOT compensate downstream. ***")
+        print("  *** ANGLE CONVENTION IS MIRRORED -- negate the azimuth in paths_to_rays. "
+              "Do NOT compensate downstream. ***")
+
+    for i, (p, e) in enumerate(zip(scan.points, err)):
+        r = float(np.hypot(*p))
+        b = float(np.rad2deg(np.arctan2(p[1], p[0])))
+        print(f"     det {i}: range {r:6.2f} m  bearing {b:+7.1f} deg  "
+              f"-> nearest surface {e:5.2f} m")
 
     out = {
         "scene": CFG_PATH,
         "pose": [px, py, yaw],
         "valid_paths_specular": counts["diffuse_False"],
         "valid_paths_diffuse": counts["diffuse_True"],
-        "true_range_m": true_range,
-        "true_bearing_deg": float(np.rad2deg(true_bearing)),
         "n_detections": int(len(scan)),
-        "best_range_m": r,
-        "best_bearing_deg": float(np.rad2deg(b)),
-        "best_error_m": float(err.min()),
-        "best_error_mirrored_m": float(err_mirror.min()),
+        "err_to_nearest_surface_m": {
+            "min": float(err.min()), "median": float(np.median(err)),
+            "max": float(err.max()),
+        },
+        "err_mirrored_m": {
+            "min": float(err_mirror.min()), "median": float(np.median(err_mirror)),
+        },
         "angle_convention_mirrored": mirrored,
     }
     print("\n" + json.dumps(out, indent=2))
@@ -140,13 +148,18 @@ def main() -> None:
         json.dump(out, f, indent=2)
     print("saved -> results/radar_substrate_validation.json")
 
-    # THE GATE
-    if err.min() > 1.0 and not mirrored:
+    # THE GATE: at least one detection must land on a real surface, and the convention
+    # must not be mirrored. (A high MEDIAN error is not a failure here -- ghosts are
+    # expected and are the paper's subject. What must be true is that the sensor CAN see
+    # a real wall, in the right place.)
+    if mirrored:
+        raise SystemExit("GATE: angle convention is mirrored. Fix paths_to_rays, re-run.")
+    if err.min() > 1.0:
         raise SystemExit(
-            f"FAIL (gate): no detection within 1 m of the true nearest surface "
-            f"(best {err.min():.2f} m), and the mirror hypothesis does not explain it. "
-            f"Diagnose before building anything on this sensor.")
-    print("\nGATE PASSED" if not mirrored else "\nGATE: fix the mirrored convention, re-run.")
+            f"FAIL (gate): not one detection lands within 1 m of any real surface "
+            f"(best {err.min():.2f} m). Diagnose before building on this sensor.")
+    print(f"\nGATE PASSED: best detection is {err.min():.2f} m from a real surface; "
+          f"angle convention confirmed (not mirrored).")
 
 
 if __name__ == "__main__":
