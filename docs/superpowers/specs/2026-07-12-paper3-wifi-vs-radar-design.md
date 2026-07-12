@@ -26,7 +26,7 @@ paper has two pillars, decided in brainstorming:
 |---|---|
 | **RQ1** | Is the phantom ceiling universal to RF sensing, or WiFi-specific? Measure the phantom rate of *radar CFAR detections* with paper 2's isolation experiment. |
 | **RQ2** | Where does radar's advantage come from — bandwidth, monostatic geometry, or carrier? |
-| **RQ3** | Head-to-head SLAM accuracy: the six metrics on every cell, **plus KITTI-protocol drift %** on the real-radar anchor (the accepted radar protocol — but see *Acceptance*: standard drift is undefined on our 30–60 m simulated trajectories, so it is reported where it is valid and not where it is not). |
+| **RQ3** | Head-to-head **mapping** accuracy: the six metrics on every cell, computed **under ground-truth poses**. *(Revised 2026-07-13 — see "The credibility gate failed, and what it changed". SLAM-based odometry comparison for radar is **out of scope**: our shared point-based back-end provably cannot estimate rotation from radar, and that limitation is now reported as a finding rather than papered over.)* |
 | **RQ4** | Cost — honestly, and with an explicit statement of what cannot be sourced. |
 
 **Explicitly dropped (YAGNI):** WiFi+radar fusion. Paper 2 already did fusion; the two sensors
@@ -117,22 +117,75 @@ silently confounded with the physics.
 Every cell reports the six metrics, drift %, **and its phantom rate** — which is what makes RQ1
 answerable *as a function of* bandwidth and geometry, not merely as a single number.
 
+## ⚠ The credibility gate FAILED, and what it changed (2026-07-13)
+
+Sub-project 2 ran our shared back-end on real Boreas radar (2,500 scans, 5,008 m) and **failed the
+gate outright** — 85 % translational drift against a 5 % pass bar. Full record:
+`docs/results-paper3-anchor.md`. The gate did precisely the job it was built for: it stopped the
+paper **before** the ablation was built on sand.
+
+**The root cause is architectural, not a bug.** Our point-to-point scan-to-map ICP **cannot estimate
+rotation from spinning-radar point clouds at all — the registration cost is FLAT in yaw.** Sweeping
+yaw ±8° around the truth on the sharpest turning frames, the cost varies by ~2 % and its minimum
+sits at *random* offsets; `corr(yaw error, true yaw change) = −0.992`, i.e. ICP recovers essentially
+**zero** rotation and keeps whatever the initial guess gave it. This holds at every point density
+tested (k = 2, 4, 12, 40) and survives every fix attempted (noise floor, motion compensation, motion
+model, map window, point-to-line).
+
+**Mechanism.** Radar's noise is **anisotropic** — accurate in range, poor in cross-range — and
+rotation is read from tangential displacement, exactly the noisy direction. The returns also lie
+along 400 *fixed* azimuth rays, identical in every scan, so nearest-neighbour correspondences have
+nothing distinctive to lock onto. This is why **CFEAR** compresses each scan into a few hundred
+**oriented surfels** and registers **point-to-line** on those.
+
+**Consequence for this paper — the restructure.** *RQ1, the headline, never needed SLAM.* "Is the
+≈89 % phantom ceiling universal to RF sensing?" is answered from the **detection chain against
+ground-truth geometry**, and so are the map metrics and the whole 2×2 ablation. Only a radar
+*odometry* comparison needed a working radar SLAM. Therefore:
+
+- **The ablation is evaluated under GROUND-TRUTH POSES.** Every cell (A–D + the MUSIC reference) is
+  scored on its *detections* and its *map*, not on its trajectory. This isolates the **sensor**
+  even more cleanly than SLAM did — no estimator is in the loop at all.
+- **Radar odometry is out of scope, and the reason is a stated contribution**, not an omission: a
+  point-based back-end that works for LiDAR (KITTI, 0.3 % drift) and WiFi *provably* cannot do
+  radar odometry, and we quantify exactly why. That is a useful, citable negative result, and it
+  independently motivates the design of CFEAR-class methods.
+- **WiFi-vs-LiDAR SLAM results are untouched** — paper 2 stands.
+
+*(The alternative — implementing CFEAR-class surfel + point-to-line registration in the shared
+back-end — is a real contribution and is recorded as future work, but it is a sub-project in its own
+right and was deliberately not slipped in to rescue a gate.)*
+
 ## Credibility: the radar baseline must not be a strawman
 
-Radar SLAM is mature — **CFEAR 1.09 %** drift (Oxford), **DRO 0.26 %** (Boreas leaderboard). A
-naïve baseline would be dismantled in review. Two defences, both required:
+Radar SLAM is mature, and a naïve baseline would be dismantled in review. The two rows we cite,
+**each with its caveat stated** (verified against the primary sources, 2026-07-12):
+
+- **CFEAR — 1.09 % translational drift** on Oxford Radar RobotCar (Adolfsson et al., *Lidar-Level
+  Localization With Radar? …*, **IEEE T-RO 39(2):1476–1495, 2023**). This is the **tuned** figure;
+  the same work reports **1.16 %** without parameter tuning. Radar-only, point-based, and its
+  front-end *"keeps the strongest returns per azimuth"* — the same class of front-end we use.
+  **This is our real reference point.**
+- **DRO — 0.26 %** on the Boreas leaderboard (Lisus et al., *DRO: Doppler-Aware Direct Radar
+  Odometry*, arXiv:2504.20339). But that number is **gyro-aided**, and DRO is a *direct* method
+  that registers raw intensity without extracting points at all. It is **not** an apples-to-apples
+  bound for a radar-only, point-based method like ours, and must never be presented as one.
+
+Two defences, both required:
 
 1. **One back-end for every sensor.** WiFi, radar (and LiDAR, inherited) all go through the
    same scan-to-map ICP, so differences are attributable to the **sensor**, not the estimator.
    This is exactly what made paper 2's comparison valid.
-2. **Anchor that back-end on real radar data + cite the SOTA row.** Run our back-end on a real
-   radar benchmark (Oxford Radar RobotCar or Boreas) and report **drift %** beside **CFEAR
-   (1.09 %) and DRO (0.26 %)**, cited from the literature — the same move that made paper 2's
-   LiDAR credible via KITTI (0.3 % drift). If our back-end lands in a plausible band, the
-   baseline is credible. **If it does not, we report that and bound our claims accordingly.**
+2. **Anchor that back-end on real radar data + cite the SOTA row.** Run our back-end on **Boreas**
+   and report **drift %** beside those rows — the same move that made paper 2's LiDAR credible via
+   KITTI. If our back-end lands in a plausible band, the baseline is credible. **If it does not, we
+   report that and bound our claims accordingly.**
 
-The SOTA row is **cited, not reimplemented** — provided we run our back-end on the *same*
-benchmark, the numbers are directly comparable, which is cheap and rigorous.
+**We anchor on Boreas, not Oxford**, for a practical reason worth stating: Boreas is served over
+anonymous public HTTPS, while Oxford requires a registration that cannot be automated. The
+consequence must be stated too, and not glossed: **CFEAR's number is on Oxford while ours is on
+Boreas** — same protocol, same sensor class (Navtech spinning radar), different city. The SOTA row
+is **cited, not reimplemented**, and it is a *reference point*, not a like-for-like head-to-head.
 
 ## Architecture
 
@@ -224,8 +277,11 @@ the method inherently**. Note their own caveat: the reflection models are "simpl
 - **Radar is expected to win.** Existing WiFi-vs-radar head-to-heads favour radar decisively
   (97.78 % vs 65.09 % on matched HAR). We design to **explain** the gap, not to close it, and
   we do **not** tune WiFi to manufacture parity.
-- **Our radar baseline is not CFEAR-class.** Say so, anchor it on real data, and place the
-  cited SOTA row beside it.
+- **Our shared back-end cannot do radar odometry, and we say so outright.** The credibility gate
+  measured it and we report it (see the gate section). We do **not** present a crippled radar SLAM
+  row and quietly let WiFi look better by comparison — that would have been the single most
+  dishonest thing available to this paper. The ablation is therefore scored under **ground-truth
+  poses**, with no estimator in the loop for any sensor.
 - **The cost argument is structurally weak here** and must not be oversold: radar is the same
   order of cost as the WiFi package, so the 84–600× story of paper 2 **does not transfer**.
   Moreover **OEM automotive-radar pricing is not public** (two research passes found none) —
@@ -261,26 +317,26 @@ merge (the pattern that worked for paper 2):
 | # | Sub-project | Deliverable |
 |---|-------------|-------------|
 | **1** | **Radar substrate** | `radar/` (RadarConfig, pure-NumPy beat→range→azimuth→CFAR chain, Sionna monostatic sensor on the `make_sensor` seam) + `eval/drift.py` (KITTI-style drift %). Unit-tested; sensor gated. |
-| **2** | **Credibility anchor** | Run the shared back-end on a real radar benchmark (Oxford/Boreas); report drift % beside the cited CFEAR (1.09 %) / DRO (0.26 %) rows. Decides whether the baseline is defensible **before** we invest in the ablation. |
-| **3** | **Ablation + phantom rates (RQ1, RQ2, RQ3)** | The five cells × two scenes → six metrics, drift %, and phantom rate each. This is the paper. |
+| **2** | **Credibility anchor** ✅ *done — GATE FAILED, deliberately* | Ran the shared back-end on real Boreas radar. **It cannot estimate rotation from radar at all** (the yaw cost is flat; ICP recovers zero rotation). Reported as a finding, not hidden. Delivered `radar/kstrongest.py`, `radar/boreas.py`, `eval/drift.py`, and the negative result. |
+| **3** | **Ablation + phantom rates (RQ1, RQ2, RQ3)** | The five cells × two scenes → phantom rate + the six metrics, **under ground-truth poses** (no estimator in the loop). This is the paper. |
 | **4** | **Cost (RQ4) + manuscript** | Eval-board/retail pricing sourced directly; manuscript reusing the paper-2 scaffold. |
 
-**Sub-project 2 is a gate.** If our shared back-end cannot reach a plausible drift band on real
-radar data, the radar baseline is not credible and the ablation would be built on sand — we stop
-and reconsider rather than proceeding.
+**Sub-project 2 was a gate, and it fired.** It found that the shared back-end cannot do radar
+odometry, which would have made radar an artificially weak SLAM baseline and flattered WiFi. Rather
+than proceed on sand, the paper was restructured: the ablation is scored under **ground-truth
+poses**, and the back-end's limitation is reported as a quantified finding. This is exactly the
+outcome a gate exists to produce.
 
 ## Acceptance
 
 - `radar/` package: `RadarConfig`, the pure-NumPy signal chain (beat → RD-FFT → CFAR →
   detections), and a Sionna monostatic sensor on the `make_sensor` seam; pure parts unit-tested
   locally, the Sionna sensor gated.
-- `eval/drift.py`: KITTI-protocol drift %, unit-tested. Applied with **standard 100–800 m
-  sub-sequence lengths on the real-radar anchor** (sub-project 2), where it is directly
-  comparable to the cited CFEAR/DRO rows. Our simulated trajectories are 30–60 m, so standard
-  drift is **undefined** there: the simulated cells report ATE/RPE + the four map metrics (as
-  in paper 2), and any reduced-length drift figure is labelled as such and never tabulated
-  beside a published KITTI/Oxford number. `drift()` reports NaN rather than fabricating a
-  value on a track too short to measure.
+- `eval/drift.py`: KITTI-protocol drift %, unit-tested. Used on the real-radar anchor
+  (sub-project 2), where the sequence is km-scale and the metric is valid. **It is not applied to
+  the simulated cells**: those trajectories are 30–60 m, far shorter than KITTI's shortest 100 m
+  sub-sequence, and `drift()` correctly reports NaN rather than fabricating a value. The simulated
+  cells are scored on detections and maps under ground-truth poses.
 - All five ablation cells (A–D + the MUSIC reference) produce the six metrics, drift %, **and a
   phantom rate**, on both scenes.
 - The shared back-end is anchored on a real radar benchmark, reported beside the cited
