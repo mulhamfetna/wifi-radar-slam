@@ -52,6 +52,37 @@ def paths_to_rays(tau, a, phi_r, yaw: float):
     return tau, a, az
 
 
+def retune_scene(scene, frequency_hz: float) -> list[str]:
+    """Retune a Sionna scene to `frequency_hz`, refusing to extrapolate materials out of band.
+
+    Returns the names of the unused materials that were frozen.
+
+    Sionna's ITU material models are only defined over published frequency bands (ITU-R
+    P.2040): concrete and metal to 100 GHz, but marble only to 60 GHz and brick only to
+    40 GHz. Setting `scene.frequency` eagerly re-evaluates **every material registered in
+    the scene**, used or not -- so moving the street-canyon scene to 77 GHz for cell D
+    raises on `marble`, a material no object in it actually uses.
+
+    The safe resolution is not to relax the check. It is to notice that a material no ray
+    ever hits has no physics to get wrong: we freeze those (drop the update callback, so
+    their parameters simply stay put) and let the frequency be set. But a material that IS
+    used and IS out of band must fail LOUDLY -- silently extrapolating ITU parameters past
+    their validity band would quietly fabricate the permittivity of every surface the radar
+    sees, which is precisely the kind of invisible error that ruins a paper. So we do not
+    touch used materials, and `scene.frequency` raises on them exactly as it should.
+    """
+    used = {o.radio_material.name for o in scene.objects.values()}
+    frozen = []
+    for name, mat in scene.radio_materials.items():
+        if name in used:
+            continue                       # never freeze a material a ray can hit
+        if mat.frequency_update_callback is not None:
+            mat.frequency_update_callback = None
+            frozen.append(name)
+    scene.frequency = frequency_hz         # raises if a USED material is out of band
+    return frozen
+
+
 class SionnaRadarSensor:
     """Monostatic 77 GHz FMCW radar: a TX co-located with the vehicle RX, diffuse material
     backscatter, and the FULL detection chain (beat -> range FFT -> beamform -> CFAR).
@@ -68,7 +99,10 @@ class SionnaRadarSensor:
         self.built, self.cfg, self.rng = built, cfg, rng
         self.max_depth = max_depth
         self.scene = built.scene
-        self.scene.frequency = cfg.carrier_hz   # the ablation's carrier axis
+        # The ablation's carrier axis. Retuning to 77 GHz is not a one-liner -- see
+        # retune_scene: the scene ships with ITU materials (marble, brick) whose published
+        # validity bands stop below 77 GHz, and Sionna re-evaluates all of them.
+        self.frozen_materials = retune_scene(self.scene, cfg.carrier_hz)
         if "radar_tx" not in self.scene.transmitters:
             self.scene.add(rt.Transmitter("radar_tx",
                                           position=[0.0, 0.0, RX_HEIGHT_M]))
