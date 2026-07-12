@@ -1,7 +1,7 @@
 # Paper 3 — design: WiFi vs automotive radar for SLAM
 
 **Date:** 2026-07-12
-**Status:** approved (brainstorming), pending review
+**Status:** approved (design + spec review, 2026-07-12)
 **Branch:** `paper3-wifi-vs-radar` (off `main`)
 **Working title:** *Is the Phantom Ceiling Universal? Ambient WiFi vs 77 GHz Automotive Radar
 for Vehicular SLAM*
@@ -208,10 +208,11 @@ the method inherently**. Note their own caveat: the reflection models are "simpl
 
 ## Target venue
 
-**IEEE IoT-J** (continuity with papers 1–2; same audience; the WiFi/ISAC framing fits).
-Noted trade-off: a radar-specialist venue (e.g. IEEE Trans. Radar Systems) would scrutinise the
-radar baseline harder — which the anchor + SOTA row are designed to survive — but would care
-less about the WiFi/IoT framing. Decide at spec review.
+**IEEE IoT-J** — decided at spec review (2026-07-12). Continuity with papers 1–2, the same
+audience, and the WiFi/ISAC framing fits. Noted trade-off, accepted: a radar-specialist venue
+(e.g. IEEE Trans. Radar Systems) would scrutinise the radar baseline harder — which the
+credibility anchor + cited SOTA row are designed to survive — but would care less about the
+WiFi/IoT framing.
 
 ## Decomposition into sub-projects
 
