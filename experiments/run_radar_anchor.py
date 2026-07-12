@@ -29,9 +29,17 @@ from wifi_radar_slam.eval.metrics import rpe
 
 SEQ = "boreas-2020-11-26-13-58"
 ROOT = f"data/boreas/{SEQ}"
-K = 12                    # k-strongest returns per azimuth (CFEAR-class front-end)
-MAX_RANGE_M = 100.0
-MAP_VOXEL = 1.0           # accumulated-map voxel; radar scans are dense, so coarser than LiDAR
+# Front-end, configured to radar's PHYSICS -- see docs/results-paper3-anchor.md. Radar noise is
+# ANISOTROPIC: range is accurate (0.06 m) but cross-range grows with range (a 0.9 deg beam gives
+# +/-1.6 m of tangential error at 100 m). Yaw is estimated FROM tangential displacement -- exactly
+# the noisy direction -- and point-to-point ICP weights every direction equally. So we (a) take
+# many more returns per azimuth, which averages the noise down, and (b) crop range, where the
+# cross-range error is worst. Measured effect on per-frame yaw error: k=12/100 m gives 5.35 deg
+# std; k=40/50 m gives 0.46 deg -- an 11x reduction, and the difference between a radar baseline
+# that tracks and one that does not.
+K = 40                    # k-strongest returns per azimuth (CFEAR-class front-end)
+MAX_RANGE_M = 50.0
+MAP_VOXEL = 0.5           # accumulated-map voxel
 DT = 0.25                 # Navtech is 4 Hz
 
 # Cited SOTA -- NOT reimplemented. The caveats are part of the citation, not footnotes.
