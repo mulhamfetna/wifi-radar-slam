@@ -119,20 +119,34 @@ answerable *as a function of* bandwidth and geometry, not merely as a single num
 
 ## Credibility: the radar baseline must not be a strawman
 
-Radar SLAM is mature — **CFEAR 1.09 %** drift (Oxford), **DRO 0.26 %** (Boreas leaderboard). A
-naïve baseline would be dismantled in review. Two defences, both required:
+Radar SLAM is mature, and a naïve baseline would be dismantled in review. The two rows we cite,
+**each with its caveat stated** (verified against the primary sources, 2026-07-12):
+
+- **CFEAR — 1.09 % translational drift** on Oxford Radar RobotCar (Adolfsson et al., *Lidar-Level
+  Localization With Radar? …*, **IEEE T-RO 39(2):1476–1495, 2023**). This is the **tuned** figure;
+  the same work reports **1.16 %** without parameter tuning. Radar-only, point-based, and its
+  front-end *"keeps the strongest returns per azimuth"* — the same class of front-end we use.
+  **This is our real reference point.**
+- **DRO — 0.26 %** on the Boreas leaderboard (Lisus et al., *DRO: Doppler-Aware Direct Radar
+  Odometry*, arXiv:2504.20339). But that number is **gyro-aided**, and DRO is a *direct* method
+  that registers raw intensity without extracting points at all. It is **not** an apples-to-apples
+  bound for a radar-only, point-based method like ours, and must never be presented as one.
+
+Two defences, both required:
 
 1. **One back-end for every sensor.** WiFi, radar (and LiDAR, inherited) all go through the
    same scan-to-map ICP, so differences are attributable to the **sensor**, not the estimator.
    This is exactly what made paper 2's comparison valid.
-2. **Anchor that back-end on real radar data + cite the SOTA row.** Run our back-end on a real
-   radar benchmark (Oxford Radar RobotCar or Boreas) and report **drift %** beside **CFEAR
-   (1.09 %) and DRO (0.26 %)**, cited from the literature — the same move that made paper 2's
-   LiDAR credible via KITTI (0.3 % drift). If our back-end lands in a plausible band, the
-   baseline is credible. **If it does not, we report that and bound our claims accordingly.**
+2. **Anchor that back-end on real radar data + cite the SOTA row.** Run our back-end on **Boreas**
+   and report **drift %** beside those rows — the same move that made paper 2's LiDAR credible via
+   KITTI. If our back-end lands in a plausible band, the baseline is credible. **If it does not, we
+   report that and bound our claims accordingly.**
 
-The SOTA row is **cited, not reimplemented** — provided we run our back-end on the *same*
-benchmark, the numbers are directly comparable, which is cheap and rigorous.
+**We anchor on Boreas, not Oxford**, for a practical reason worth stating: Boreas is served over
+anonymous public HTTPS, while Oxford requires a registration that cannot be automated. The
+consequence must be stated too, and not glossed: **CFEAR's number is on Oxford while ours is on
+Boreas** — same protocol, same sensor class (Navtech spinning radar), different city. The SOTA row
+is **cited, not reimplemented**, and it is a *reference point*, not a like-for-like head-to-head.
 
 ## Architecture
 
