@@ -32,6 +32,28 @@ paper 1. The hold protects paper 1's review; it is not a dependency.
 
 **To resume:** follow the checklist in `SUBMISSION.md`.
 
+## Amendment 2026-07-12 → tag `paper2-v1.1.0` (SUBMIT FROM THIS TAG)
+
+`paper2-v1.0.0` / branch `paper2-held` pin the original freeze. **`paper2-v1.1.0` supersedes
+it as the submit-ready state** — the frozen pin was deliberately not moved.
+
+The paper-3 research pass surfaced two works paper 2 had to engage with, and doing so
+**strengthens** it:
+- **Li et al., IEEE T-WC 2021** (`li2021csipwr`): the passive-WiFi-radar community already
+  holds WiFi's bandwidth to make **range unusable** ("distance estimation errors in the order
+  of several meters"; "the range resolution is not sufficient") — **they abandon range and use
+  Doppler alone.** Our pipeline is range-based, so this is a direct challenge.
+- **RadarSLAM (Hong et al., IJRR 2022)** (`hong2022radarslam`): spurious peaks "distributed
+  randomly across the whole radar image, even for the areas with no real object" — the ghost
+  phenomenon is **qualitatively known in radar**.
+
+**Neither quantifies it.** Paper 2's contribution is therefore restated as the **first
+quantification** (≈89 % phantoms) plus the genuinely new claim: the residual **6.45 m error is
+a BIAS, not a resolution bound** (≈7× the 0.94 m limit at 160 MHz), so **bandwidth does not fix
+it** — corroborated by paper 1's 60 GHz + 16-antenna null result. This *contradicts* the
+natural reading of the bandwidth argument and closes an obvious reviewer attack
+("this is already known").
+
 ## Headline results (the paper's four contributions)
 
 | | Result |

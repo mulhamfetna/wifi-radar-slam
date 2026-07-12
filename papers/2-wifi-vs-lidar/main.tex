@@ -119,9 +119,13 @@ to two orders of magnitude better accuracy per dollar (Section~\ref{sec:cost}).
 solo sensors in three of four configurations but \emph{degrades} the stronger sensor by
 $8\times$ when the pair is badly mismatched (Section~\ref{sec:fusion}).
 
-\item \textbf{The mapping ceiling, located.} An isolation experiment shows the WiFi
-mapping floor is dominated by \emph{phantom} detections ($\approx89\%$) and estimator
-\emph{range bias}, not by path discrimination. This refines the interpretation of
+\item \textbf{The mapping ceiling, located and quantified.} That WiFi ranges poorly
+\cite{li2021csipwr} and that RF sensors produce spurious returns \cite{hong2022radarslam} are
+both known qualitatively. We contribute the \emph{first quantification}: an isolation
+experiment attributes $\approx89\%$ of detections to \emph{phantoms} (no real propagation
+path) and shows the residual error is a \SI{6.45}{m} \textbf{bias, not a resolution limit} ---
+so bandwidth does not fix it. Path discrimination, the previously assumed culprit, is the
+\emph{smallest} of the three terms. This refines the interpretation of
 \cite{fetna2026wifiradar} and tells a learned method where it must act
 (Section~\ref{sec:ceiling}).
 \end{enumerate}
@@ -168,6 +172,18 @@ SLAM accuracy comparison, and none treats WiFi as a candidate replacement.
 \cite{maatta2024csipointcloud} reconstructs 3-D point clouds from CSI with a transformer.
 Notably these methods learn \emph{end-to-end from raw CSI}; none classifies estimated
 propagation paths. Section~\ref{sec:ceiling} explains why that distinction is decisive.
+
+\textbf{What is already known about WiFi's range.} The passive-WiFi-radar community has
+long held that WiFi's channel bandwidth makes \emph{range} unusable: Li~et~al.\
+\cite{li2021csipwr} report that the 20/40\,MHz bandwidths give 50/25\,ns time resolution and
+hence ``distance estimation errors in the order of several meters'', and conclude that ``due
+to the limited bandwidth in WiFi, the range resolution is not sufficient'' --- so they abandon
+range and use Doppler alone. Our pipeline is deliberately range-based, and
+Section~\ref{sec:ceiling} measures precisely what that costs. Likewise, spurious returns are
+familiar in radar: RadarSLAM~\cite{hong2022radarslam} notes that naive peak detection yields
+peaks ``distributed randomly across the whole radar image, even for the areas with no real
+object''. Neither literature, however, \emph{quantifies} the phenomenon or separates it from
+the other failure modes --- which is what Section~\ref{sec:ceiling} does.
 
 \textbf{The open cell.} On-vehicle, outdoor, commodity-CSI WiFi sensing evaluated
 head-to-head against LiDAR for SLAM --- with a cost analysis --- is, to our knowledge,
@@ -518,11 +534,16 @@ identified this term.
 
 \textbf{2) Estimator range bias.} On the controlled wall, holding discrimination perfect,
 swapping true parameters for MUSIC's collapses triangulation from $100\%$ to $2.4\%$ within
-\SI{1}{m}. The median range error is \SI{6.45}{m} --- far beyond the \SI{0.94}{m} resolution
-limit at \SI{160}{MHz}. It is therefore a \emph{bias}, not a resolution bound, and no amount
-of bandwidth removes it. (Consistent with this, \cite{fetna2026wifiradar} found that
-\SI{60}{GHz} with \SI{1.76}{GHz} of bandwidth and sixteen antennas did not move map accuracy
-at all.)
+\SI{1}{m}. The median range error is \SI{6.45}{m}.
+
+That WiFi ranging is poor is not itself news --- \cite{li2021csipwr} report metre-scale
+distance errors and abandon range on exactly these grounds. What is new is the
+\emph{character} of the error. \SI{6.45}{m} is nearly seven times the \SI{0.94}{m}
+resolution limit at \SI{160}{MHz}: it is therefore a \textbf{bias, not a resolution bound},
+and \emph{no amount of bandwidth removes it}. This directly contradicts the natural reading of
+the bandwidth argument --- that a wider channel would fix ranging --- and it is corroborated
+independently: \cite{fetna2026wifiradar} found that \SI{60}{GHz} with \SI{1.76}{GHz} of
+bandwidth (a $44\times$ increase) and sixteen antennas did not move map accuracy at all.
 
 \textbf{3) Discrimination failures ($2$--$8\%$).} MUSIC does sometimes pick real but
 non-facade paths. This is the mechanism \cite{fetna2026wifiradar} identified. It is real ---
