@@ -3,7 +3,9 @@ import numpy as np
 import pytest
 from wifi_radar_slam.radar.config import RadarConfig
 from wifi_radar_slam.radar.processing import (beat_matrix, range_fft, azimuth_beamform,
-                                              cfar_2d, cluster_detections)
+                                              cfar_2d, cluster_detections,
+                                              detections_to_scan, radar_scan)
+from wifi_radar_slam.lidar.pointcloud import Scan
 
 C = 299792458.0
 
@@ -313,3 +315,75 @@ def test_the_array_taper_actually_suppresses_sidelobes():
         i += 1                                  # descend to the first null
     peak_sidelobe_db = 20 * np.log10(af[i + 1:].max())
     assert peak_sidelobe_db <= -TAPER_SIDELOBE_DB + 1.0
+
+
+# --- detections -> Scan, and the end-to-end chain --------------------------------
+
+def test_detections_to_scan_is_a_plain_polar_projection():
+    # THE monostatic geometry. Contrast with the bistatic case (cell A), where the measured
+    # range is an AP->reflector->vehicle path length and recovering the reflector needs an
+    # ill-conditioned ellipse solve. That asymmetry IS the A->B geometry ablation, which is
+    # why it lives in a named function rather than inline.
+    cfg = cfg_small()
+    scan = detections_to_scan(np.array([10.0]), np.array([0.0]), cfg)
+    assert isinstance(scan, Scan)
+    assert np.allclose(scan.points, [[10.0, 0.0]])          # +x forward
+
+
+def test_detections_to_scan_places_azimuth_correctly():
+    cfg = cfg_small()
+    scan = detections_to_scan(np.array([10.0]), np.array([np.pi / 2]), cfg)
+    assert np.allclose(scan.points, [[0.0, 10.0]], atol=1e-9)   # +y is +90 deg
+
+
+def test_detections_to_scan_gates_the_blind_zone_and_max_range():
+    cfg = cfg_small()                       # min 1 m, max 60 m
+    scan = detections_to_scan(np.array([0.3, 25.0, 200.0]),
+                              np.array([0.0, 0.0, 0.0]), cfg)
+    assert len(scan) == 1
+    assert np.allclose(scan.points, [[25.0, 0.0]])
+
+
+def test_detections_to_scan_on_no_detections_returns_an_empty_scan():
+    cfg = cfg_small()
+    scan = detections_to_scan(np.empty(0), np.empty(0), cfg)
+    assert isinstance(scan, Scan) and len(scan) == 0
+
+
+def test_radar_scan_end_to_end_recovers_two_known_reflectors():
+    # THE acceptance test for the whole pure chain: two reflectors in, two points out, each
+    # within a range cell and a beamwidth of the truth.
+    cfg = cfg_small(noise=0.02)
+    truth = [(15.0, np.deg2rad(-30.0)), (40.0, np.deg2rad(25.0))]
+    scan = radar_scan([tau_of(r) for r, _ in truth], [1.0 + 0j, 1.0 + 0j],
+                      [a for _, a in truth], cfg, rng=np.random.default_rng(0))
+    assert len(scan) == 2
+    for r, a in truth:
+        expected = np.array([r * np.cos(a), r * np.sin(a)])
+        d = np.linalg.norm(scan.points - expected, axis=1).min()
+        assert d < 0.15 * r, f"no detection near ({r} m, {np.rad2deg(a):.0f} deg)"
+
+
+def test_radar_scan_on_an_empty_scene_returns_few_or_no_points():
+    # Sanity floor: pure noise must not manufacture a point cloud.
+    cfg = cfg_small(noise=1.0)
+    scan = radar_scan([], [], [], cfg, rng=np.random.default_rng(2))
+    assert len(scan) <= 3
+
+
+def test_a_multi_bounce_ray_becomes_a_ghost_at_the_wrong_range():
+    # THE MECHANISM THE PAPER IS ABOUT. A double-bounce ray arrives with a LONGER delay
+    # than the true reflector distance, so the chain -- which can only assume a round trip
+    # -- places a detection too far away. Radar cannot tell the difference, and neither
+    # could WiFi's MUSIC. Ghosts are not a bug in the chain; they are the physics the chain
+    # is built to expose. If this test ever "passes" by producing no ghost, the sensor has
+    # been short-circuited and RQ1 is rigged.
+    cfg = cfg_small(noise=0.01)
+    true_range = 20.0
+    bounce_path_len = 55.0                 # a longer folded path off a second surface
+    scan = radar_scan([tau_of(true_range), tau_of(bounce_path_len)],
+                      [1.0 + 0j, 0.7 + 0j], [0.0, 0.0], cfg,
+                      rng=np.random.default_rng(0))
+    r = np.linalg.norm(scan.points, axis=1)
+    assert np.any(np.abs(r - true_range) < 1.0), "the real reflector must be detected"
+    assert np.any(np.abs(r - bounce_path_len) < 1.5), "the ghost must appear, uncorrected"

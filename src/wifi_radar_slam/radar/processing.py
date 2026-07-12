@@ -15,6 +15,8 @@ import numpy as np
 from scipy import ndimage
 from scipy.signal.windows import chebwin
 
+from ..lidar.pointcloud import Scan
+
 C = 299792458.0
 
 # Paths are synthesized in blocks so that the intermediate (n_paths, n_samples) matrix
@@ -220,3 +222,44 @@ def cluster_detections(mask: np.ndarray, ra_map: np.ndarray, cfg):
     ranges = np.interp(rg_i, np.arange(cfg.n_range), cfg.range_bins())
     azimuths = np.interp(az_i, np.arange(cfg.n_azimuth), cfg.azimuth_grid())
     return ranges, azimuths
+
+
+def detections_to_scan(ranges: np.ndarray, azimuths: np.ndarray, cfg) -> Scan:
+    """Monostatic polar -> Cartesian: place each detection in the sensor-local frame.
+
+    Returns a Scan (+x forward), range-gated to [cfg.min_range_m, cfg.max_range_m].
+
+    This is trivially simple *because the geometry is monostatic*. TX and RX are co-located,
+    so the measured delay is an honest round trip: range = tau*c/2, projected straight out
+    along the measured bearing.
+
+    The bistatic case (cell A -- ambient WiFi) has no such luxury. There the measured
+    quantity is a **path length** AP -> reflector -> vehicle, whose locus is an *ellipse*
+    with the AP and the vehicle at its foci; pinning the reflector down on that ellipse
+    needs an angle estimate whose error is amplified by the ellipse's eccentricity. That
+    asymmetry is not an implementation detail -- it is precisely what the A->B ablation
+    isolates, and it is why paper 2's WiFi maps carried a 6.45 m range bias when the
+    resolution limit was only 0.94 m.
+    """
+    ranges = np.asarray(ranges, dtype=float).ravel()
+    azimuths = np.asarray(azimuths, dtype=float).ravel()
+    if ranges.size == 0:
+        return Scan.empty()
+    keep = (ranges >= cfg.min_range_m) & (ranges <= cfg.max_range_m)
+    r, a = ranges[keep], azimuths[keep]
+    if r.size == 0:
+        return Scan.empty()
+    return Scan(np.stack([r * np.cos(a), r * np.sin(a)], axis=1))
+
+
+def radar_scan(taus, amps, azimuths, cfg, rng=None) -> Scan:
+    """The complete chain: rays -> beat signal -> range FFT -> beamform -> CFAR -> Scan.
+
+    The single entry point sensor.py uses. Every ablation cell calls exactly this function
+    with exactly this detection chain -- only cfg (carrier, bandwidth) and the ray set
+    differ -- which is what makes any difference between cells attributable to physics.
+    """
+    beat = beat_matrix(taus, amps, azimuths, cfg, rng=rng)
+    ra = azimuth_beamform(range_fft(beat, cfg), cfg)
+    ranges, az = cluster_detections(cfar_2d(ra, cfg), ra, cfg)
+    return detections_to_scan(ranges, az, cfg)
