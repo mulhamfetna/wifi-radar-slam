@@ -11,6 +11,10 @@ def test_figure_data_comes_from_the_committed_jsons():
     lidar_a = json.load(open("data/lidar_geo_results.json"))
     assert d["rq3"]["controlled_wall"]["LiDAR-A"]["ate"] == \
         lidar_a["controlled_wall"]["ate"]
+    # WiFi rows must come from paper-2's OWN regenerated runs, not paper 1's
+    wfp = json.load(open("data/wifi_results_paper2.json"))
+    assert d["rq3"]["controlled_wall"]["WiFi"]["ate"] == \
+        wfp["controlled_wall"]["realistic"]["ate"]["mean"]
     # the mapping-ceiling figure must use the isolation result
     iso = json.load(open("data/mapping_floor_isolation.json"))
     assert d["ceiling"]["controlled_wall"]["no_plausible_match_pct"] == \

@@ -27,6 +27,50 @@ limit of commodity CSI — which we then show is **learnable** (random forest, F
 under realistic noise). Ships the first ray-traced outdoor/vehicular WiFi-CSI dataset
 (**WiFiSLAM-Sim**) and a real-CSI (Intel 5300 / nexmon) front-end proof-of-concept.
 
+## 🚨 MUST FIX AT REVISION — a reported number does not reproduce
+
+**Found 2026-07-12 while making paper 2 self-contained. Author decision: do NOT notify the
+editor proactively; correct this when reviews arrive.** Do not lose this item.
+
+**The defect.** The submitted manuscript (`paper/main.tex` l.332 and the 60 GHz table)
+claims joint 2-D MUSIC lifts realistic ATE to **\SI{0.027}{m}** ("matches the 0.045 m
+oracle"). Running paper 1's **own frozen `v0.7.1` code** with its **own committed config**
+(`configs/controlled_music_joint.yaml`) gives:
+
+| Seed | 42 | 1 | 2 | 3 | 4 | 5 |
+|------|----|----|----|----|----|----|
+| ATE (m) | 0.143 | 0.108 | 0.056 | 0.089 | 0.092 | 0.097 |
+
+**mean 0.098 ± 0.028; the reported 0.027 is below the minimum of every seed** — this is not
+run-to-run variance. Map metrics also differ (reported Chamfer 4.1 / completeness 3.5;
+actual ~6.0 / ~9.5, IoU 0). The paper additionally labels this row **40 MHz** while the
+committed joint config is **160 MHz**, so the configuration that produced 0.027 may not be
+among the released files at all. Likely cause: the figure was recorded from an earlier code
+state / uncommitted config and never re-verified against the final code before submission.
+
+**NOT a regression from paper-2 work:** current code and `v0.7.1` produce byte-identical
+results (0.0677500035479644 both).
+
+**Scope is NARROW — the rest of paper 1 reproduces cleanly** (5-seed audit,
+`experiments/regen_wifi_results.py`):
+
+| Claim | Reported | Reproduced | |
+|-------|---------:|-----------:|---|
+| Controlled oracle ATE / map-acc / IoU | 0.045 / 0.25 / 0.79 | 0.049±0.027 / 0.248±0.003 / 0.791 | ✓ |
+| Street oracle ATE / map-acc / IoU | 0.116 / 0.30 / 0.077 | 0.104±0.041 / 0.309±0.010 / 0.077 | ✓ |
+| **Controlled realistic (joint) ATE** | **0.027** | **0.098 ± 0.028** | ✗ |
+
+**Corrected claim to use at revision.** Joint 2-D MUSIC still improves realistic ATE ~7×
+over sorted 1-D pairing (0.73 → **0.098 ± 0.028**), so the *qualitative* finding stands —
+but it **approaches** rather than **matches** the oracle (0.049 ± 0.027). The sentence
+"realistic localization is essentially oracle-quality" must be removed. Quote **mean ± std
+over seeds**, not a single run.
+
+**Also fix at revision:** `refs.bib` contains `%` comments with `@` (e.g. `@40 MHz`), which
+BibTeX parses as entry types (3 errors). And see paper 2 for the RQ2 interpretation
+refinement (path discrimination is the *smallest* of three mechanisms; the discriminator's
+`elevation` feature is not measurable by a 2-D single-ULA front-end).
+
 ## Novelty gap (defensible)
 Passive WiFi radar / CSI sensing is mature but indoor/static/infrastructure-fixed;
 the one moving-platform passive radar uses 5G, not WiFi; comms+SLAM is "in its

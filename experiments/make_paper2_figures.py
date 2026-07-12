@@ -35,7 +35,11 @@ def figure_data():
     """Every number the figures use, read from the committed artifacts."""
     ga = json.load(open("data/lidar_geo_results.json"))
     gb = json.load(open("data/lidar_sionna_results.json"))
-    wf = json.load(open("data/wifi_results.json"))
+    # paper-2's OWN WiFi runs (mean over seeds), so the paper depends on no
+    # unpublished work. See experiments/regen_wifi_results.py.
+    wfp = json.load(open("data/wifi_results_paper2.json"))
+    wf = {s: {m: {k: v["mean"] for k, v in wfp[s][m].items() if v}
+              for m in ("oracle", "realistic")} for s in SCENES}
     cost = json.load(open("data/cost_results.json"))
     fus = json.load(open("data/fusion_results.json"))
     iso = json.load(open("data/mapping_floor_isolation.json"))
