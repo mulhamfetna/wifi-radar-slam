@@ -190,8 +190,18 @@ class SionnaRadarSensor:
         return np.any((inter != 0) & is_floor, axis=0)
 
     def __call__(self, pose) -> Scan:
+        """Solve and detect."""
+        return self.detect(self._solve(pose), pose)
+
+    def detect(self, paths, pose) -> Scan:
+        """An ALREADY-SOLVED `paths` -> Scan.
+
+        Split out of `__call__` so a caller can score the phantom rate against the very same ray
+        set that produced these detections, and so the ray tracer -- which dominates the runtime
+        -- runs once per frame rather than twice.
+        """
         yaw = float(pose[2]) if len(pose) > 2 else 0.0
-        tau, a, phi = self._extract(self._solve(pose))
+        tau, a, phi = self._extract(paths)
         taus, amps, az = paths_to_rays(tau, a, phi, yaw)
         return radar_scan(taus, amps, az, self.cfg, rng=self.rng)
 

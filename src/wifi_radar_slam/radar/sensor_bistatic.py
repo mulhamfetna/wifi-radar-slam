@@ -129,12 +129,19 @@ class SionnaBistaticSensor:
         return np.any((inter != 0) & np.isin(objs, list(self.floor_ids)), axis=0)
 
     def __call__(self, pose):
+        """Solve and detect. See `detect` for the return contract."""
+        return self.detect(self._solve(pose), pose)
+
+    def detect(self, paths, pose):
         """-> (world_points (M,2), det_pathlen (K,), det_azimuth_world (K,), ap_index (K,))
 
         The world points are the MAP contribution; the detection triples are what the phantom
         rate is measured on.
+
+        Takes an ALREADY-SOLVED `paths` so the caller can measure the phantom rate against the
+        very same ray set that produced the detections -- and so the ray tracer, which dominates
+        the runtime, runs once per frame rather than twice.
         """
-        paths = self._solve(pose)
         tau_all = np.asarray(paths.tau.numpy())[0]              # (n_tx, n_paths)
         phi_all = np.asarray(paths.phi_r.numpy())[0]
         val_all = np.asarray(paths.valid.numpy())[0].astype(bool)
