@@ -1,0 +1,144 @@
+%% Supplementary material for
+%%  "Can Ambient WiFi Replace LiDAR for Automotive SLAM?
+%%   Localization Yes, Mapping No --- and Why"
+%% Build: pdflatex supplementary
+\documentclass[journal]{IEEEtran}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\newcommand{\SI}[2]{#1\,#2}
+\newcommand{\SIrange}[3]{#1--#2\,#3}
+\providecommand{\degree}{\ensuremath{^\circ}}
+
+\begin{document}
+
+\title{Supplementary Material\\
+\large Can Ambient WiFi Replace LiDAR for Automotive SLAM?\\
+Localization Yes, Mapping No --- and Why}
+\author{Mulham Fetna}
+\maketitle
+
+\section{Reproducibility}
+
+Every quantitative claim in the paper is reproduced from a committed artifact. The
+repository contains the pipeline, the configurations, the result files, and the scripts that
+generate each figure; a test asserts that the figures are computed \emph{from} the result
+files, so a figure cannot silently drift from the data behind it.
+
+\subsection{Recipe}
+Install the package and its simulation extra, then run the experiment for the section of
+interest. Ray-traced runs take the sample count from \texttt{WRS\_NUM\_SAMPLES}
+(we use $10^6$ throughout).
+
+\begin{table}[h]
+\caption{Section $\rightarrow$ script $\rightarrow$ artifact.}
+\centering
+\footnotesize
+\begin{tabular}{lll}
+\toprule
+Section & Script & Artifact \\
+\midrule
+IV (LiDAR A)   & \texttt{run\_lidar\_geo.py}     & \texttt{lidar\_geo\_results.json} \\
+IV (LiDAR B)   & \texttt{run\_lidar\_sionna.py}  & \texttt{lidar\_sionna\_results.json} \\
+IV (KITTI)     & \texttt{run\_lidar\_kitti.py}   & \texttt{kitti\_results.json} \\
+V  (WiFi)      & \texttt{regen\_wifi\_results.py}& \texttt{wifi\_results\_paper2.json} \\
+VI (cost)      & \texttt{run\_cost\_model.py}    & \texttt{cost\_results.json} \\
+VII (fusion)   & \texttt{run\_fusion.py}         & \texttt{fusion\_results.json} \\
+VIII (ladder)  & \texttt{run\_enhanced\_map.py}  & \texttt{enhanced\_map\_results.json} \\
+VIII (ceiling) & \texttt{isolate\_mapping\_floor.py} & \texttt{mapping\_floor\_isolation.json} \\
+Figures        & \texttt{make\_paper2\_figures.py}   & \texttt{docs/assets/paper2\_fig*.pdf} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Stochasticity}
+The WiFi pipeline is stochastic (ray-tracer sampling, CSI noise, and a particle filter), so
+WiFi results in the paper are reported as \textbf{mean $\pm$ standard deviation over five
+seeds} rather than a single run. Table~\ref{tab:seeds} gives the per-seed spread for the
+headline configuration. We recommend that any reproduction quote the spread, not one
+realization: the seed-to-seed range of the realistic controlled ATE is
+\SIrange{0.056}{0.143}{m}, which is wider than several effects one might otherwise be tempted
+to claim.
+
+\begin{table}[h]
+\caption{Per-seed ATE (m), realistic joint 2-D MUSIC, controlled wall. A single run is not a
+claim.}
+\label{tab:seeds}
+\centering
+\footnotesize
+\begin{tabular}{lcccccc}
+\toprule
+Seed & 42 & 1 & 2 & 3 & 4 & 5 \\
+\midrule
+ATE (m) & 0.143 & 0.108 & 0.056 & 0.089 & 0.092 & 0.097 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{The LiDAR envelope}
+
+Because ``LiDAR'' is not one sensor, we bracket it. \textbf{Model A} slices each scene
+object at the scan plane and ray-casts the resulting wall segments with occlusion-correct
+nearest-hit: crisp returns, sparse coverage. \textbf{Model B} models the sensor as a
+monostatic node co-located with the vehicle and gives the scene materials a diffuse
+scattering coefficient, taking the single-scatter interaction vertices of the ray tracer as
+returns: dense coverage, noisier points. Both run at mid-range spinning-LiDAR parameters
+(\SI{120}{m}, $\pm$\SI{3}{cm}, $360\degree$).
+
+A physically important detail: with \emph{specular-only} propagation a monostatic node
+receives essentially nothing (one retro-reflection in our test), because a specular surface
+returns energy to the source only at normal incidence. Diffuse backscatter is what makes an
+EM ray tracer behave like a LiDAR at all --- with it, the same scene yields thousands of
+single-scatter returns. Model B is therefore not merely ``LiDAR in Sionna''; the scattering
+model is the load-bearing choice.
+
+\section{Why the mapping ceiling is not path discrimination}
+
+The paper's isolation experiment matches every MUSIC detection to its nearest true
+ray-traced path and, for those matching a genuine single-bounce facade path, triangulates
+the \emph{same} path twice --- once with the true delay and azimuth, once with MUSIC's
+estimates. Any degradation is then pure estimation error with discrimination held perfect.
+
+The result is that $\approx89\%$ of detections match \emph{no} real path (they are estimator
+artefacts), a further $2$--$8\%$ match real but non-facade paths (the discrimination failure
+that earlier work identified), and only $2$--$9\%$ match a genuine facade path. Of the last
+group, on the controlled wall a \SI{6.45}{m} median \emph{range bias} collapses triangulation
+success from $100\%$ to $2.4\%$ within \SI{1}{m}.
+
+Two consequences follow, and they are the reason the paper reports a negative result rather
+than a method. First, a filter \emph{selects} among detections: it can neither invent the
+real paths that most detections fail to correspond to, nor correct the bias that ruins the
+rest. Second, the bias exceeds the \SI{0.94}{m} resolution limit at \SI{160}{MHz} by nearly
+seven times, so it is not a bandwidth problem --- consistent with the earlier finding that
+\SI{60}{GHz} with \SI{1.76}{GHz} of bandwidth and sixteen antennas did not move map accuracy.
+
+\section{Fusion: the parity condition}
+
+Tight fusion carries two independent likelihoods in one particle filter --- the WiFi bistatic
+reprojection and a LiDAR scan-match --- with the output map the union of both sensors' points.
+The scan-match target is the accumulated \emph{LiDAR} map only; realistic-CSI WiFi reflectors
+are several metres from the true surfaces and would corrupt registration if used as a
+registration target.
+
+The weighting is fixed (equal confidence) and deliberately \emph{not} tuned per scene. That
+choice is what exposes the paper's fusion finding: fusion reinforces when the two sensors are
+of comparable accuracy and \emph{degrades the stronger sensor} when they are badly mismatched
+(street/LiDAR-A: \SI{0.027}{m} alone, \SI{0.218}{m} fused). Had we tuned the weighting per
+scene, the regression would have disappeared and the condition would have gone unnoticed.
+Confidence-adaptive weighting is the obvious remedy and is named as future work, not claimed
+as a result.
+
+\section{Cost model}
+
+Prices are USD ranges with a source and a date recorded per entry in the released artifact;
+entries drawn from press reporting carry a verification flag. The model reports ranges
+throughout and never a point estimate. LiDAR rows in the cost-normalized comparison are
+priced at the \emph{tier whose parameters we simulate} (mid-range spinning,
+\$8{,}000--24{,}000): crediting the accuracy of that sensor to the price of a budget
+solid-state unit we never simulated would be an apples-to-oranges comparison. The budget 2-D
+scanner (\$99) appears as a price \emph{floor}, not as an automotive peer, and we never
+compare mapping quality against it.
+
+\end{document}
