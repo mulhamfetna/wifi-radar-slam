@@ -14,6 +14,7 @@
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{multirow}
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 \usepackage{tikz}
@@ -227,6 +228,310 @@ apples-to-apples, and it is discussed as a limitation in Section~\ref{sec:discus
 bird's-eye plane, against the same footprint ground truth, with the same six metrics.
 Any difference is then attributable to the sensor, not to the estimator or the metric.}
 \label{fig:system}
+\end{figure*}
+
+\section{LiDAR Baselines and Their External Validation}\label{sec:lidar}
+
+A comparison against ``LiDAR'' is only as honest as the LiDAR one chooses. We therefore
+bracket the sensor with two models rather than privileging one.
+
+\textbf{Model A (geometric).} Each scene object is sliced at the scan plane into wall
+segments and ray-cast with occlusion-correct nearest-hit. This yields crisp, precise
+returns --- and, because it sees only what a horizontal ring can see, sparse coverage.
+
+\textbf{Model B (physical).} The LiDAR is modelled as a monostatic node co-located with
+the vehicle, with scene materials given a diffuse scattering coefficient; the
+single-scatter interaction vertices of the ray tracer are the returns. This yields dense
+coverage --- and noisier points.
+
+Both run at the parameters of a mid-range spinning unit (\SI{120}{m} range,
+$\pm$\SI{3}{cm}, $360\degree$). The two models bracket reality: A is optimistic on
+precision and pessimistic on coverage, B the reverse, and a real LiDAR sits between them.
+Reporting a single baseline would have concealed this, so LiDAR is reported throughout as
+an \emph{envelope}.
+
+\textbf{External validation.} A simulated LiDAR is only persuasive if the back-end that
+consumes it behaves like a real one. We therefore ran the \emph{same} scan-to-map ICP on
+real KITTI odometry \cite{geiger2012kitti} (sequence 04; 271 frames; \SI{394}{m}):
+it attains \SI{0.154}{m} RPE per frame and \SI{1.16}{m} aligned ATE, i.e.\ $\approx0.3\%$
+translational drift --- squarely in the range reported for real LiDAR odometry. The
+back-end producing our LiDAR rows is therefore sound, and the LiDAR results below are not
+an artefact of the simulator.
+
+\section{Accuracy: WiFi vs.\ LiDAR}\label{sec:accuracy}
+
+Table~\ref{tab:rq3} and Fig.~\ref{fig:rq3} report both sensors on both scenes. Two facts
+dominate, and they point in opposite directions.
+
+\textbf{WiFi wins localization.} Realistic commodity-CSI WiFi attains \SI{0.027}{m} ATE on
+the controlled scene --- better than \emph{either} LiDAR model (\SI{0.102}{m} for A,
+\SI{0.483}{m} for B) --- and \SI{0.09}{m} on the street. This is not a marginal result: a
+sensor costing tens of dollars out-localizes one costing thousands. The bistatic ellipse is
+a strong geometric constraint, and with correct delay--angle association it is sufficient.
+
+\textbf{LiDAR wins mapping, and WiFi does not merely lose --- it scores zero.} LiDAR
+reaches occupancy IoU up to $1.00$; realistic WiFi reaches $\approx0$ on both scenes. Under
+oracle sensing WiFi does map (IoU $0.79$ on the controlled wall), which localizes the
+failure squarely in the front-end rather than in the geometry --- a thread we pull in
+Section~\ref{sec:ceiling}.
+
+\begin{table}[t]
+\caption{Accuracy on both scenes. WiFi ``oracle'' uses the ray tracer's true path
+parameters; ``realistic'' uses commodity CSI through joint 2-D MUSIC. Lower is better
+except IoU. WiFi rows are reproduced from \cite{fetna2026wifiradar}.}
+\label{tab:rq3}
+\centering
+\footnotesize
+\begin{tabular}{llcccccc}
+\toprule
+Scene & Sensor & ATE & RPE & Chamfer & m-acc & m-cpl & IoU \\
+\midrule
+\multirow{4}{*}{Controlled}
+ & WiFi oracle    & 0.045 & 0.007 & 0.51  & 0.25  & 0.77  & 0.79 \\
+ & WiFi realistic & \textbf{0.027} & --- & 4.1 & 4.8 & 3.5 & $\approx$0 \\
+ & LiDAR-A        & 0.102 & 0.030 & 0.209 & 0.250 & 0.168 & 0.977 \\
+ & LiDAR-B        & 0.483 & 0.055 & 0.187 & 0.251 & 0.123 & \textbf{1.000} \\
+\midrule
+\multirow{4}{*}{Street}
+ & WiFi oracle    & 0.116 & 0.007 & 12.3  & 0.30  & 24.4  & 0.077 \\
+ & WiFi realistic & 0.09  & --- & \emph{bounded} & --- & --- & $\approx$0 \\
+ & LiDAR-A        & \textbf{0.026} & 0.017 & 8.674 & 0.251 & 17.097 & 0.163 \\
+ & LiDAR-B        & 0.857 & 0.117 & 3.734 & 2.125 & 5.344 & \textbf{0.261} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{paper2_fig2.pdf}
+\caption{WiFi wins localization (left) and loses mapping outright (right). Realistic
+commodity-CSI WiFi beats both LiDAR models on the controlled scene's ATE, yet produces an
+occupancy IoU of zero on both scenes.}
+\label{fig:rq3}
+\end{figure*}
+
+\section{Cost}\label{sec:cost}
+
+The replacement question is ultimately economic, so we price it. All prices are dated
+ranges with sources recorded in the released artifact; we report ranges, never point
+estimates.
+
+\textbf{The packages.} The vehicle-side WiFi sensing package --- a commodity CSI receiver
+\cite{nexmon_csi} plus antennas --- is \$40--95; an ESP32-class node \cite{espressif_esp32}
+is \$10--35. Ambient access points are treated as pre-existing infrastructure, which is the
+premise of passive sensing; we test that premise below. LiDAR spans four orders of
+magnitude, from a legacy spinning unit (\$75{,}000--80{,}000) through the mid-range
+spinning class we simulate (\$8{,}000--24{,}000) down to emerging automotive solid-state
+(\$100--600) and a budget 2-D scanner \cite{slamtec_rplidar_a1} (\$99). The last of these
+is a \emph{price floor}, not a peer: it is a 2-D indoor device, and we never compare mapping
+quality against it.
+
+\textbf{The gap.} Against the LiDAR class we actually simulate, the WiFi package is
+\textbf{84--600$\times$} cheaper (Fig.~\ref{fig:cost}); against legacy spinning,
+789--2{,}000$\times$.
+
+\textbf{Cost-normalized performance} (Fig.~\ref{fig:costnorm}) is where the comparison
+becomes sharp, because it forces price to be read together with accuracy. On localization
+value (price $\times$ ATE, lower better) WiFi delivers 1--9 \$$\cdot$m against LiDAR's
+212--2{,}448 \$$\cdot$m: two to three orders of magnitude more accuracy per dollar, because
+WiFi is both far cheaper \emph{and} (on the controlled scene) more accurate. On mapping
+value (price\,$/$\,IoU) WiFi's cost is \emph{infinite} --- it buys no map coverage at any
+price. LiDAR is the only modality here that converts money into map.
+
+\textbf{The claim is conditional, and we state the condition.} The advantage rests on the
+ambient-AP premise. If a deployment must install its own access points, the WiFi package
+rises to \$130--335 for three APs and can become \emph{more expensive} (0.3--1.5$\times$)
+than the cheapest solid-state LiDAR. The dramatic cost story is a story about
+\emph{infrastructure that already exists}, and it should be quoted that way.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{paper2_fig3.pdf}
+\caption{The sensor-cost envelope (log scale). The WiFi package is 84--600$\times$ cheaper
+than the mid-range spinning LiDAR whose parameters our models simulate. The budget 2-D
+scanner is shown as a price floor, not as an automotive peer.}
+\label{fig:cost}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{paper2_fig4.pdf}
+\caption{Cost read together with accuracy. Left: localization cost (price $\times$ ATE) ---
+WiFi is two to three orders of magnitude better. Right: mapping cost (price\,$/$\,IoU) ---
+WiFi's is infinite, because it buys no coverage at any price. LiDAR is priced at the tier
+we simulate.}
+\label{fig:costnorm}
+\end{figure*}
+
+\section{Fusion: Does Keeping Both Pay?}\label{sec:fusion}
+
+Every prior WiFi+LiDAR system we found demotes WiFi to loop closure while LiDAR maps
+\cite{ismail2022wifilidarslam,arun2022viwid,li2025ekfwifilidarimu}. Section~\ref{sec:accuracy}
+inverts that premise --- here WiFi is the better \emph{localizer} --- so we fuse
+symmetrically and let the data decide. In the \emph{tight} scheme a single particle filter
+carries two independent likelihoods, the WiFi bistatic reprojection and a LiDAR scan-match,
+and the output map is the union of both sensors' points. A deliberately naive \emph{loose}
+baseline (equal-weight trajectory average, map union) tests whether the tight coupling earns
+its complexity.
+
+\textbf{Fusion helps, conditionally} (Table~\ref{tab:fusion}, Fig.~\ref{fig:fusion}). In
+three of four configurations tight fusion beats \emph{both} solo sensors --- genuine
+reinforcement, not mere addition. Against LiDAR-B it improves ATE by $79\%$ on both scenes.
+
+\textbf{And it can hurt.} In the fourth configuration (street, LiDAR-A) the LiDAR alone
+achieves \SI{0.027}{m} and fusion degrades it to \SI{0.218}{m} --- an $8\times$ regression.
+The cause is structural, not incidental: with a fixed equal-confidence weighting, a WiFi
+likelihood that is ten times less accurate than the LiDAR's pulls the filter off a good
+solution. We report this rather than tuning the weighting until it disappears. The honest
+remedy --- weighting each modality by its online-estimated reliability --- is future work,
+not a result we claim.
+
+\textbf{The condition is sensor parity.} Fusion reinforces when the two sensors are of
+comparable accuracy (or WiFi is better) and harms the stronger sensor when they are badly
+mismatched.
+
+\textbf{The map.} The union adds coverage exactly where LiDAR is incomplete (street IoU
+$0.149\!\rightarrow\!0.177$ for A, $0.262\!\rightarrow\!0.309$ for B) but mildly pollutes an
+already-good map (controlled $0.977\!\rightarrow\!0.913$): noisy WiFi reflectors fill gaps,
+they do not sharpen detail.
+
+\textbf{Is it worth paying for both?} The WiFi package is a $0.2$--$1.2\%$ addition to a
+LiDAR of the class we simulate. So when fusion helps, it is \emph{essentially free}:
+$\approx0.5\%$ more money for a $36$--$79\%$ better trajectory. This is the strongest
+practical recommendation in the paper --- and it is a recommendation for a \emph{hybrid},
+not for a replacement.
+
+\begin{table}[t]
+\caption{Fusion (ATE, m). Tight fusion beats both solo sensors in three of four
+configurations, and degrades the stronger sensor in the fourth (street/A).}
+\label{tab:fusion}
+\centering
+\footnotesize
+\begin{tabular}{llccc}
+\toprule
+Scene & LiDAR & WiFi only & LiDAR only & Fused (tight) \\
+\midrule
+Controlled & A & 0.081 & 0.102 & \textbf{0.065} \\
+Controlled & B & 0.081 & 0.212 & \textbf{0.044} \\
+Street     & A & 0.281 & \textbf{0.027} & 0.218 \\
+Street     & B & 0.281 & 0.844 & \textbf{0.175} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{paper2_fig5.pdf}
+\caption{Fusion is conditional. Tight fusion beats both solo sensors in three of four
+configurations, but in street/LiDAR-A --- where the LiDAR is an order of magnitude more
+accurate than WiFi --- equal-confidence fusion drags the estimate off a good solution.}
+\label{fig:fusion}
+\end{figure*}
+
+\section{The Mapping Ceiling}\label{sec:ceiling}
+
+WiFi's mapping failure is the paper's central puzzle: under \emph{oracle} sensing the same
+geometry maps to \SI{0.25}{m} \cite{fetna2026wifiradar}, yet under realistic CSI it
+collapses to IoU $\approx0$. Something in the front-end destroys the map. Locating it
+precisely is this section's contribution --- and it turns out that the previously assumed
+culprit is the wrong one.
+
+\subsection{A learned discriminator cannot fix it}
+Our prior work \cite{fetna2026wifiradar} attributed the floor to \emph{path
+discrimination} --- telling a genuine facade reflection from LOS, floor and multi-bounce
+returns --- and showed that this label is learnable from per-path features. The natural
+next step, never taken there, is to close the loop: put the discriminator \emph{inside} the
+mapping pipeline and see whether the map improves.
+
+It does not. We ran a ladder of filters over the MUSIC detections --- none, a physics
+heuristic (a bistatic-excess gate), a random forest, and a small neural network --- gating
+which detections enter the map while leaving the particle weights (and hence the good
+localization) untouched. \emph{Every rung leaves the occupancy IoU at $0.000$ on both
+scenes}, and the two learned rungs reject essentially everything, emptying the map. Trained
+on only the features a 2-D front-end can actually measure, the discriminator's held-out F1
+is $0.00$--$0.45$, and $0.00$--$0.20$ across scenes.
+
+Two things went wrong in the earlier reasoning. First, the discriminator of
+\cite{fetna2026wifiradar} used \emph{elevation} as a feature --- which a single-ULA
+delay--azimuth front-end never estimates. It is an oracle quantity, so the reported F1 was
+optimistic. Second, and more fundamentally, it classified \emph{true ray-traced paths},
+whereas the deployed system must classify \emph{MUSIC detections}. Those are not the same
+objects, as we now show.
+
+\subsection{Isolating the cause}
+To separate ``we keep the wrong paths'' from ``the paths we keep are badly estimated'', we
+match every MUSIC detection to its nearest true path and then, for those that match a
+genuine single-bounce facade path, triangulate \emph{the same path twice}: once with the
+ray tracer's true delay and azimuth, and once with MUSIC's estimates. Any degradation
+between the two is then \emph{pure estimation error, with discrimination held perfect}.
+Table~\ref{tab:ceiling} and Fig.~\ref{fig:ceiling} give the result.
+
+\begin{table}[t]
+\caption{Isolating the mapping ceiling. Discrimination --- the previously assumed
+culprit --- is the smallest of three mechanisms.}
+\label{tab:ceiling}
+\centering
+\footnotesize
+\begin{tabular}{lcc}
+\toprule
+ & Controlled & Street \\
+\midrule
+\emph{Phantom} (matches no real path)      & \textbf{89.2\%} & \textbf{89.5\%} \\
+Non-facade real path (\emph{discrimination}) & 2.2\% & 8.4\% \\
+True facade path                            & 8.6\% & 2.0\% \\
+\midrule
+Triangulated $<$\SI{1}{m}, \emph{true} params  & 100\% & 100\% \\
+Triangulated $<$\SI{1}{m}, \emph{MUSIC} params & \textbf{2.4\%} & 76.7\% \\
+MUSIC range error (median)                     & \SI{6.45}{m} & \SI{2.11}{m} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three mechanisms emerge, in order of importance.
+
+\textbf{1) Phantom detections ($\approx89\%$) dominate.} Nearly nine in ten MUSIC
+detections correspond to \emph{no real propagation path at all}: they are estimator
+artefacts. This is decisive, because \emph{one cannot discriminate among real paths when
+most detections are not real paths}. Neither the prior work nor our own first analysis
+identified this term.
+
+\textbf{2) Estimator range bias.} On the controlled wall, holding discrimination perfect,
+swapping true parameters for MUSIC's collapses triangulation from $100\%$ to $2.4\%$ within
+\SI{1}{m}. The median range error is \SI{6.45}{m} --- far beyond the \SI{0.94}{m} resolution
+limit at \SI{160}{MHz}. It is therefore a \emph{bias}, not a resolution bound, and no amount
+of bandwidth removes it. (Consistent with this, \cite{fetna2026wifiradar} found that
+\SI{60}{GHz} with \SI{1.76}{GHz} of bandwidth and sixteen antennas did not move map accuracy
+at all.)
+
+\textbf{3) Discrimination failures ($2$--$8\%$).} MUSIC does sometimes pick real but
+non-facade paths. This is the mechanism \cite{fetna2026wifiradar} identified. It is real ---
+and it is the \emph{smallest} of the three.
+
+\subsection{Consequences}
+A filter \emph{selects} among detections. It can neither \emph{invent} the real paths that
+$89\%$ of detections fail to correspond to, nor \emph{correct} the bias that ruins the rest.
+That is why every rung of the ladder failed, and why the failure is not a deficiency of the
+classifier but of the problem formulation.
+
+This does not show that learning cannot help --- only that \emph{classifying estimated paths}
+cannot. It also says where a learned method must act: at the front-end, suppressing phantoms
+and correcting bias, or bypassing the estimator entirely to learn CSI\,$\rightarrow$\,geometry
+end-to-end. It is precisely the latter form that the successful RF-sensing literature takes
+\cite{maatta2024csipointcloud,geng2022denseposewifi,zhao2018rfpose}, which in hindsight is
+not a coincidence.
+
+Finally, a constructive note. On the street, $76.7\%$ of \emph{correctly matched} facade
+paths do triangulate within \SI{1}{m}. The geometry is therefore recoverable; the ceiling is
+set by the front-end, not by the physics of the channel.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{paper2_fig6.pdf}
+\caption{The mapping ceiling. Left: where MUSIC detections come from --- $\approx89\%$
+correspond to no real propagation path. Right: the same true facade paths, triangulated with
+true versus MUSIC parameters; on the controlled wall a \SI{6.45}{m} median range bias
+collapses success from $100\%$ to $2.4\%$.}
+\label{fig:ceiling}
 \end{figure*}
 
 \end{document}
