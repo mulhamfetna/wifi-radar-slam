@@ -29,14 +29,20 @@ from wifi_radar_slam.eval.metrics import rpe
 
 SEQ = "boreas-2020-11-26-13-58"
 ROOT = f"data/boreas/{SEQ}"
-# Front-end, configured to radar's PHYSICS -- see docs/results-paper3-anchor.md. Radar noise is
-# ANISOTROPIC: range is accurate (0.06 m) but cross-range grows with range (a 0.9 deg beam gives
-# +/-1.6 m of tangential error at 100 m). Yaw is estimated FROM tangential displacement -- exactly
-# the noisy direction -- and point-to-point ICP weights every direction equally. So we (a) take
-# many more returns per azimuth, which averages the noise down, and (b) crop range, where the
-# cross-range error is worst. Measured effect on per-frame yaw error: k=12/100 m gives 5.35 deg
-# std; k=40/50 m gives 0.46 deg -- an 11x reduction, and the difference between a radar baseline
-# that tracks and one that does not.
+# NOTE: these values do NOT matter to the outcome, and it is important to say why.
+#
+# An earlier version of this comment claimed k=40/50 m was "11x better" than k=12/100 m, on the
+# strength of a per-frame yaw error measured from a PERFECT initial guess. That conclusion was
+# WRONG, and the way it was wrong is instructive: the point-to-point cost is FLAT in yaw, so a
+# flatter cost simply makes ICP MOVE LESS -- and a method that returns its input unchanged scores
+# perfectly on a perfect-init test. It was measuring stillness, not accuracy.
+#
+# The real result (docs/results-paper3-anchor.md): this back-end recovers essentially ZERO rotation
+# from spinning radar at ANY front-end setting. corr(yaw error, true yaw change) = -0.992, and the
+# yaw cost's minimum sits at random offsets from the truth. The gate FAILS regardless of k, of the
+# range crop, of the map window, of the motion model, and of motion compensation.
+#
+# This script is retained as the reproducible record of that NEGATIVE RESULT.
 K = 40                    # k-strongest returns per azimuth (CFEAR-class front-end)
 MAX_RANGE_M = 50.0
 MAP_VOXEL = 0.5           # accumulated-map voxel
