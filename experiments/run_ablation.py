@@ -16,12 +16,20 @@ RQ1 (the headline) is the PHANTOM RATE, reported at BOTH a fixed tolerance (comp
 2's ~89 %) and a resolution-scaled one -- because a fixed absolute window would hand radar a
 lower phantom rate BY CONSTRUCTION (cell D resolves to 0.0375 m, cell A to 0.94 m).
 
-    WRS_NUM_SAMPLES=1000000 nice -n 19 ionice -c3 .venv/bin/python experiments/run_ablation.py
+TWO SOLVES PER FRAME, NOT FOUR. A Sionna solve returns the paths of EVERY transmitter at once,
+and cells C and D differ only in BANDWIDTH -- which changes the signal chain, not the physics. So
+one solve at 5.2 GHz serves cells A and B, and one at 77 GHz serves C and D. Ray tracing
+dominates the runtime, so this halves it, and every cell still sees exactly the rays it would
+have seen on its own.
+
+    WRS_NUM_SAMPLES=1000000 nice -n 19 ionice -c3 \\
+        .venv/bin/python experiments/run_ablation.py [scene_name]
 """
 from __future__ import annotations
 import json
 import logging
 import os
+import sys
 import time
 
 import numpy as np
@@ -47,6 +55,11 @@ SCENES = {
 SEEDS = [0, 1, 2]
 MAP_VOXEL = 0.5
 
+# Take every FRAME_STRIDE-th frame. Consecutive frames are 0.25 m apart (5 m/s at a 50 ms step),
+# so they are highly redundant for the MAP and DETECTION statistics -- which is all we measure,
+# since with ground-truth poses there is no trajectory to estimate. Stated, not silent.
+FRAME_STRIDE = 2
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%H:%M:%S")
 log = logging.getLogger("ablation")
 
@@ -61,8 +74,8 @@ def _voxel_map(points: np.ndarray, voxel: float = MAP_VOXEL) -> np.ndarray:
 def _map_metrics(est_map: np.ndarray, gt_xy: np.ndarray) -> dict:
     """The four map metrics.
 
-    ATE/RPE are absent BY DESIGN: poses are ground truth, so there is no trajectory error to
-    report -- for any cell. That is the point of scoring this way.
+    ATE/RPE are absent BY DESIGN: the poses are ground truth, so there is no trajectory error to
+    report -- for any cell. That is the entire point of scoring this way.
     """
     if est_map.size == 0:
         return {"chamfer": float("inf"), "map_accuracy": float("inf"),
@@ -76,112 +89,165 @@ def _map_metrics(est_map: np.ndarray, gt_xy: np.ndarray) -> dict:
     }
 
 
-def run_cell(cell, built, seed: int) -> dict:
-    """One cell, one scene, one seed -> phantom stats (BOTH tolerances) + map metrics."""
-    rng = np.random.default_rng(seed)
-    traj = built.trajectory
-    gt_xy = built.ground_truth_map[:, :2]
+def _summarise(cell, poses, maps, det_r, det_a, true_r, true_a, gt_xy) -> dict:
+    """Phantom stats (BOTH tolerances) + map metrics, for one cell."""
+    est_map = (map_under_gt_poses(maps, poses, voxel=MAP_VOXEL) if cell.monostatic
+               else _voxel_map(np.concatenate([w for w in maps if w.size])
+                               if any(w.size for w in maps) else np.empty((0, 2))))
 
-    sensor = (SionnaRadarSensor(built, cell.config, rng) if cell.monostatic
-              else SionnaBistaticSensor(built, cell.config, rng))
-
-    scans, world_pts = [], []
-    det_r, det_a, true_r, true_a = [], [], [], []
-    t0 = time.time()
-    for f in range(len(traj)):
-        pose = traj[f]
-        yaw = float(pose[2]) if len(pose) > 2 else 0.0
-        paths = sensor._solve(pose)                 # ray-trace ONCE per frame
-
-        if cell.monostatic:
-            scan = sensor.detect(paths, pose)
-            scans.append(scan)
-            if len(scan):
-                # the chain's detections, in the SAME quantity the true paths use:
-                # round-trip range (m) and WORLD azimuth
-                r = np.linalg.norm(scan.points, axis=1)
-                a = np.arctan2(scan.points[:, 1], scan.points[:, 0]) + yaw
-            else:
-                r = a = np.empty(0)
-            tp = true_paths_for_tx(paths, sensor.tidx, yaw, sensor.floor_ids, monostatic=True)
-            true_r.append(tp["range_m"])
-            true_a.append(tp["azimuth_world_rad"])
-        else:
-            world, r, a, _ = sensor.detect(paths, pose)
-            world_pts.append(world)
-            # pool the true paths of EVERY illuminating AP -- cell A pools their detections too
-            tr, ta = [], []
-            for t in sensor.ap_idx:
-                one = true_paths_for_tx(paths, t, yaw, sensor.floor_ids, monostatic=False)
-                tr.append(one["range_m"])
-                ta.append(one["azimuth_world_rad"])
-            true_r.append(np.concatenate(tr) if tr else np.empty(0))
-            true_a.append(np.concatenate(ta) if ta else np.empty(0))
-
-        det_r.append(np.asarray(r).ravel())
-        det_a.append(np.angle(np.exp(1j * np.asarray(a).ravel())))
-
-        if f % 100 == 0 or f == len(traj) - 1:
-            el = time.time() - t0
-            eta = el / (f + 1) * (len(traj) - f - 1)
-            log.info("    cell %s frame %4d/%d  elapsed %.0fs  ETA %.0fs",
-                     cell.key, f, len(traj), el, eta)
-
-    est_map = (map_under_gt_poses(scans, traj, voxel=MAP_VOXEL) if cell.monostatic
-               else _voxel_map(np.concatenate([w for w in world_pts if w.size])
-                               if any(w.size for w in world_pts) else np.empty((0, 2))))
-
-    # --- RQ1: the phantom rate, at BOTH tolerances -------------------------------------
-    # Matched FRAME BY FRAME. A detection made at frame 5 must be explained by a path that
-    # existed at frame 5's vehicle position; pooling every frame's paths into one haystack
-    # would let a detection be "explained" by a path from somewhere else entirely on the
-    # trajectory, which massively undercounts phantoms.
+    # Matched FRAME BY FRAME. A detection made at frame f must be explained by a path that
+    # existed at frame f's vehicle position; pooling every frame's paths into one haystack would
+    # let a detection be "explained" by a path from somewhere else entirely on the trajectory,
+    # which massively undercounts phantoms.
     res = cell.config.range_resolution_m
-    fixed = phantom_stats_frames(det_r, det_a, true_r, true_a, range_scale_m=3.0)
-    scaled = phantom_stats_frames(det_r, det_a, true_r, true_a, range_scale_m=3.0 * res)
-
     return {
-        "cell": cell.key, "label": cell.label, "seed": seed,
+        "cell": cell.key, "label": cell.label,
         "carrier_ghz": cell.config.carrier_hz / 1e9,
         "bandwidth_mhz": cell.config.bandwidth_hz / 1e6,
         "monostatic": cell.monostatic,
         "isolates": cell.isolates,
         "range_resolution_m": res,
+        "n_frames": int(len(poses)),
         "n_true_paths": int(sum(t.size for t in true_r)),
-        "phantom_fixed_3m": fixed,
-        "phantom_resolution_scaled": scaled,
+        "phantom_fixed_3m": phantom_stats_frames(det_r, det_a, true_r, true_a,
+                                                 range_scale_m=3.0),
+        "phantom_resolution_scaled": phantom_stats_frames(det_r, det_a, true_r, true_a,
+                                                          range_scale_m=3.0 * res),
         "map": _map_metrics(est_map, gt_xy),
     }
 
 
-def run_music_reference(built, cfg, seed: int) -> dict:
-    """The 5th row: WiFi + joint 2-D MUSIC -- papers 1-2's front-end, same GT poses.
+def run_all_cells(cfg, seed: int) -> list[dict]:
+    """All four cells, for one scene and one seed, with only TWO ray-trace solves per frame.
 
-    Kept OUT of the cell chain on purpose, so the superresolution-vs-FFT axis is VISIBLE rather
-    than silently confounded with the physics the ablation isolates.
+    A Sionna solve returns every transmitter's paths at once, and cells C and D differ only in
+    bandwidth -- a property of the signal chain, not of the physics. So:
+
+        solve at 5.2 GHz  ->  cell A (bistatic; the AP transmitters) and cell B (monostatic)
+        solve at 77 GHz   ->  cells C and D (the same rays; different bandwidth downstream)
+
+    Ray tracing dominates the runtime, so this halves it -- and every cell still sees exactly the
+    rays it would have seen had it run alone.
     """
+    built52 = build_scene(cfg)          # its sensors retune it to 5.2 GHz
+    built77 = build_scene(cfg)          # its sensors retune it to 77 GHz
+    traj = built52.trajectory
+    poses = traj[list(range(0, len(traj), FRAME_STRIDE))]
+    gt_xy = built52.ground_truth_map[:, :2]
+
+    rng = np.random.default_rng(seed)
+    sB = SionnaRadarSensor(built52, CELLS["B"].config, rng)      # adds radar_tx; retunes to 5.2
+    sA = SionnaBistaticSensor(built52, CELLS["A"].config, rng)   # same scene, same carrier
+    sC = SionnaRadarSensor(built77, CELLS["C"].config, rng)      # adds radar_tx; retunes to 77
+    sD = SionnaRadarSensor(built77, CELLS["D"].config, rng)      # same scene, same carrier
+
+    maps = {"A": [], "B": [], "C": [], "D": []}
+    det = {k: ([], []) for k in "ABCD"}                          # per-frame (ranges, azimuths)
+    tru = {k: ([], []) for k in "ABCD"}
+
+    def _polar(scan, yaw):
+        if len(scan) == 0:
+            return np.empty(0), np.empty(0)
+        r = np.linalg.norm(scan.points, axis=1)
+        a = np.arctan2(scan.points[:, 1], scan.points[:, 0]) + yaw   # -> WORLD azimuth
+        return r, np.angle(np.exp(1j * a))
+
+    t0 = time.time()
+    for i, pose in enumerate(poses):
+        yaw = float(pose[2]) if len(pose) > 2 else 0.0
+
+        # ---- ONE solve at 5.2 GHz: serves cells A and B --------------------------------
+        p52 = sB._solve(pose)
+
+        s = sB.detect(p52, pose)
+        maps["B"].append(s)
+        r, a = _polar(s, yaw)
+        det["B"][0].append(r)
+        det["B"][1].append(a)
+        tB = true_paths_for_tx(p52, sB.tidx, yaw, sB.floor_ids, monostatic=True)
+        tru["B"][0].append(tB["range_m"])
+        tru["B"][1].append(tB["azimuth_world_rad"])
+
+        w, rA, aA, _ = sA.detect(p52, pose)
+        maps["A"].append(w)
+        det["A"][0].append(np.asarray(rA).ravel())
+        det["A"][1].append(np.angle(np.exp(1j * np.asarray(aA).ravel())))
+        trs, tas = [], []
+        for t in sA.ap_idx:                     # pool EVERY illuminating AP's true paths
+            one = true_paths_for_tx(p52, t, yaw, sA.floor_ids, monostatic=False)
+            trs.append(one["range_m"])
+            tas.append(one["azimuth_world_rad"])
+        tru["A"][0].append(np.concatenate(trs) if trs else np.empty(0))
+        tru["A"][1].append(np.concatenate(tas) if tas else np.empty(0))
+
+        # ---- ONE solve at 77 GHz: serves cells C and D ---------------------------------
+        p77 = sC._solve(pose)
+        tCD = true_paths_for_tx(p77, sC.tidx, yaw, sC.floor_ids, monostatic=True)
+        for key, sensor in (("C", sC), ("D", sD)):
+            s = sensor.detect(p77, pose)
+            maps[key].append(s)
+            r, a = _polar(s, yaw)
+            det[key][0].append(r)
+            det[key][1].append(a)
+            tru[key][0].append(tCD["range_m"])
+            tru[key][1].append(tCD["azimuth_world_rad"])
+
+        if i % 10 == 0 or i == len(poses) - 1:
+            el = time.time() - t0
+            eta = el / (i + 1) * (len(poses) - i - 1)
+            log.info("    frame %3d/%d  elapsed %.0fs  ETA %.0fs", i, len(poses), el, eta)
+
+    out = []
+    for key in ("A", "B", "C", "D"):
+        r = _summarise(CELLS[key], poses, maps[key], det[key][0], det[key][1],
+                       tru[key][0], tru[key][1], gt_xy)
+        r["seed"] = seed
+        out.append(r)
+        log.info("  -> cell %s seed %d: phantom(fixed)=%.1f%% (res-scaled %.1f%%)  "
+                 "n_det=%d  IoU=%.3f  map=%d pts",
+                 key, seed,
+                 100 * r["phantom_fixed_3m"]["phantom_rate"],
+                 100 * r["phantom_resolution_scaled"]["phantom_rate"],
+                 r["phantom_fixed_3m"]["n_detections"],
+                 r["map"]["iou"], r["map"]["n_map_points"])
+    return out
+
+
+def run_music_reference(cfg, seed: int) -> dict:
+    """The 5th row: WiFi + joint 2-D MUSIC -- papers 1-2's front-end, on the SAME GT poses.
+
+    Kept OUT of the cell chain on purpose. This row is what makes the superresolution-vs-FFT axis
+    VISIBLE: cells A and M share the same physics (bistatic 5.2 GHz WiFi) and the same
+    ground-truth poses, and differ ONLY in the front-end. Any gap between them is therefore the
+    front-end, with nothing else left to blame -- which is exactly the confound the spec insisted
+    we must not bury.
+    """
+    built = build_scene(cfg)
     rng = np.random.default_rng(seed)
     traj = built.trajectory
+    idx = list(range(0, len(traj), FRAME_STRIDE))
     gt_xy = built.ground_truth_map[:, :2]
+
     csi = simulate_csi(built, cfg.rf, cfg.snr_db, rng)
     dets = extract_detections(csi, cfg.rf, n_paths=3, world_aoa=cfg.world_aoa, joint=True)
 
     pts = []
-    for f in range(len(traj)):
-        for (pl, aoa, ap_i) in np.asarray(dets[f]).reshape(-1, 3):
+    n_det = 0
+    for f in idx:
+        D = np.asarray(dets[f]).reshape(-1, 3)
+        n_det += int(D.shape[0])
+        for (pl, aoa, ap_i) in D:
             ap_xy = np.asarray(built.ap_positions[int(ap_i)])[:2]
             R = _triangulate_bistatic(traj[f][:2], ap_xy, float(pl), float(aoa))
             if R is not None:
                 pts.append(R)
     est_map = _voxel_map(np.array(pts) if pts else np.empty((0, 2)))
     return {"cell": "M", "label": "WiFi + joint 2-D MUSIC (papers 1-2 front-end)",
-            "seed": seed, "map": _map_metrics(est_map, gt_xy)}
+            "seed": seed, "n_frames": len(idx), "n_detections": n_det,
+            "map": _map_metrics(est_map, gt_xy)}
 
 
 def main() -> None:
-    import sys
-    # Optionally restrict to one scene, so the two scenes can run as parallel processes:
-    #     python experiments/run_ablation.py street_canyon
     only = sys.argv[1] if len(sys.argv) > 1 else None
     scenes = {only: SCENES[only]} if only else SCENES
     suffix = f"_{only}" if only else ""
@@ -191,29 +257,23 @@ def main() -> None:
         cfg = load_config(cfgp)
         log.info("=== scene %s (%s) ===", scene, cfgp)
         for seed in SEEDS:
-            for key in ("A", "B", "C", "D"):
-                built = build_scene(cfg)            # rebuild: the sensors mutate the scene
-                log.info("  cell %s, seed %d ...", key, seed)
-                r = run_cell(CELLS[key], built, seed)
+            log.info("  seed %d: four cells, TWO solves per frame ...", seed)
+            for r in run_all_cells(cfg, seed):
                 r["scene"] = scene
                 results.append(r)
-                log.info("  -> cell %s seed %d: phantom(fixed)=%.1f%% "
-                         "phantom(res-scaled)=%.1f%% IoU=%.3f  map=%d pts",
-                         key, seed,
-                         100 * r["phantom_fixed_3m"]["phantom_rate"],
-                         100 * r["phantom_resolution_scaled"]["phantom_rate"],
-                         r["map"]["iou"], r["map"]["n_map_points"])
-            built = build_scene(cfg)
-            m = run_music_reference(built, cfg, seed)
+            m = run_music_reference(cfg, seed)
             m["scene"] = scene
             results.append(m)
-            log.info("  -> MUSIC ref seed %d: IoU=%.3f", seed, m["map"]["iou"])
+            log.info("  -> MUSIC ref seed %d: n_det=%d  IoU=%.3f  map=%d pts",
+                     seed, m["n_detections"], m["map"]["iou"], m["map"]["n_map_points"])
 
-    os.makedirs("results", exist_ok=True)
-    out = f"results/ablation{suffix}.json"
-    with open(out, "w") as f:
-        json.dump(results, f, indent=2)
-    log.info("saved -> %s  (%d rows)", out, len(results))
+            os.makedirs("results", exist_ok=True)
+            with open(f"results/ablation{suffix}.json", "w") as f:   # checkpoint every seed
+                json.dump(results, f, indent=2)
+            log.info("  [checkpointed %d rows -> results/ablation%s.json]",
+                     len(results), suffix)
+
+    log.info("DONE -> results/ablation%s.json  (%d rows)", suffix, len(results))
 
 
 if __name__ == "__main__":
