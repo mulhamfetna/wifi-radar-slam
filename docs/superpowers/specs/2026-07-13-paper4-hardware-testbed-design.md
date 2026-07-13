@@ -3,8 +3,8 @@
 **Date:** 2026-07-13
 **Status:** approved (brainstorming), pending spec review
 **Branch:** `paper4-hardware-testbed` (off `paper3-wifi-vs-radar`)
-**Working title:** *Does the Phantom Ceiling Survive Contact with a Real Channel? A $260 Test of
-Simulated WiFi Sensing*
+**Working title:** *Does the Phantom Ceiling Survive Contact with a Real Channel? A $60 ESP32 Test
+of Simulated WiFi Sensing*
 
 ---
 
@@ -77,6 +77,8 @@ real geometry — not merely log signal strength — with $8 chips and no synchr
 - **Whether `nexmon_csi` captures all four bcm4366c0 RX cores coherently per packet.**
 - A fetched claim that bcm43455c0 works on **Raspberry Pi 5** — **treat as false until checked.**
 - Commercial 4-element 5 GHz ULA products and prices.
+- **Whether an ESPARGOS-class coherent ESP32 array can run HT40 (40 MHz)** rather than the 20 MHz
+  reported. If it can, the "array costs you bandwidth" trade-off above weakens.
 
 ---
 
@@ -108,22 +110,32 @@ paper 1's revision is prepared.)*
 
 ---
 
-## The staged rig — one vehicle that grows
+## The staged rig — ESP32-ONLY for both headline experiments
 
-Each stage isolates **one axis of paper 3's ablation**. Nothing is thrown away between stages.
+**Revised 2026-07-13.** Both experiments that matter run on **ESP32 boards alone, for ~$60.** The
+LiDAR, the Raspberry Pi and the Intel NIC were each carrying an assumption that does not survive
+scrutiny:
 
-### Stage 0 — acquisition + the FRONT-END axis (~$250)
+| dropped | why it was there | why it goes |
+|---|---|---|
+| RPLIDAR A1M8 ($99) | ground-truth *map* of an unknown room | papers 1–2's own `controlled_wall` scene is **one reflector at a known position**. We **survey the scene with a tape measure**. A written-down number is *better* ground truth than a LiDAR-derived one, not worse. |
+| Raspberry Pi 4 ($60) | logging | the ESP32 streams CSI over WiFi/serial to a laptop you already own |
+| Intel 5300 ($100) | AoA | **three TX beacons give three ellipses; their intersection locates the reflector with no AoA at all** |
+
+### Stage 0 — the FRONT-END axis (~$60, ESP32 only)
 
 | item | qty | ~USD |
 |---|---|---|
-| 4WD robot chassis + motor driver | 1 | 40 |
-| **ESP32-DevKitC — CSI receiver** | 1 | 8 |
-| **ESP32 — TX beacons** (the "triangle") | 3 | 24 |
-| **RPLIDAR A1M8** — ground-truth pose + map | 1 | 99 |
-| Raspberry Pi 4 — logger / time sync | 1 | 60 |
-| Dipoles, wiring, battery | — | 20 |
+| **ESP32-DevKitC — CSI receiver** (on the car) | 1 | 8 |
+| **ESP32 — TX beacons**, at surveyed positions | 3 | 24 |
+| 2WD robot chassis + driver + battery | 1 | 20 |
+| *(optional)* ESP32-CAM + ArUco tags — pose ground truth | 1 | 8 |
 
 **Physics:** 2.4 GHz, HT40 → **40 MHz** → bistatic path-length resolution **c/B = 7.5 m**.
+
+**Why delay-only still tests the mechanism.** Paper 2's ~89 % arises from MUSIC's **fixed model
+order**: asked for 3 paths it emits 3 peaks *whether or not 3 resolvable paths exist*. That
+pathology lives on the **delay axis alone**. No AoA is required to expose it.
 
 **How a phantom is measured without AoA.** The LiDAR gives ground-truth pose *and* a 2-D map. From
 that map plus the known beacon positions we **predict the true path lengths** at every pose. The CSI
@@ -137,7 +149,7 @@ same definition as `eval/phantom.py`, evaluated on the delay axis alone.
 - ❌ **no AoA** → cannot reproduce papers 1–2's *(delay, AoA)* detection exactly
 - ❌ 7.5 m resolution is coarse relative to indoor features
 
-### Stage 1 — the GEOMETRY axis. The headline. (+$10)
+### Stage 1 — the GEOMETRY axis. The headline. (+$8, one more ESP32)
 
 **The entire change: unplug one beacon from the wall and bolt it to the car**, 30–50 cm from the
 receiver. The two ellipse foci nearly collapse and the geometry becomes **monostatic-in-effect**.
@@ -153,16 +165,26 @@ and it costs **ten dollars**.
 - **A real dynamic-range fight**: the direct path we *need* as the timing reference is the same
   signal swamping the echoes. Mitigations: antenna isolation, cross-polarisation, RX attenuation.
 
-### Stage 2 — the AoA axis (+~$100)
+### Stage 2 — the AoA axis (OPTIONAL, +~$100) — and why an ESP32 array is the WRONG way to get it
 
-**Intel 5300** (3 phase-coherent antennas, 5 GHz, 40 MHz) in a used mini-PCIe laptop. Antennas:
-three 5 GHz dipoles at **λ/2 = 2.9 cm** on a bar (~$10), plus inter-antenna phase calibration.
+AoA is the one thing ESP32s cannot give cheaply, and it is **not needed for either headline
+experiment**. If we want it:
 
-**Claim it tests:** full **(delay, AoA) MUSIC — papers 1–2's exact front-end** — so it measures the
-**89 % claim directly on real CSI**. This is the paper 2 named as P-C.
+**Intel 5300** (3 phase-coherent antennas, 5 GHz, 40 MHz) in a used mini-PCIe laptop, ~$60–125.
+Antennas: three 5 GHz dipoles at **λ/2 = 2.9 cm** on a bar (~$10) plus inter-antenna phase
+calibration. It gives full **(delay, AoA) MUSIC — papers 1–2's exact front-end** — so it measures
+the **89 % claim directly**. Risk: it needs a kernel from 2012–2015; the driver work, not the $60
+card, is the real cost.
 
-**Risk:** the 5300 needs a kernel from 2012–2015. Sourcing and driver work are the real cost, not
-the $60 card.
+**The ESP32-only route to AoA is a TRAP.** An ESPARGOS-style coherent array is ESP32-only, but it is
+capped at **20 MHz** — i.e. **15 m** path-length resolution, against **7.5 m** for a single HT40
+ESP32.
+
+> **A coherent ESP32 array buys angle by paying with half the bandwidth — and bandwidth is what
+> resolves the delays the phantom rate is *defined on*. For this experiment, ONE ESP32 at 40 MHz
+> beats FOUR at 20 MHz.**
+
+*(Whether an ESPARGOS-class array could run HT40 is NOT verified — added to the gaps list.)*
 
 ### Stage 3 — the BANDWIDTH axis (+~$30)
 
@@ -191,11 +213,20 @@ planned until Stages 0–3 are done.
 
 ---
 
-## The biggest risk, stated plainly
+## 🔴 THE make-or-break parameter: the scene must be BIG
 
-At 40 MHz the path-length resolution is **7.5 m** — comparable to an entire room. The research
-predicts real hardware will therefore **reproduce** the phantom ceiling rather than refute it, and
-that this coarseness may be its *physical origin*.
+At 40 MHz the path-length resolution is **7.5 m**. A reflection is separable from the direct path
+only if its **excess** path length exceeds that.
+
+For a reflector offset *r* from the AP–receiver line at separation *d*, the excess is
+approximately **2r²/d**. With an AP 10 m away, clearing 7.5 m of excess needs **r ≈ 6 m**.
+
+> **A small lab collapses every echo into the LOS bin and measures nothing.** The site must be a
+> corridor, sports hall, or car park, with large surveyed reflectors (metal sheets) placed WELL
+> OFF-AXIS. This is geometry, not budget, and it decides whether the experiment works at all.
+
+The research also predicts real hardware will **reproduce** the phantom ceiling rather than refute
+it, and that this 7.5 m coarseness may be its *physical origin*.
 
 **That is a confirmation, not a failure** — but it has two consequences we accept in advance:
 1. **Run in a corridor or car park, not a small lab.** Path lengths must span many resolution cells.
@@ -233,7 +264,7 @@ that this coarseness may be its *physical origin*.
 
 | # | Sub-project | Deliverable |
 |---|---|---|
-| **1** | **Stage 0 rig + CSI capture** | Robot, ESP32 RX + 3 TX beacons, RPLIDAR, synchronised logging. Deliverable: a dataset of (CSI, ground-truth pose, ground-truth map). |
+| **1** | **Stage 0 rig + CSI capture** | Robot, ESP32 RX + 3 ESP32 TX beacons, **a SURVEYED scene** (no LiDAR), synchronised logging. Deliverable: a dataset of (CSI, ground-truth pose, surveyed map). |
 | **2** | **The real-CSI phantom measurement** | Port `eval/phantom.py` to real data: predict true path lengths from the LiDAR map, extract taps, measure the phantom rate. **MUSIC vs CFAR.** |
 | **3** | **The geometry experiment (Stage 1)** | Move the TX onto the car. Re-measure. **This is the headline.** |
 | **4** | **AoA (Stage 2) + bandwidth (Stage 3)** | Intel 5300, then AX210. Only if 1–3 succeed. |
