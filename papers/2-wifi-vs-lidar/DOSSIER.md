@@ -47,9 +47,42 @@ The paper-3 research pass surfaced two works paper 2 had to engage with, and doi
   randomly across the whole radar image, even for the areas with no real object" — the ghost
   phenomenon is **qualitatively known in radar**.
 
+## Correction — the resolution limit (2026-07-13, PRE-SUBMISSION)
+
+**Corrected before submission; this is NOT an erratum** — paper 2 was held precisely so that
+something like this could be caught.
+
+The manuscript compared the **6.45 m median range bias** against a **0.94 m resolution limit** at
+160 MHz. **That was the resolution of the wrong quantity.**
+
+- MUSIC reports `delay * c` — a **bistatic PATH LENGTH** (`sensing/frontend.py:33,41`), which is then
+  fed to `_triangulate_bistatic(..., path_len, ...)`.
+- The Rayleigh resolution of a *path-length* estimate at bandwidth *B* is **c/B = 1.87 m** at
+  160 MHz.
+- The quoted **0.94 m is c/2B** — the *monostatic range* resolution, i.e. the resolution of a
+  **different observable** (range = path length / 2).
+
+| | value | ratio to the 6.45 m bias |
+|---|---|---|
+| quoted (c/2B) — wrong quantity | 0.94 m | 6.9× ("nearly seven times") |
+| **correct (c/B)** | **1.87 m** | **3.4×** |
+
+**The claim survives intact.** At 3.4× the resolution limit the error remains a **bias, not a
+resolution bound**, and *"no amount of bandwidth removes it"* still holds — and that conclusion never
+rested on this ratio anyway: it is independently corroborated by **paper 1's 60 GHz + 1.76 GHz
+bandwidth null result**, which is the stronger evidence. Only the numbers changed.
+
+Fixed in `main.tex` (x2), this DOSSIER (x2), and `docs/results-paper2.md` (x1). The manuscript still
+builds at 7 pages. **The submit-from tag must be re-cut.**
+
+Found while researching paper 4's hardware testbed — the same c/B vs c/2B distinction decides
+whether a 40 MHz ESP32 can resolve anything.
+
+---
+
 **Neither quantifies it.** Paper 2's contribution is therefore restated as the **first
 quantification** (≈89 % phantoms) plus the genuinely new claim: the residual **6.45 m error is
-a BIAS, not a resolution bound** (≈7× the 0.94 m limit at 160 MHz), so **bandwidth does not fix
+a BIAS, not a resolution bound** (≈3.4× the 1.87 m limit at 160 MHz), so **bandwidth does not fix
 it** — corroborated by paper 1's 60 GHz + 16-antenna null result. This *contradicts* the
 natural reading of the bandwidth argument and closes an obvious reviewer attack
 ("this is already known").
@@ -311,7 +344,9 @@ perfect**:
    nor our first analysis identified this.
 2. **Estimation bias.** Controlled: a **6.45 m median range bias** ruins even correctly
    identified facade paths (true params 100 % within 1 m → MUSIC params **2.4 %**). That
-   dwarfs the 0.94 m resolution limit at 160 MHz — a *bias*, not a resolution bound. Street:
+   is 3.4× the 1.87 m path-length resolution limit at 160 MHz — a *bias*, not a resolution
+   bound. (The limit is c/B, not c/2B: the measured quantity is a bistatic PATH LENGTH, not a
+   monostatic range.) Street:
    estimates of genuine facade paths are usable (**76.7 %** within 1 m).
 3. **Discrimination failures (2–8 %).** Paper 1's mechanism — real, but the **smallest**.
 

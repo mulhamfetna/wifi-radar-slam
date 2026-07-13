@@ -260,8 +260,9 @@ then **pure estimation error, with discrimination held perfect**.
    analysis identified.
 2. **Estimation bias.** On the controlled wall a **6.45 m median range bias** destroys
    triangulation even for correctly identified facade paths (100 % → **2.4 %** within 1 m).
-   That dwarfs the 0.94 m resolution limit at 160 MHz, so it is a **bias**, not a resolution
-   bound. (Paper 1 observed this range bias but did not connect it to the mapping floor.) On
+   That is 3.4× the **1.87 m** path-length resolution limit at 160 MHz, so it is a **bias**, not
+   a resolution bound. (The limit is c/B = 1.87 m, NOT c/2B = 0.94 m: MUSIC reports a bistatic
+   PATH LENGTH, not a monostatic range.) (Paper 1 observed this range bias but did not connect it to the mapping floor.) On
    the street, by contrast, estimates of genuine facade paths are usable (76.7 % within 1 m).
 3. **Discrimination failures (2–8 %).** MUSIC picks real but non-facade paths (LOS / floor /
    multi-bounce). This *is* paper 1's mechanism — it is real, but it is the **smallest** of

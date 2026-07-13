@@ -69,7 +69,7 @@ sensor cost. Second, on \emph{mapping} it fails outright
 cannot produce. Third, we locate the mapping ceiling precisely: it is \emph{not} path
 discrimination, as previously supposed, but a front-end limit --- roughly
 \textbf{89\%} of MUSIC detections correspond to \emph{no real propagation path}, and a
-\SI{6.45}{m} median range \emph{bias} (far beyond the \SI{0.94}{m} resolution limit)
+\SI{6.45}{m} median range \emph{bias} (far beyond the \SI{1.87}{m} resolution limit)
 corrupts the rest. Consequently a learned discriminator cannot repair the map, and we
 show that a heuristic, a random forest, and a neural network all fail identically. The
 practical consequence is a hybrid: adding WiFi to an existing LiDAR costs
@@ -538,8 +538,10 @@ swapping true parameters for MUSIC's collapses triangulation from $100\%$ to $2.
 
 That WiFi ranging is poor is not itself news --- \cite{li2021csipwr} report metre-scale
 distance errors and abandon range on exactly these grounds. What is new is the
-\emph{character} of the error. \SI{6.45}{m} is nearly seven times the \SI{0.94}{m}
-resolution limit at \SI{160}{MHz}: it is therefore a \textbf{bias, not a resolution bound},
+\emph{character} of the error. The measured quantity is a \emph{bistatic path length}, whose
+Rayleigh resolution is $c/B$ (not the monostatic $c/2B$), i.e.\ \SI{1.87}{m} at \SI{160}{MHz}.
+At \SI{6.45}{m}, the error is \num{3.4} times that limit: it is therefore a
+\textbf{bias, not a resolution bound},
 and \emph{no amount of bandwidth removes it}. This directly contradicts the natural reading of
 the bandwidth argument --- that a wider channel would fix ranging --- and it is corroborated
 independently: \cite{fetna2026wifiradar} found that \SI{60}{GHz} with \SI{1.76}{GHz} of
