@@ -92,14 +92,17 @@ point. Two cheap ways to get bearing, neither needing phase coherence:
 | ⇒ **our bistatic ellipse method works on a $5 chip** | **TRUE** — the ellipse needs exactly the *excess* path length, not the absolute one | follows |
 | Cheapest **phase-coherent multi-antenna** CSI | **Intel 5300**, 3 antennas, 5 GHz, 40 MHz, ~$60–125 used — but needs an **ancient kernel (3.2–4.2)** | Linux 802.11n CSI Tool |
 | Widest-bandwidth commodity CSI | **Intel AX210 + PicoScenes**, **160 MHz**, card ~$30 — but **only 2 RX chains** | Vetco / PicoScenes |
-| 4 antennas **AND** ≥80 MHz on commodity hardware | **DOES NOT EXIST.** You choose aperture *or* bandwidth. | survey of the above |
+| 4 antennas **AND** ≥80 MHz on commodity hardware | ⚠️ **I CLAIMED THIS DOES NOT EXIST. THAT LOOKS WRONG.** Later research found **WiROS + ASUS RT-AC86U** — a **4-channel coherent array for ~$110**, median **5.3° bearing error** post-calibration, i.e. exactly the thing I said was impossible. **Bandwidth not yet confirmed** (nexmon on bcm4366c0 reaches 80 MHz). **Do not repeat the "does not exist" claim until this is settled.** | WiROS; nexmon_csi |
 
 ### ⚠ Explicitly NOT verified — do not fill these in by guessing
 
 - **SDR price table** (USRP B210/X310, bladeRF, LimeSDR, KrakenSDR frequency coverage).
 - **PicoScenes licence cost and terms** (site returned 404/403).
 - **ESPARGOS price / purchasability** (site returned 403).
-- **Whether `nexmon_csi` captures all four bcm4366c0 RX cores coherently per packet.**
+- **Whether `nexmon_csi` captures all four bcm4366c0 RX cores coherently per packet** — and at what
+  bandwidth. **This is now the highest-value open question**: if WiROS + RT-AC86U really gives 4
+  coherent antennas at 80 MHz for ~$110, it beats the Intel 5300 on every axis and my "you must
+  choose aperture OR bandwidth" claim is simply false.
 - A fetched claim that bcm43455c0 works on **Raspberry Pi 5** — **treat as false until checked.**
 - Commercial 4-element 5 GHz ULA products and prices.
 - **Whether an ESPARGOS-class coherent ESP32 array can run HT40 (40 MHz)** rather than the 20 MHz
@@ -143,7 +146,7 @@ scrutiny:
 
 | dropped | why it was there | why it goes |
 |---|---|---|
-| RPLIDAR A1M8 ($99) | ground-truth *map* of an unknown room | papers 1–2's own `controlled_wall` scene is **one reflector at a known position**. We **survey the scene with a tape measure**. A written-down number is *better* ground truth than a LiDAR-derived one, not worse. |
+| RPLIDAR ($69–99) | ground-truth *map* of an unknown room | papers 1–2's own `controlled_wall` scene is **one reflector at a known position**. We **survey the scene with a tape measure**. A written-down number is *better* ground truth than a LiDAR-derived one, not worse. |
 | Raspberry Pi 4 ($60) | logging | the ESP32 streams CSI over WiFi/serial to a laptop you already own |
 | Intel 5300 ($100) | AoA | **three TX beacons give three ellipses; their intersection locates the reflector with no AoA at all** |
 
