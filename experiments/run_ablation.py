@@ -58,7 +58,13 @@ MAP_VOXEL = 0.5
 # Take every FRAME_STRIDE-th frame. Consecutive frames are 0.25 m apart (5 m/s at a 50 ms step),
 # so they are highly redundant for the MAP and DETECTION statistics -- which is all we measure,
 # since with ground-truth poses there is no trajectory to estimate. Stated, not silent.
-FRAME_STRIDE = 2
+#
+# Set per scene via WRS_FRAME_STRIDE so both scenes contribute the SAME number of frames:
+# controlled_wall has a 120-frame trajectory (stride 2 -> 60 frames, 0.5 m apart) and
+# street_canyon a 240-frame one (stride 4 -> 60 frames, 1.0 m apart). The street canyon carries
+# far more geometry, so it costs ~6.6x more per frame to ray-trace; equalising the frame count
+# keeps the map statistics comparable AND the run tractable.
+FRAME_STRIDE = int(os.environ.get("WRS_FRAME_STRIDE", "2"))
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%H:%M:%S")
 log = logging.getLogger("ablation")
