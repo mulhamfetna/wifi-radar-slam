@@ -7,6 +7,109 @@ not make it into either but will matter later.
 **Verification legend:** **[V]** verified — the source was fetched and says this · **[P]** partial ·
 **[U]** unverified — **do not put in a paper**.
 
+> **Read §0 first.** It answers the one question that decides what this paper is allowed to claim.
+
+---
+
+## 0. Can we prove a self-contained SLAM system? — **NO.** And that is now settled.
+
+**The question:** can a SLAM system be shown to work with **only on-vehicle gear** — no anchors, no
+towers, no surveyed beacons?
+
+**The answer: not with this hardware, and not with any commodity WiFi hardware at any price.** The
+blocker was never infrastructure — the no-anchor constraint is satisfiable. **The blocker is that a
+WiFi channel is too narrow to be a radar, and a delay-only return is too weak to be a landmark.**
+
+### The four independent reasons — each one alone is fatal
+
+**1. Our own estimator cannot recover rotation from radar at all.** Paper 3's credibility gate: the
+yaw cost is **flat** — ~2 % variation across ±8°, minimum at random offsets, and corr(yaw error, true
+Δyaw) = **−0.992**, i.e. the estimator returns its initial guess. That was with **real 77 GHz Boreas
+radar: a full 360° scan, 400 azimuths × 3371 range bins.** An ESP32 has **one RF chain → zero
+azimuths.** If yaw is unrecoverable from a full angular scan, it is not recoverable from a
+bearing-less delay profile. *(ours — `docs/results-paper3-anchor.md`)*
+
+**2. Range-only SLAM has never been demonstrated with anonymous returns.** Every foundational result
+assumes **labelled** landmarks **and** an odometry prior. Blanco et al., ICRA'08, verbatim:
+> *"The only assumptions are the availability of **odometry** and a range sensor **able of identifying
+> the different beacons**."*
+
+Newman & Leonard (ICRA'03) used *interrogated* LBL transponders — they reply, so they are
+addressable. Djugash et al. (ICRA'06) used radio beacons that range to *each other*. **A wall has no
+ID.** Range-only SLAM from anonymous, high-clutter returns is **not in the literature**. **[V]**
+
+**3. A wall is not a point landmark — the physics breaks the model outright.** A monostatic echo from
+a flat specular surface has delay = 2 × the **perpendicular** distance, so **the apparent scattering
+centre slides along the wall as the vehicle moves.** The point-landmark model that every range-only
+SLAM paper is built on is violated *even with perfect data association*. The only literature that ever
+solved this class of problem is 1990s **sonar** (Leonard & Durrant-Whyte, *Directed Sonar Sensing*,
+1992: Regions of Constant Depth + arc-intersection across many poses) — **and it needed odometry and
+many returns per surface.** **[V/P]**
+
+**4. The synthetic-aperture escape hatch is closed by two top-tier negative results.** Angle-from-motion
+would need trajectory knowledge to **λ/16 = 7.8 mm** at 2.4 GHz (two-way), over the whole aperture.
+- **Ubicarse** (MobiCom'14), verbatim: SAR *"requires **sub-centimeter accuracy**… commercial motion
+  sensors are **virtually unusable** to measure such fine-grained translation."*
+- **Zhu et al.** (MobiCom'15): injected **5 mm** of trajectory error → imaging error grew **4× to
+  40 cm**; they then **abandoned coherent SAR** for a non-coherent RSS method.
+
+Best-case *calibrated* differential-drive odometry (Borenstein & Feng, UMBmark) = 0.3–0.5 % of distance
+→ **3–5 mm per metre: exactly on the boundary, zero margin.** A slipping RC car is **2–5 cm — 3–6×
+over budget.** The aperture decoheres. **[V]**
+
+### What it would actually take — and it is a number, not a cleverness
+
+Anchorless radar SLAM **does exist and does work**, on-platform, no beacons:
+
+| work | sensor | bandwidth | result |
+|---|---|---|---|
+| arXiv:2311.14970 | 2 × IR-UWB (Novelda X4M300), on-board, + wheel odometry | ~1.5 GHz | real 2-D **occupancy grid**, EKF-SLAM, loop closure |
+| arXiv:2510.02874 | UWB SAR (ARIA LT102), odometry-driven back-projection | **2 GHz** | **9 %** cell-wise difference vs LiDAR grid |
+
+**The only thing they have that we do not is bandwidth: 500 MHz – 2 GHz. We have 40 MHz.**
+
+| platform | max B | path-length resolution (c/B) |
+|---|---|---|
+| ESP32 (2.4 GHz, HT40) | 40 MHz | **7.5 m** |
+| RT-AC86U / nexmon (5 GHz) | 80 MHz | 3.75 m |
+| AX210 (5–6 GHz) | 160 MHz | 1.9 m |
+| **77 GHz automotive FMCW** | **1–4 GHz** | **15 → 3.75 cm** |
+
+**A 25–100× gap that no amount of money closes**, because **160 MHz is the widest channel the standard
+permits below 6 GHz.** The limit is the *regulation*, not the *wallet*. There is no $500 WiFi device
+with 4 GHz of bandwidth, because no such device would be legal.
+
+### The closest prior art to our exact rig — and it stops where we predict
+
+**Daniels, Yeh & Heath**, *Forward Collision Vehicular Radar with IEEE 802.11* (arXiv:1702.03351):
+transmitter **and** receiver **on the vehicle**, real over-the-air measurements, 802.11 OFDM, 20 MHz.
+Output: **range to the closest target, meter-level. No angle. No map. No SLAM.** **[V]**
+**Nobody has gone past that at sub-7 GHz.** That ceiling is precisely what we propose to *measure*.
+
+### ⛔ The claim we must never make
+
+> Claiming full self-contained WiFi SLAM on cheap hardware puts us in **direct contradiction with two
+> published negative results** (Ubicarse; Zhu et al.). One citation kills the paper.
+
+### ✅ The claim the literature will defend
+
+> **A self-contained, on-vehicle RF sensor** (TX + RX on the platform, **zero infrastructure**),
+> **validated against measured ground truth**, with **mapping evaluated under ground-truth poses** —
+> **full SLAM not claimed.** Precedent for the *sensor* framing exists (Daniels/Heath; the UWB
+> anchorless work), and it is **novel at 2.4/5 GHz**.
+
+This is **exactly** where the spec already stood (*"we validate the reading, not a SLAM system"*) and
+exactly where paper 3 already stands (everything scored under ground-truth poses). **The verification
+changed nothing about the plan. It changed how well we can defend it.**
+
+### One thing that runs in our favour — say it out loud
+
+Commodity CSI carries per-packet random phase (CFO/SFO/packet-detection delay) which *"prevents
+coherent processing across multiple packets."* **A monostatic design whose TX and RX share one local
+oscillator eliminates CFO/SFO by construction** (ISAC-Fi, arXiv:2408.09851, notes exactly this). **The
+phase-reference obstacle that blocks everyone else is one our geometry designs away.** The obstacle we
+have *not* designed away is **position** — and that is reason 4 above.
+
 ---
 
 ## 1. The four facts the whole programme rests on
@@ -216,23 +319,62 @@ another.** **Cite it *as the trap*, not as evidence.**
 
 ---
 
-## 7. Open questions — **do NOT fill these by guessing**
+## 7. Open questions
 
-1. **[HIGHEST VALUE]** Does **WiROS + ASUS RT-AC86U** really give **4 coherent antennas at 80 MHz** for
-   ~$110? If yes, it beats the Intel 5300 on every axis and my "you must choose aperture OR bandwidth"
-   claim is simply **false**.
-2. **Intel AX200/AX210 per-chain phase offset is UNCHARACTERISED** in the literature — no paper
+### ❌ RETRACTED — a claim of mine that verification proved FALSE
+
+> ~~"With cheap WiFi hardware you must choose **either** aperture (coherent antennas, for angle) **or**
+> bandwidth. You cannot have both cheaply."~~ — **FALSE. Never publish this.** **[V]**
+
+**The counterexample is real.** **WiROS** (Arun, Hunter, Bharadia — UCSD/WCSNG, arXiv:2305.13418) on an
+**ASUS RT-AC86U** delivers, on one ~$70–180 router:
+
+- *"for the **Asus hardware, there are 4 receive antennas**"* — vs 3 on the Intel 5300;
+- **20 / 40 / 80 MHz** (80 MHz → **256 subcarriers**);
+- **median bearing error 5.3°** after calibration — **versus 115° without it**;
+- SpotFi + MUSIC, open-sourced, with a ROS driver.
+
+**Aperture *and* bandwidth, together, for the price of a router.** A reviewer who has read WiROS would
+kill the old claim instantly.
+
+**The TRUE claim — and it is stronger:** *cheap WiFi cannot buy **range resolution** at **any** price,
+because the ceiling is the **802.11 standard**, not the budget.* The real trade is not
+aperture-vs-bandwidth; it is **WiFi vs radar**. See §0.
+
+**Caveat kept honest:** "coherent **out of the box**" is **FALSE** for nexmon — nexmon's own issue #222
+asks whether cross-core phase is AoA-usable and is **unanswered by the maintainers**. The answer comes
+from WiROS: usable, but **only after their published calibration**, re-run **on every channel change
+and device reset**. The `~$110` figure is **[P]** — it appears in no paper; market range $70–180,
+**discontinued**.
+
+### ✅ RESOLVED by verification
+
+| # | question | answer |
+|---|---|---|
+| 1 | Multi-ESP32 coherent array — real or folklore? | **REAL — but not the naive version. [V]** **ESPARGOS** (Stuttgart, arXiv:2502.09405 / 2408.16377) built 8×ESP32 with **measured MUSIC pseudo-spectra**, public datasets, `pyespargos`. **But the hardware is closed-source, and a shared crystal is NOT enough** — see next row. |
+| 2 | Does a shared 40 MHz crystal give a deterministic RF LO phase? | **NO — my hypothesis was right, and the ESPARGOS authors confirm it in print. [V]** Verbatim: *"The initial phase changes after a chip reset and after modifying the LO frequency (WiFi channel), **likely every time the PLL has to acquire a new frequency lock**."* Shared XTAL ⇒ zero **CFO**; shared XTAL ⇒ **NOT** a known **phase**. Their fix is **hardware**: a per-chip RF switch plus a **wired, length-calibrated phase-reference distribution network**, recalibrated on every reset/channel change. **"Bolt 4 dev boards to one oscillator and run MUSIC" is folklore — no working AoA spectrum from that recipe exists anywhere.** *(Same PLL disease afflicts 2× HackRF at 10× the price.)* |
+| 3 | ESP32 external clock input | **[V]** `XTAL_P` (**pin 45**), DC-blocked ~**10 pF**, **±10 ppm**, amplitude **≤ 1.1 V**, `XTAL_N` floating. *Espressif HW Design Guidelines §2.4.* **ESP32-C5 is a trap** — it wants a **48 MHz** crystal and has a documented **unresolved** shared-clock boot failure. |
+| 4 | Can ESP32 antenna *diversity* give AoA? | **NO — as suspected. [V]** External RF switch (RTC6603SP), **1T1R**: one antenna downconverted at a time, **never sampled simultaneously**, selection is RSSI-based. And **ESP32 has no BLE 5.1 AoA/CTE** either (ESP-FAQ: *"ESP32-C3/C6/S3 do not support Bluetooth AOA/AOD"*). 802.11 has **no CTE-equivalent field** — CSI comes only from the preamble. |
+| 5 | KrakenSDR as a cheap coherent array? | **REFUTED. [V]** Tunes **24–1766 MHz** — it **physically cannot reach 2.4 GHz** — and 2.56 MHz/channel is ~1/8 of one WiFi channel. |
+| 6 | Intel 5300 inter-antenna phase | **Coherent (shared clock + shared down-converter LO), but needs calibration. [V]** Unknown **constant** offset, plus a reported **multiple-of-π** rotation that **depends on the RF channel** (arXiv:2005.03755). Published fixes: SpotFi, ArrayTrack, Ubicarse, π-Splicer. **~$7–15 used.** |
+
+**The governing principle, stated once:** on a **single multi-chain NIC**, all RX chains share one
+crystal **and one down-converter LO**, so CFO/SFO/packet-detection delay are **common-mode and cancel
+in the antenna-to-antenna phase difference**, leaving an unknown **constant** — which is what
+calibration removes. **Across separate chips there is no such luck.** That is the entire ESPARGOS
+problem, and the entire reason multi-ESP32 is a PCB project rather than an integration exercise.
+
+### ⚠ Still open — do NOT fill these by guessing
+
+1. **Intel AX200/AX210 per-chain phase offset is UNCHARACTERISED** in the literature — no paper
    validates AoA on it. Stage 3 buys bandwidth into **unknown** AoA territory.
-3. **Can an ESPARGOS-class coherent ESP32 array run HT40 (40 MHz)?** If so, the "an array costs you
-   half your bandwidth" trade-off weakens.
-4. **Does `nexmon_csi` capture all four bcm4366c0 RX cores coherently per packet?** (Its own issue #222
-   asks exactly this and is **unanswered**.)
-5. **PicoScenes licence cost/terms** — site returned 404/403.
-6. **SDR price table** (USRP B210/X310, bladeRF, LimeSDR) — never returned.
-7. **ESPARGOS price / purchasability** — site returned 403.
-8. A fetched claim that **bcm43455c0 works on Raspberry Pi 5** — **treat as FALSE until checked.**
-9. **Gyrodometry** heading-error figures — **[U]**, PDF unobtainable.
-10. Friedlander & Weiss 1991 mutual-coupling text — DOI verified, **content paywalled [P]**.
+2. **Can an ESPARGOS-class coherent ESP32 array run HT40 (40 MHz)?** ESPARGOS reports **20 MHz**.
+3. **ESPARGOS price / purchasability** — hardware is **not open source**; no public price. **[U]**
+4. **PicoScenes**: Free licence covers AX210/QCA9300/IWL5300; **Pro = $1,500 for 2 licences** **[V]** —
+   but the docs make **no phase-coherence or AoA claim**. **[U]**
+5. A fetched claim that **bcm43455c0 works on Raspberry Pi 5** — **treat as FALSE until checked.**
+6. **Gyrodometry** heading-error figures — **[U]**, PDF unobtainable.
+7. Friedlander & Weiss 1991 mutual-coupling text — DOI verified, **content paywalled [P]**.
 
 ---
 

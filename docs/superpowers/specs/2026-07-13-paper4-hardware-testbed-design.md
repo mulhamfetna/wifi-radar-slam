@@ -92,17 +92,25 @@ point. Two cheap ways to get bearing, neither needing phase coherence:
 | ⇒ **our bistatic ellipse method works on a $5 chip** | **TRUE** — the ellipse needs exactly the *excess* path length, not the absolute one | follows |
 | Cheapest **phase-coherent multi-antenna** CSI | **Intel 5300**, 3 antennas, 5 GHz, 40 MHz, ~$60–125 used — but needs an **ancient kernel (3.2–4.2)** | Linux 802.11n CSI Tool |
 | Widest-bandwidth commodity CSI | **Intel AX210 + PicoScenes**, **160 MHz**, card ~$30 — but **only 2 RX chains** | Vetco / PicoScenes |
-| 4 antennas **AND** ≥80 MHz on commodity hardware | ⚠️ **I CLAIMED THIS DOES NOT EXIST. THAT LOOKS WRONG.** Later research found **WiROS + ASUS RT-AC86U** — a **4-channel coherent array for ~$110**, median **5.3° bearing error** post-calibration, i.e. exactly the thing I said was impossible. **Bandwidth not yet confirmed** (nexmon on bcm4366c0 reaches 80 MHz). **Do not repeat the "does not exist" claim until this is settled.** | WiROS; nexmon_csi |
+| 4 antennas **AND** ≥80 MHz on commodity hardware | ✅ **IT EXISTS — my "does not exist" claim was FALSE, now RETRACTED. [V]** **WiROS + ASUS RT-AC86U**: *"for the Asus hardware, there are **4 receive antennas**"*, **20/40/80 MHz** (80 MHz → 256 subcarriers), median bearing error **5.3°** post-calibration vs **115°** without. ~$70–180 (discontinued; the "~$110" is **[P]** — in no paper). **Coherent out of the box is FALSE; coherent after their published calibration is TRUE** — and it must be re-run on every **channel change and device reset**. | WiROS arXiv:2305.13418 (UCSD/Bharadia); nexmon_csi |
+
+### ❌ RETRACTED — verified FALSE, never publish
+
+> ~~"With cheap WiFi you must choose **either** aperture **or** bandwidth — not both."~~ **FALSE** (see
+> the row above). **The TRUE and stronger claim:** *cheap WiFi cannot buy **range resolution** at **any**
+> price, because the ceiling is the **802.11 standard**, not the budget.* 160 MHz is the widest channel
+> permitted below 6 GHz; a 77 GHz FMCW radar sweeps **1–4 GHz**. The real trade is **WiFi vs radar** —
+> a **25–100× bandwidth gap that money cannot close**. Full argument: `docs/research-paper4-hardware.md` §0.
 
 ### ⚠ Explicitly NOT verified — do not fill these in by guessing
 
-- **SDR price table** (USRP B210/X310, bladeRF, LimeSDR, KrakenSDR frequency coverage).
-- **PicoScenes licence cost and terms** (site returned 404/403).
-- **ESPARGOS price / purchasability** (site returned 403).
-- **Whether `nexmon_csi` captures all four bcm4366c0 RX cores coherently per packet** — and at what
-  bandwidth. **This is now the highest-value open question**: if WiROS + RT-AC86U really gives 4
-  coherent antennas at 80 MHz for ~$110, it beats the Intel 5300 on every axis and my "you must
-  choose aperture OR bandwidth" claim is simply false.
+- **SDR price table** (USRP B210/X310, bladeRF, LimeSDR).
+  *(KrakenSDR is **REFUTED [V]**: tunes 24–1766 MHz — it **cannot reach 2.4 GHz** — at 2.56 MHz/channel.)*
+- **ESPARGOS price / purchasability** — hardware is **not open source**; no public price. **[U]**
+  *(But ESPARGOS itself is **[V] REAL**: 8×ESP32, measured MUSIC spectra. Caveat: a shared crystal gives
+  frequency lock, **NOT phase lock** — the PLL re-randomises its phase on every reset and channel change.
+  Their fix is a custom RF PCB with a wired phase-reference network. **Multi-ESP32 AoA is a board
+  bring-up project, not a weekend.**)*
 - A fetched claim that bcm43455c0 works on **Raspberry Pi 5** — **treat as false until checked.**
 - Commercial 4-element 5 GHz ULA products and prices.
 - **Whether an ESPARGOS-class coherent ESP32 array can run HT40 (40 MHz)** rather than the 20 MHz
