@@ -179,8 +179,15 @@ def run_music_reference(built, cfg, seed: int) -> dict:
 
 
 def main() -> None:
+    import sys
+    # Optionally restrict to one scene, so the two scenes can run as parallel processes:
+    #     python experiments/run_ablation.py street_canyon
+    only = sys.argv[1] if len(sys.argv) > 1 else None
+    scenes = {only: SCENES[only]} if only else SCENES
+    suffix = f"_{only}" if only else ""
+
     results = []
-    for scene, cfgp in SCENES.items():
+    for scene, cfgp in scenes.items():
         cfg = load_config(cfgp)
         log.info("=== scene %s (%s) ===", scene, cfgp)
         for seed in SEEDS:
@@ -203,9 +210,10 @@ def main() -> None:
             log.info("  -> MUSIC ref seed %d: IoU=%.3f", seed, m["map"]["iou"])
 
     os.makedirs("results", exist_ok=True)
-    with open("results/ablation.json", "w") as f:
+    out = f"results/ablation{suffix}.json"
+    with open(out, "w") as f:
         json.dump(results, f, indent=2)
-    log.info("saved -> results/ablation.json  (%d rows)", len(results))
+    log.info("saved -> %s  (%d rows)", out, len(results))
 
 
 if __name__ == "__main__":
