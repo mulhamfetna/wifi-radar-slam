@@ -3,8 +3,7 @@
 **Date:** 2026-07-13
 **Status:** approved (brainstorming), pending spec review
 **Branch:** `paper4-hardware-testbed` (off `paper3-wifi-vs-radar`)
-**Working title:** *Does the Phantom Ceiling Survive Contact with a Real Channel? A $60 ESP32 Test
-of Simulated WiFi Sensing*
+**Working title:** *A $40 Self-Contained WiFi Radar: Testing the Phantom Ceiling on a Real Channel*
 
 ---
 
@@ -39,17 +38,43 @@ answer is cell B→C of our own ablation.
 
 ---
 
-## The design insight: coherence is a receiver problem, not a transmitter problem
+## 🔴 THE governing constraint: this is a SLAM sensor, not a positioning service
 
-> **Multiple *receivers* must be phase-coherent (hard, expensive). Multiple *transmitters* need no
-> coherence whatsoever (free).**
+**An earlier draft of this spec proposed three surveyed transmitter beacons in the room. That was
+wrong, and it is worth saying why, because the mistake is seductive.**
 
-Each transmitter yields an independent bistatic **ellipse** (from its excess delay, with the AP and
-the vehicle at the foci). **Three transmitters → three ellipses → intersect → the reflector is
-located with no angle-of-arrival estimate at all.**
+Three fixed, surveyed transmitters + a moving receiver is an **anchor network** — infrastructure-based
+localisation. It is not SLAM. A SLAM sensor must be **self-contained**: bolt it to any vehicle, drop
+it into any building, and it works, with nothing pre-installed and nothing surveyed. A LiDAR passes
+that test. A radar passes it. An anchor mesh does not.
 
-This is the single most important architectural decision here. It means the cheapest tier can do
-real geometry — not merely log signal strength — with $8 chips and no synchronisation.
+**Our own best result already satisfies this.** Paper 3's **cell B — monostatic, the transmitter ON
+THE VEHICLE — needs no infrastructure whatsoever.** The vehicle illuminates the world and listens
+to its own echoes, exactly as a radar does. And cell B is *also* the best cell we measured (0 %
+phantoms; highest map IoU).
+
+That hands the paper a far sharper argument than the one we started with:
+
+> **Ambient WiFi SLAM is not really SLAM** — it needs the access points' positions, so it is
+> infrastructure-bound. **Move the transmitter onto the vehicle and you get a genuinely
+> self-contained sensor that is *also* dramatically better.** Infrastructure-free and
+> higher-performing at the same time.
+
+**Everything below is therefore vehicle-mounted. Nothing is installed in the environment.**
+
+### Where bearing comes from, with no phase-coherent array
+
+A single receive antenna gives **range only** — a circle of possible reflector positions, not a
+point. Two cheap ways to get bearing, neither needing phase coherence:
+
+1. **From motion (free).** Each pose yields a range circle. Circles from successive poses
+   **intersect at real reflectors and fail to intersect for phantoms.** The vehicle's own movement
+   is the baseline. This is exactly what our simulated SLAM does when it accumulates detections
+   across frames.
+2. **From a servo (~$5) + a directional antenna (~$8).** Mechanically sweep the beam and you get
+   **range–azimuth scans — the exact data format of paper 3's radar chain** (range → azimuth →
+   CFAR), and of the Navtech spinning radar we anchored against in sub-project 2. A poor man's
+   spinning WiFi radar. **Mechanical scanning buys azimuth without any coherence at all.**
 
 ---
 
@@ -122,20 +147,40 @@ scrutiny:
 | Raspberry Pi 4 ($60) | logging | the ESP32 streams CSI over WiFi/serial to a laptop you already own |
 | Intel 5300 ($100) | AoA | **three TX beacons give three ellipses; their intersection locates the reflector with no AoA at all** |
 
-### Stage 0 — the FRONT-END axis (~$60, ESP32 only)
+### Stage 0 — the self-contained sensor (~$40, ESP32 only, NOTHING in the environment)
 
 | item | qty | ~USD |
 |---|---|---|
-| **ESP32-DevKitC — CSI receiver** (on the car) | 1 | 8 |
-| **ESP32 — TX beacons**, at surveyed positions | 3 | 24 |
-| 2WD robot chassis + driver + battery | 1 | 20 |
-| *(optional)* ESP32-CAM + ArUco tags — pose ground truth | 1 | 8 |
+| **ESP32 — illuminator** (transmits), on the vehicle | 1 | 8 |
+| **ESP32 — CSI receiver**, on the vehicle, 30–50 cm away | 1 | 8 |
+| 2WD chassis + motor driver + battery | 1 | 20 |
+| *(offline)* a laptop you already own — runs MUSIC/CFAR | — | 0 |
 
-**Physics:** 2.4 GHz, HT40 → **40 MHz** → bistatic path-length resolution **c/B = 7.5 m**.
+**Nothing is installed in the building. Nothing is surveyed except the reflectors we are scoring
+against** (the ground truth, exactly as papers 1–2's `controlled_wall` scene is a single reflector
+at a known position).
+
+**Physics:** 2.4 GHz, HT40 → **40 MHz**. Monostatic-in-effect (the TX/RX foci nearly collapse), so
+the observable is a **round-trip range** with resolution **c/2B = 3.75 m** — *twice as good as the
+bistatic 7.5 m*, and one more reason the geometry flip is the right move.
+
+**No on-board compute is needed.** The ESP32 only **streams CSI**; MUSIC and CFAR run offline on a
+laptop. So "do we need a more powerful processor?" — **no**, not on the vehicle.
 
 **Why delay-only still tests the mechanism.** Paper 2's ~89 % arises from MUSIC's **fixed model
 order**: asked for 3 paths it emits 3 peaks *whether or not 3 resolvable paths exist*. That
 pathology lives on the **delay axis alone**. No AoA is required to expose it.
+
+### Stage 0b — mechanical azimuth (+~$13): a poor man's spinning WiFi radar
+
+Add a **servo (~$5)** and a **directional antenna (~$8, patch or Yagi)** to the receiver. Sweep it.
+
+You now produce **range–azimuth scans** — the *identical data format* to paper 3's radar chain and
+to the Navtech spinning radar of the credibility anchor. The **same code** (`radar/processing.py`:
+range → azimuth → CFAR) processes it.
+
+Beamwidth is coarse (a small 2.4 GHz patch is ~60–80°; a Yagi ~30–40°), so azimuth resolution is
+poor — but it is **real bearing, obtained with zero phase coherence**.
 
 **How a phantom is measured without AoA.** The LiDAR gives ground-truth pose *and* a 2-D map. From
 that map plus the known beacon positions we **predict the true path lengths** at every pose. The CSI
@@ -149,16 +194,26 @@ same definition as `eval/phantom.py`, evaluated on the delay axis alone.
 - ❌ **no AoA** → cannot reproduce papers 1–2's *(delay, AoA)* detection exactly
 - ❌ 7.5 m resolution is coarse relative to indoor features
 
-### Stage 1 — the GEOMETRY axis. The headline. (+$8, one more ESP32)
+### Stage 1 — the GEOMETRY axis. The headline. ($0 extra — it is a LOGGING mode, not hardware)
 
-**The entire change: unplug one beacon from the wall and bolt it to the car**, 30–50 cm from the
-receiver. The two ellipse foci nearly collapse and the geometry becomes **monostatic-in-effect**.
+The monostatic rig above is already the *good* configuration. The **comparison** — bistatic, the
+infrastructure-bound one — costs **nothing extra**: on the same drive, also log CSI from **an access
+point that already exists in the building** (its position measured once). That is precisely papers
+1–2's ambient premise.
 
-Two *separate* radios, so there is **no full-duplex self-interference problem** — we sidestep the
-~110 dB monster that makes real monostatic WiFi radar expensive.
+So one drive, one vehicle, **two geometries**:
 
-**Claim it tests:** paper 3 predicts phantoms collapse **18 % → ~0 %**. This is our novel finding,
-and it costs **ten dollars**.
+| | illuminator | infrastructure needed | paper-3 cell |
+|---|---|---|---|
+| **bistatic** | an existing building AP | **YES — the AP's position must be known** | A |
+| **monostatic** | the ESP32 on the vehicle | **NONE** | B |
+
+**Claim it tests:** paper 3 predicts phantoms collapse **18 % → ~0 %** across that flip — while the
+monostatic side simultaneously **removes the infrastructure dependence that stops ambient WiFi SLAM
+from being SLAM at all.** Two arguments, one experiment, zero extra hardware.
+
+Two *separate* radios (TX and RX), so there is **no full-duplex self-interference problem** — we
+sidestep the ~110 dB monster that makes real monostatic WiFi radar expensive.
 
 **Costs, stated up front, not discovered later:**
 - **~3.75 m blind range**: the direct TX→RX path occupies the first resolution cell.
@@ -213,17 +268,43 @@ planned until Stages 0–3 are done.
 
 ---
 
+## Scope: we are validating the READING, not building a SLAM system
+
+**We do not estimate poses and we do not build a map.** That is deliberate, and it is exactly what
+paper 3 already does (it scores every cell **under ground-truth poses**, with no estimator in the
+loop — see `docs/results-paper3-anchor.md` for why that is the *stronger* experiment).
+
+| | how |
+|---|---|
+| **poses** | **measured** — tape/rail/wheel encoders. Not estimated. |
+| **map** | **surveyed** — the reflectors' true positions. Not built. |
+| **outputs** | phantom rate · range bias · MUSIC vs CFAR · bistatic vs monostatic |
+
+If the reading is wrong, no SLAM back-end can save it. If the reading is right, the SLAM back-end is
+already written (it is `lidar/slam_icp.py`, shared across all three papers). **Get the reading
+right; the rest exists.**
+
+---
+
 ## 🔴 THE make-or-break parameter: the scene must be BIG
 
-At 40 MHz the path-length resolution is **7.5 m**. A reflection is separable from the direct path
-only if its **excess** path length exceeds that.
+At 40 MHz the **monostatic round-trip range resolution is c/2B = 3.75 m**, and the **bistatic
+path-length resolution is c/B = 7.5 m**. An echo is separable from the direct TX→RX path only if it
+falls outside the first resolution cell.
 
-For a reflector offset *r* from the AP–receiver line at separation *d*, the excess is
-approximately **2r²/d**. With an AP 10 m away, clearing 7.5 m of excess needs **r ≈ 6 m**.
+- **Monostatic (the good case):** a reflector must be **beyond ~3.75 m**. Easy — that is most of a
+  corridor or car park.
+- **Bistatic (the control):** the **excess** path must exceed 7.5 m. For a reflector offset *r*
+  from the AP–receiver line at separation *d*, excess ≈ **2r²/d**; with the AP 10 m away that needs
+  **r ≈ 6 m**.
 
-> **A small lab collapses every echo into the LOS bin and measures nothing.** The site must be a
-> corridor, sports hall, or car park, with large surveyed reflectors (metal sheets) placed WELL
-> OFF-AXIS. This is geometry, not budget, and it decides whether the experiment works at all.
+> **A small lab collapses every echo into the direct-path bin and measures nothing.** The site must
+> be a corridor, sports hall, or car park, with large surveyed reflectors (metal sheets) placed well
+> off-axis. This is geometry, not budget, and it decides whether the experiment works at all.
+
+Note the asymmetry: **the monostatic configuration is twice as forgiving** (3.75 m vs 7.5 m),
+because a round trip traverses the distance twice. That is a *second*, independent reason the
+transmitter belongs on the vehicle.
 
 The research also predicts real hardware will **reproduce** the phantom ceiling rather than refute
 it, and that this 7.5 m coarseness may be its *physical origin*.
@@ -256,6 +337,10 @@ it, and that this 7.5 m coarseness may be its *physical origin*.
 - No true full-duplex monostatic radar (self-interference cancellation is out of budget and
   unnecessary — the co-located-TX trick achieves the geometry we care about).
 - No outdoor vehicular driving. A small robot in a corridor/car park is sufficient and safe.
+- **No anchor/tower/mesh network.** Any design that needs transmitters installed and surveyed in the
+  environment is disqualified: it is positioning, not SLAM. The vehicle carries its own illuminator.
+- **No pose estimation and no map building.** We validate the READING, under measured poses, exactly
+  as paper 3 scores its ablation.
 - No change to papers 1–3 **except** the paper-2 `c/B` correction above, which is mandatory.
 
 ---
@@ -264,19 +349,20 @@ it, and that this 7.5 m coarseness may be its *physical origin*.
 
 | # | Sub-project | Deliverable |
 |---|---|---|
-| **1** | **Stage 0 rig + CSI capture** | Robot, ESP32 RX + 3 ESP32 TX beacons, **a SURVEYED scene** (no LiDAR), synchronised logging. Deliverable: a dataset of (CSI, ground-truth pose, surveyed map). |
-| **2** | **The real-CSI phantom measurement** | Port `eval/phantom.py` to real data: predict true path lengths from the LiDAR map, extract taps, measure the phantom rate. **MUSIC vs CFAR.** |
-| **3** | **The geometry experiment (Stage 1)** | Move the TX onto the car. Re-measure. **This is the headline.** |
-| **4** | **AoA (Stage 2) + bandwidth (Stage 3)** | Intel 5300, then AX210. Only if 1–3 succeed. |
+| **1** | **The self-contained sensor + CSI capture** | Vehicle carrying **TX + RX ESP32s** (nothing installed in the building), a **surveyed** reflector scene, measured poses, streamed CSI. Deliverable: a dataset of (CSI, measured pose, surveyed reflector map) in BOTH geometries — monostatic (own TX) and bistatic (an existing building AP). |
+| **2** | **The real-CSI phantom measurement** ⟵ **GATE** | Port `eval/phantom.py` to real data: predict the true echo ranges from the surveyed scene + measured pose, extract taps, measure the phantom rate and range bias. **MUSIC vs CFAR** on identical CSI. |
+| **3** | **The geometry experiment** | Compare monostatic vs bistatic on the SAME drive. **This is the headline** — and it is a *logging mode*, not new hardware. |
+| **4** | **Mechanical azimuth (Stage 0b)** | Servo + directional antenna → range–azimuth scans, processed by the EXISTING `radar/processing.py`. Only if 1–3 succeed. |
 
-**Sub-project 2 is the gate.** If we cannot measure a phantom rate on real CSI at all, Stage 1's
-geometry experiment has nothing to compare against and the programme stops there.
+**Sub-project 2 is the gate.** If we cannot measure a phantom rate on real CSI at all, the geometry
+experiment has nothing to compare against and the programme stops there.
 
 ---
 
 ## Acceptance
 
-- A committed dataset: real CSI + LiDAR ground-truth pose and map, on a moving robot.
+- A committed dataset: real CSI + **measured** pose + **surveyed** reflector map, on a moving
+  vehicle carrying **its own illuminator** — nothing installed in the environment.
 - A **phantom rate measured on real CSI**, with the same definition as `eval/phantom.py`.
 - **MUSIC vs CFAR** on identical real CSI — the front-end axis, physically.
 - **Bistatic vs monostatic** on identical real CSI — the geometry axis, physically. *The headline.*
