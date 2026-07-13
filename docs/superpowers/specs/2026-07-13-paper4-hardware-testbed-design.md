@@ -268,6 +268,56 @@ planned until Stages 0–3 are done.
 
 ---
 
+## Phase 2 — the vehicle becomes TOTALLY self-contained (no laptop)
+
+The laptop in Phase 1 is a **development tool, not a dependency**. You cannot tune an algorithm you
+cannot see, and Phase 1 must compare MUSIC against CFAR and score both against ground truth. Once
+the winner is known, it is ported to the ESP32 and the laptop is cut loose.
+
+**And our own result hands us the cheap algorithm.** Paper 3 found CFAR beats MUSIC (89 % → 18 %
+phantoms). Computationally:
+
+- **MUSIC** requires an eigendecomposition — **O(N³)**.
+- **CFAR** is a sliding average and a threshold — **O(N)**.
+
+> **The scientifically better front-end is also the computationally cheaper one.** That is not luck:
+> MUSIC's cost *is* its pathology — it forces a fixed model order onto data that does not support it,
+> and pays O(N³) for the privilege of inventing peaks.
+
+### The on-board compute budget (128 subcarriers, 64 range bins, 36 azimuths/sweep, 240 MHz)
+
+| stage | flops per sweep |
+|---|---|
+| 128-pt FFT × 36 azimuths | 161,280 |
+| CA-CFAR × 36 | 18,432 |
+| polar → Cartesian projection | 13,824 |
+| **total** | **193,536** |
+
+- **Sustained sweep rate: ~1,240 Hz** at one flop/cycle (pessimistic — ESP32-S3 has SIMD and
+  `esp-dsp` ships an optimised FFT). **We need 1–5 Hz.** ~250× headroom.
+- **MUSIC, for contrast:** 11.8 Mflop/sweep → ~20 Hz. Still feasible, but **61× more expensive —
+  and worse.**
+- Scan-to-map ICP (≈50 scan points vs ≈500 map points, 30 iterations) ≈ **15 ms** → a few Hz.
+  Comfortable.
+
+### Memory
+
+| | |
+|---|---|
+| CSI frame (128 complex float32) | 1.0 KB |
+| range–azimuth map (36 × 64) | 9.0 KB |
+| accumulated point map (2,000 pts) | 15.6 KB |
+| **total** | **≈ 26 KB** |
+
+**ESP32 SRAM is 520 KB; the ESP32-S3 adds up to 8 MB PSRAM.** The whole sensor fits in ~5 % of the
+base chip's RAM.
+
+**Conclusion: compute was never the obstacle.** A fully autonomous $40 sensor — CSI in, map out, no
+host — is a port, not a research problem. Use an **ESP32-S3** for the on-board build (SIMD + PSRAM);
+the plain ESP32 suffices for Phase 1 streaming.
+
+---
+
 ## Scope: we are validating the READING, not building a SLAM system
 
 **We do not estimate poses and we do not build a map.** That is deliberate, and it is exactly what
@@ -353,6 +403,7 @@ it, and that this 7.5 m coarseness may be its *physical origin*.
 | **2** | **The real-CSI phantom measurement** ⟵ **GATE** | Port `eval/phantom.py` to real data: predict the true echo ranges from the surveyed scene + measured pose, extract taps, measure the phantom rate and range bias. **MUSIC vs CFAR** on identical CSI. |
 | **3** | **The geometry experiment** | Compare monostatic vs bistatic on the SAME drive. **This is the headline** — and it is a *logging mode*, not new hardware. |
 | **4** | **Mechanical azimuth (Stage 0b)** | Servo + directional antenna → range–azimuth scans, processed by the EXISTING `radar/processing.py`. Only if 1–3 succeed. |
+| **5** | **On-board autonomy (Phase 2)** | Port the winning chain (FFT → CFAR → project → map) to an **ESP32-S3**. Budget: 194 kflop/sweep, 26 KB — ~250x headroom. **Cut the laptop loose.** Only after 1–3 have named the winner. |
 
 **Sub-project 2 is the gate.** If we cannot measure a phantom rate on real CSI at all, the geometry
 experiment has nothing to compare against and the programme stops there.
