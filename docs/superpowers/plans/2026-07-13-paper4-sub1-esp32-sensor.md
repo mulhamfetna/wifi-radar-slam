@@ -598,6 +598,235 @@ Two tests carry the paper's whole thesis:
 
 ---
 
+### Task 2b: 🔴 Divide out the INSTRUMENT — or measure its phantoms instead of the world's
+
+**Files:**
+- Create: `src/wifi_radar_slam/hw/calib.py`
+- Test: `tests/test_hw_calib.py`
+
+**Interfaces:**
+- Consumes: `hw.delay.delay_profile` (Task 2).
+- Produces:
+  - `reference_from_los(csi_los) -> np.ndarray` — `(n_sub,)` complex instrument+direct-path reference.
+  - `apply_reference(csi, ref) -> np.ndarray` — the calibrated channel.
+
+**WHY THIS EXISTS, AND WHY IT IS NOT OPTIONAL.** Every receiver has a **frequency-selective analog
+response** — the `Hdist` term. PicoScenes measured **>15 dB of magnitude swing across subcarriers**
+on commodity NICs and states, in their own words, that it ***"causes a phantom object that
+interferes with the H_air measurement."*** It is **not** removed by SpotFi-style linear-fit
+sanitisation.
+
+> **An uncalibrated receiver manufactures phantom taps out of its own filter.** Since **the phantom
+> rate is the number this entire paper reports**, shipping that uncorrected would mean measuring
+> *our instrument* and calling it *the world*. This is the same class of self-inflicted artifact
+> that had to be hunted out of paper 3 three separate times (the untapered aperture, CFAR
+> self-masking, the periodic azimuth axis).
+
+**The correction is free**, because the LOS-only capture of Task 7 already measures it. In an open
+space with the TX ~40 cm away and no reflector within 10 m, the channel is essentially one path, so
+
+```
+H_los(f)  ≈  H_dist(f) · a · exp(-j 2 pi f tau_0)
+```
+
+Dividing any later capture by `H_los` removes **both** the instrument response **and** the direct
+path in one stroke, leaving `1 + (echoes relative to the direct arrival)`. The IFFT of that is a
+spike at bin 0 plus the **echo taps we actually want** — and the excess delays are, by construction,
+exactly the quantity `hw/truth.py` predicts.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `tests/test_hw_calib.py`:
+
+```python
+import numpy as np
+import pytest
+from wifi_radar_slam.hw.calib import reference_from_los, apply_reference
+from wifi_radar_slam.hw.delay import delay_profile, cfar_excess_lengths
+from wifi_radar_slam.hw.csi import ESP32_HT40_BANDWIDTH_HZ as B
+
+C = 299792458.0
+N = 128
+
+
+def _instrument(n_sub=N, swing_db=15.0, rng=None):
+    """A frequency-selective receiver response -- the `Hdist` term. PicoScenes measured >15 dB
+    of swing across subcarriers on commodity NICs, and reported it manufactures a PHANTOM."""
+    f = np.linspace(0, 1, n_sub)
+    mag = 10 ** ((swing_db / 2) * np.sin(2 * np.pi * 2.5 * f) / 20.0)
+    phase = 1.3 * np.sin(2 * np.pi * 1.7 * f + 0.4)      # not a linear ramp: a real filter
+    return mag * np.exp(1j * phase)
+
+
+def _channel(excess_m, n_sub=N, bandwidth_hz=B):
+    f = np.arange(n_sub) * (bandwidth_hz / n_sub)
+    h = np.ones(n_sub, dtype=complex)                     # the direct path
+    for d in np.atleast_1d(excess_m):
+        h = h + 0.6 * np.exp(-1j * 2 * np.pi * f * (d / C))
+    return h
+
+
+def test_an_UNCALIBRATED_instrument_MANUFACTURES_phantom_taps():
+    # THE HAZARD. A LOS-only channel has exactly ONE path. But pushed through a
+    # frequency-selective receiver, its delay profile sprouts extra taps -- and CFAR dutifully
+    # detects them. Those are the INSTRUMENT's phantoms, not the world's, and they would inflate
+    # the very number this paper reports.
+    los = _channel([]) * _instrument()
+    bogus = cfar_excess_lengths(los, B)
+    assert len(bogus) > 0, "expected the instrument response to fabricate taps"
+
+
+def test_dividing_by_the_LOS_REFERENCE_removes_them():
+    ref = reference_from_los(_channel([]) * _instrument())
+    clean = apply_reference(_channel([]) * _instrument(), ref)
+    assert len(cfar_excess_lengths(clean, B)) == 0        # one path in, no echoes out
+
+
+def test_calibration_PRESERVES_a_real_echo():
+    inst = _instrument()
+    ref = reference_from_los(_channel([]) * inst)
+    got = cfar_excess_lengths(apply_reference(_channel([30.0]) * inst, ref), B)
+    assert len(got) >= 1
+    assert np.min(np.abs(got - 30.0)) < C / B
+
+
+def test_the_reference_is_averaged_over_frames_to_beat_down_noise():
+    rng = np.random.default_rng(0)
+    frames = np.stack([_channel([]) * _instrument()
+                       + 0.01 * (rng.normal(size=N) + 1j * rng.normal(size=N))
+                       for _ in range(64)])
+    ref = reference_from_los(frames)
+    assert ref.shape == (N,)
+    # the averaged reference must be closer to the truth than any single noisy frame
+    truth = _channel([]) * _instrument()
+    assert np.linalg.norm(ref - truth) < np.linalg.norm(frames[0] - truth)
+
+
+def test_a_zero_in_the_reference_does_not_blow_up():
+    # A deep notch in the receiver response would divide by ~0 and inject a spike.
+    ref = np.ones(N, dtype=complex)
+    ref[10] = 0.0
+    out = apply_reference(_channel([]), ref)
+    assert np.all(np.isfinite(out))
+
+
+def test_shape_mismatch_is_rejected():
+    with pytest.raises(ValueError):
+        apply_reference(np.ones(N, dtype=complex), np.ones(N + 1, dtype=complex))
+```
+
+- [ ] **Step 2: Run the test and watch it fail**
+
+```bash
+.venv/bin/python -m pytest tests/test_hw_calib.py -q
+```
+
+Expected: `ModuleNotFoundError: No module named 'wifi_radar_slam.hw.calib'`.
+
+- [ ] **Step 3: Implement**
+
+Create `src/wifi_radar_slam/hw/calib.py`:
+
+```python
+"""Divide out the INSTRUMENT, so we measure the world and not our own receiver.
+
+THE HAZARD. Every receiver has a frequency-selective analog response -- the `Hdist` term.
+PicoScenes measured **>15 dB of magnitude swing across subcarriers** on commodity NICs and stated
+plainly that it *"causes a phantom object that interferes with the H_air measurement"*. It is NOT
+removed by SpotFi-style linear-fit sanitisation, which only takes out the common linear slope.
+
+**An uncalibrated receiver manufactures phantom taps out of its own filter**, and the phantom rate
+is the number this whole paper reports. Left uncorrected we would be measuring our instrument and
+calling it the world.
+
+THE CORRECTION IS FREE. The LOS-only capture that validates the byte layout (Task 7) already
+measures it. With the TX ~40 cm away and no reflector within 10 m, the channel is essentially one
+path:
+
+    H_los(f)  ~=  H_dist(f) * a * exp(-j 2 pi f tau_0)
+
+Dividing a later capture by `H_los` removes the instrument response AND the direct path together,
+leaving `1 + (echoes relative to the direct arrival)`. Its IFFT is a spike at bin 0 plus the echo
+taps we actually want -- and those excess delays are, by construction, exactly what hw/truth.py
+predicts.
+"""
+from __future__ import annotations
+import numpy as np
+
+# Below this fraction of the median magnitude a reference bin is a notch, not a measurement.
+# Dividing by it would inject a spike -- a phantom of our own making.
+_NOTCH_FLOOR = 1e-3
+
+
+def reference_from_los(csi_los: np.ndarray) -> np.ndarray:
+    """LOS-only capture -> the instrument+direct-path reference, averaged over frames.
+
+    `csi_los` is (n_frames, n_sub) or a single (n_sub,) vector. Averaging beats the noise down;
+    the reference is measured once per power cycle, so it is worth measuring well.
+    """
+    h = np.asarray(csi_los, dtype=complex)
+    if h.ndim == 1:
+        return h.copy()
+    if h.size == 0:
+        raise ValueError("empty LOS capture -- cannot build a reference")
+    return h.mean(axis=0)
+
+
+def apply_reference(csi: np.ndarray, ref: np.ndarray) -> np.ndarray:
+    """Divide out the instrument (and the direct path). Returns the calibrated channel.
+
+    Notch bins -- where the receiver's own response is near zero -- are set to 1 rather than
+    divided, because dividing by ~0 injects a spike, which is precisely the kind of self-inflicted
+    phantom this module exists to prevent.
+    """
+    h = np.asarray(csi, dtype=complex)
+    r = np.asarray(ref, dtype=complex).ravel()
+    if h.shape[-1] != r.size:
+        raise ValueError(f"csi has {h.shape[-1]} subcarriers but the reference has {r.size}")
+    mag = np.abs(r)
+    floor = _NOTCH_FLOOR * max(float(np.median(mag)), 1e-30)
+    safe = np.where(mag > floor, r, 1.0)
+    out = h / safe
+    return np.where(mag > floor, out, 1.0)      # notches contribute nothing, not infinity
+```
+
+- [ ] **Step 4: Run the tests and watch them pass**
+
+```bash
+.venv/bin/python -m pytest tests/test_hw_calib.py -q
+```
+
+Expected: 6 passed.
+
+**If `test_an_UNCALIBRATED_instrument_MANUFACTURES_phantom_taps` ever stops failing to detect
+anything, do NOT relax it.** That test is the reason this module exists: it proves the hazard is
+real *before* we go near hardware.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add src/wifi_radar_slam/hw/calib.py tests/test_hw_calib.py
+git commit -m "paper4(hw): divide out the INSTRUMENT, or measure its phantoms instead of the world's
+
+Every receiver has a frequency-selective analog response (Hdist). PicoScenes measured >15 dB of
+swing across subcarriers on commodity NICs and stated it 'causes a phantom object that interferes
+with the H_air measurement' -- and that it is NOT removed by SpotFi-style linear-fit sanitisation.
+
+An UNCALIBRATED receiver manufactures phantom taps out of its own filter. Since the phantom rate is
+the number this entire paper reports, shipping that uncorrected would mean measuring our instrument
+and calling it the world. This is the same class of self-inflicted artifact that had to be hunted
+out of paper 3 three times over.
+
+The correction is FREE: the LOS-only capture that validates the byte layout already measures it.
+Dividing by it removes the instrument response AND the direct path at once, leaving exactly the
+echoes relative to the direct arrival -- which is precisely the quantity hw/truth.py predicts.
+
+A test proves the hazard is real before we touch hardware: a ONE-PATH channel pushed through a
+frequency-selective receiver sprouts taps that CFAR dutifully detects."
+```
+
+---
+
 ### Task 3: The ground truth — predicted excess path lengths
 
 **Files:**
@@ -997,6 +1226,7 @@ import sys
 import numpy as np
 
 from wifi_radar_slam.hw.csi import parse_csi_csv, ESP32_HT40_BANDWIDTH_HZ
+from wifi_radar_slam.hw.calib import reference_from_los, apply_reference
 from wifi_radar_slam.hw.delay import cfar_excess_lengths, music_excess_lengths
 from wifi_radar_slam.hw.truth import monostatic_excess, bistatic_excess
 from wifi_radar_slam.eval.phantom import phantom_stats_frames
@@ -1027,6 +1257,18 @@ def main() -> None:
     scene = load_scene(os.path.join(root, "scene.json"))
     with open(os.path.join(root, "csi.csv")) as f:
         _, csi = parse_csi_csv(f.read())
+
+    # DIVIDE OUT THE INSTRUMENT. Without this we measure the receiver's own frequency-selective
+    # response -- which manufactures phantom taps -- and report them as the world's.
+    los_path = os.path.join(root, "los_only.csv")
+    if not os.path.exists(los_path):
+        raise SystemExit(f"missing {los_path}: capture a LOS-only run first (see Task 7). "
+                         f"Without it the phantom rate measures OUR RECEIVER, not the channel.")
+    with open(los_path) as f:
+        _, csi_los = parse_csi_csv(f.read())
+    ref = reference_from_los(csi_los)
+    csi = apply_reference(csi, ref)
+    print(f"instrument response divided out (reference from {len(csi_los)} LOS-only frames)")
 
     poses = np.asarray(scene["poses"], dtype=float)
     refl = np.asarray(scene["reflectors"], dtype=float)
@@ -1301,12 +1543,14 @@ git push
 - [ ] `hw/csi.py` — the ESP32 stream parsed, byte layout **validated on real hardware**, not assumed.
 - [ ] `hw/delay.py` — CSI → delay profile → excess path lengths, with **both** front-ends returning
       the **same quantity**, and the MUSIC-invents-peaks mechanism pinned by a test.
+- [ ] `hw/calib.py` — the **instrument's own frequency response divided out**, so the phantom rate
+      measures the world and not our receiver.
 - [ ] `hw/truth.py` — predicted excess from the **surveyed** scene and **measured** pose.
 - [ ] Two ESP32 firmwares: illuminator + CSI receiver, both HT40 on channel 6.
 - [ ] `experiments/run_hw_phantom.py` — the phantom rate on real CSI, scored with
       `eval/phantom.py` **verbatim**.
 - [ ] `docs/hardware-build.md` — BOM, wiring, survey, and the **site-size rule**.
-- [ ] Full suite green (223 expected).
+- [ ] Full suite green (229 expected).
 
 **Sub-project 2 is the GATE.** If we cannot measure a phantom rate on real CSI at all, the geometry
 experiment has nothing to compare against and the programme stops there.
