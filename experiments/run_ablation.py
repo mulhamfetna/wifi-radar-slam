@@ -35,7 +35,7 @@ from wifi_radar_slam.radar.cells import CELLS
 from wifi_radar_slam.radar.sensor import SionnaRadarSensor
 from wifi_radar_slam.radar.sensor_bistatic import SionnaBistaticSensor
 from wifi_radar_slam.radar.truth import true_paths_for_tx
-from wifi_radar_slam.eval.phantom import phantom_stats
+from wifi_radar_slam.eval.phantom import phantom_stats_frames
 from wifi_radar_slam.eval.mapping import map_under_gt_poses
 from wifi_radar_slam.eval.metrics import (chamfer, map_accuracy, map_completeness,
                                           occupancy_iou)
@@ -132,14 +132,13 @@ def run_cell(cell, built, seed: int) -> dict:
                                if any(w.size for w in world_pts) else np.empty((0, 2))))
 
     # --- RQ1: the phantom rate, at BOTH tolerances -------------------------------------
-    DR = np.concatenate(det_r) if det_r else np.empty(0)
-    DA = np.concatenate(det_a) if det_a else np.empty(0)
-    TR = np.concatenate(true_r) if true_r else np.empty(0)
-    TA = np.concatenate(true_a) if true_a else np.empty(0)
-
+    # Matched FRAME BY FRAME. A detection made at frame 5 must be explained by a path that
+    # existed at frame 5's vehicle position; pooling every frame's paths into one haystack
+    # would let a detection be "explained" by a path from somewhere else entirely on the
+    # trajectory, which massively undercounts phantoms.
     res = cell.config.range_resolution_m
-    fixed = phantom_stats(DR, DA, TR, TA, range_scale_m=3.0)
-    scaled = phantom_stats(DR, DA, TR, TA, range_scale_m=3.0 * res)
+    fixed = phantom_stats_frames(det_r, det_a, true_r, true_a, range_scale_m=3.0)
+    scaled = phantom_stats_frames(det_r, det_a, true_r, true_a, range_scale_m=3.0 * res)
 
     return {
         "cell": cell.key, "label": cell.label, "seed": seed,
@@ -148,7 +147,7 @@ def run_cell(cell, built, seed: int) -> dict:
         "monostatic": cell.monostatic,
         "isolates": cell.isolates,
         "range_resolution_m": res,
-        "n_true_paths": int(TR.size),
+        "n_true_paths": int(sum(t.size for t in true_r)),
         "phantom_fixed_3m": fixed,
         "phantom_resolution_scaled": scaled,
         "map": _map_metrics(est_map, gt_xy),

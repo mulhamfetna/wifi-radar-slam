@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
-from wifi_radar_slam.eval.phantom import match_detections, phantom_stats
+from wifi_radar_slam.eval.phantom import (match_detections, phantom_stats,
+                                          phantom_stats_frames)
 
 
 def test_a_detection_on_top_of_a_true_path_matches_it():
@@ -88,5 +89,57 @@ def test_no_detections_gives_nan_rate_not_zero():
     # An empty detection set has NO phantom rate. Reporting 0 % would read as "perfect",
     # when in fact the sensor is blind.
     s = phantom_stats(np.empty(0), np.empty(0), np.array([10.0]), np.array([0.0]))
+    assert s["n_detections"] == 0
+    assert np.isnan(s["phantom_rate"])
+
+
+# --- per-frame aggregation ------------------------------------------------------
+
+def test_frames_are_matched_INDEPENDENTLY_not_pooled():
+    # THE bug this guards, and it would have produced a flattering, false headline.
+    # A detection in frame 0 must be explained by a true path that existed IN FRAME 0. If
+    # frames are pooled, a detection can be "explained" by a path from a completely different
+    # vehicle position -- which massively UNDERCOUNTS phantoms. Paper 2 matched per frame; so
+    # must we, or the ~89% comparison is meaningless.
+    #
+    # Here: frame 0's detection at 20 m matches nothing in frame 0 (whose only path is at
+    # 90 m), but WOULD match frame 1's path at 20 m if the frames were pooled.
+    det_r = [np.array([20.0]), np.array([90.0])]
+    det_a = [np.array([0.0]), np.array([0.0])]
+    tru_r = [np.array([90.0]), np.array([20.0])]
+    tru_a = [np.array([0.0]), np.array([0.0])]
+    s = phantom_stats_frames(det_r, det_a, tru_r, tru_a)
+    assert s["n_detections"] == 2
+    assert s["n_phantoms"] == 2                    # BOTH are phantoms, frame by frame
+    assert s["phantom_rate"] == 1.0
+    # and if we (wrongly) pooled them, neither would be a phantom -- proving the test bites
+    pooled = phantom_stats(np.concatenate(det_r), np.concatenate(det_a),
+                           np.concatenate(tru_r), np.concatenate(tru_a))
+    assert pooled["n_phantoms"] == 0
+
+
+def test_frames_aggregate_counts_and_pool_the_bias():
+    det_r = [np.array([22.0]), np.array([23.0, 200.0])]
+    det_a = [np.array([0.0]), np.array([0.0, 0.0])]
+    tru_r = [np.array([20.0]), np.array([20.0])]
+    tru_a = [np.array([0.0]), np.array([0.0])]
+    s = phantom_stats_frames(det_r, det_a, tru_r, tru_a)
+    assert s["n_detections"] == 3
+    assert s["n_phantoms"] == 1
+    assert s["range_bias_m"] == pytest.approx(2.5)         # median of [+2, +3] across frames
+
+
+def test_frames_with_no_detections_contribute_nothing():
+    s = phantom_stats_frames([np.empty(0), np.array([20.0])],
+                             [np.empty(0), np.array([0.0])],
+                             [np.array([20.0]), np.array([20.0])],
+                             [np.array([0.0]), np.array([0.0])])
+    assert s["n_detections"] == 1
+    assert s["n_phantoms"] == 0
+
+
+def test_frames_with_no_detections_at_all_give_nan():
+    s = phantom_stats_frames([np.empty(0)], [np.empty(0)],
+                             [np.array([20.0])], [np.array([0.0])])
     assert s["n_detections"] == 0
     assert np.isnan(s["phantom_rate"])

@@ -105,3 +105,61 @@ def phantom_stats(det_range_m, det_azimuth_rad, true_range_m, true_azimuth_rad,
         "abs_range_err_m": float(np.median(np.abs(d_rng))),
         "azimuth_err_deg": float(np.median(np.abs(np.rad2deg(d_az)))),
     }
+
+
+def phantom_stats_frames(det_range_m, det_azimuth_rad, true_range_m, true_azimuth_rad,
+                         range_scale_m: float = 3.0, azimuth_scale_deg: float = 10.0,
+                         max_cost: float = 3.0) -> dict:
+    """Phantom stats over a SEQUENCE of frames. Each argument is a list, one entry per frame.
+
+    **Frames are matched INDEPENDENTLY, and that is not a performance detail -- it is the
+    definition.** A detection made in frame 5 must be explained by a path that existed at
+    frame 5's vehicle position. Pooling every frame's paths into one haystack would let a
+    detection be "explained" by a path from a completely different place on the trajectory,
+    which massively UNDERCOUNTS phantoms and would hand us a flattering, false headline.
+    Paper 2's isolation experiment matched per frame; so does this, or the comparison to its
+    ~89 % is meaningless.
+
+    (It is also what keeps the cost matrix small: pooling would build an
+    n_detections x n_true_paths matrix over hundreds of thousands of rays.)
+    """
+    n_det = n_ph = 0
+    bias, abs_err, az_err = [], [], []
+
+    for d_r, d_a, t_r, t_a in zip(det_range_m, det_azimuth_rad,
+                                  true_range_m, true_azimuth_rad):
+        d_r = np.asarray(d_r, dtype=float).ravel()
+        d_a = np.asarray(d_a, dtype=float).ravel()
+        t_r = np.asarray(t_r, dtype=float).ravel()
+        t_a = np.asarray(t_a, dtype=float).ravel()
+        if d_r.size == 0:
+            continue
+        n_det += int(d_r.size)
+        m = match_detections(d_r, d_a, t_r, t_a, range_scale_m, azimuth_scale_deg, max_cost)
+        hit = m >= 0
+        n_ph += int((~hit).sum())
+        if hit.any():
+            j = m[hit]
+            dr = d_r[hit] - t_r[j]                       # SIGNED
+            bias.append(dr)
+            abs_err.append(np.abs(dr))
+            az_err.append(np.abs(np.rad2deg(
+                np.angle(np.exp(1j * (d_a[hit] - t_a[j]))))))
+
+    if n_det == 0:
+        return {"n_detections": 0, "n_phantoms": 0, "phantom_rate": float("nan"),
+                "range_bias_m": float("nan"), "abs_range_err_m": float("nan"),
+                "azimuth_err_deg": float("nan")}
+    if not bias:
+        return {"n_detections": n_det, "n_phantoms": n_ph, "phantom_rate": 1.0,
+                "range_bias_m": float("nan"), "abs_range_err_m": float("nan"),
+                "azimuth_err_deg": float("nan")}
+
+    return {
+        "n_detections": n_det,
+        "n_phantoms": n_ph,
+        "phantom_rate": float(n_ph / n_det),
+        "range_bias_m": float(np.median(np.concatenate(bias))),
+        "abs_range_err_m": float(np.median(np.concatenate(abs_err))),
+        "azimuth_err_deg": float(np.median(np.concatenate(az_err))),
+    }
