@@ -107,6 +107,12 @@ point. Two cheap ways to get bearing, neither needing phase coherence:
 - Commercial 4-element 5 GHz ULA products and prices.
 - **Whether an ESPARGOS-class coherent ESP32 array can run HT40 (40 MHz)** rather than the 20 MHz
   reported. If it can, the "array costs you bandwidth" trade-off above weakens.
+- **Intel AX200/AX210 per-chain phase offset is UNCHARACTERISED in the literature** — no paper
+  validates AoA on it. So Stage 3 (160 MHz) buys bandwidth into *unknown* AoA territory.
+
+*(CLOSED since the first draft: the inter-antenna phase-calibration procedure — see the antenna
+section. It is a per-boot constant, and ArrayTrack's cable-swap trick removes it along with the
+cable imbalance.)*
 
 ---
 
@@ -266,8 +272,34 @@ planned until Stages 0–3 are done.
   λ/2 = **2.9 cm**, so the whole aperture is under 6 cm.
 - **Directional antennas (patch, Yagi) buy gain and a narrower field of view — we need neither.**
   Skip them.
-- **Inter-antenna phase calibration IS required** for AoA (Stage 2+). *(Exact procedure and
-  references: NOT yet verified — see the gaps list. Do not invent one.)*
+- **Inter-antenna phase calibration IS required** for AoA (Stage 2+) — **now verified, gap closed:**
+
+  **The folklore is wrong, in a way that helps.** The per-antenna phase offset is **not random per
+  packet**. It is a **per-boot** (Intel/Atheros) or **per-retune** (Broadcom) constant drawn from a
+  small discrete set. What *is* random per packet — CFO, packet-detection delay, SFO — is **common
+  to all antennas and cancels in the inter-antenna difference** (Zubow et al., arXiv:2005.03755,
+  verbatim). **One calibration per power cycle suffices.**
+
+  **The procedure** (ArrayTrack, NSDI'13, Eqs. 9–12): splitter + reference tone into all channels,
+  with the **cable-swap-and-average trick** — measure the offsets, physically swap the cables at the
+  splitter, measure again, average. This kills the **LO offset *and* the cable imbalance at once**,
+  so **matched cables stop mattering**. Every serious DF platform does some version of this
+  (KrakenSDR: internal noise source + RF switches; Ettus: *"re-align the LOs after each tune
+  command"*; ADI Phaser: boresight tone → `phase_cal_val.pkl`). **None skips it.**
+
+  **Why it is not optional:** at 5.2 GHz, **1 mm of cable mismatch ≈ 9° of phase ≈ 3° of bearing
+  error**, and 10° of residual per-element phase yields a **3.2° bias** — which dominates the noise
+  floor (CRLB ~1.8° for a 4-element ULA at 10 dB SNR) by **10–100×** on an uncalibrated array.
+
+  **⚠ TWO TRAPS, both flagged:**
+  1. **"SpotFi needs no calibration" is a trap.** That claim is about the *environment*, not the
+     array. SpotFi's Algorithm 1 deliberately removes only the **common-mode** slope — fitting one
+     slope jointly across all antennas — so it **preserves** (and therefore does **not** remove) the
+     per-chain PLL offset.
+  2. **PicoScenes' `Hdist`** — a per-chain, **frequency-selective** distortion (>15 dB swing across
+     subcarriers) which, in their own words, ***"causes a phantom object."*** **Not** removed by
+     linear-fit sanitisation. **This one bites us even at Stage 0 with a single antenna**, and is
+     why the plan divides out the instrument response (`hw/calib.py`) before reporting any number.
 
 ---
 
