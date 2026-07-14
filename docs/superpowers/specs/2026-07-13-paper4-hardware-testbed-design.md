@@ -1,3 +1,15 @@
+> # ⛔ SUPERSEDED — DO NOT FOLLOW THIS DOCUMENT
+>
+> **Withdrawn 2026-07-14.** It describes a **moving vehicle**, a **servo**, and a SLAM-adjacent framing.
+> All three are wrong. Its differential-CSI method is **broken as written** (it subtracts raw complex CSI
+> across recordings — see Part 5 of the replacement).
+>
+> **Replaced by: [`docs/paper4-restart-static-bench.md`](../../paper4-restart-static-bench.md)**
+> (Arabic mirror: `docs/paper4-restart-static-bench.ar.md`)
+>
+> Kept only as a record of what was tried. The **research** in `docs/research-paper4-hardware.md`
+> remains valid.
+
 # Paper 4 — design: a physical WiFi-CSI testbed that replicates the ablation
 
 **Date:** 2026-07-13
