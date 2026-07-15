@@ -72,13 +72,18 @@ static void csi_rx_cb(void *ctx, wifi_csi_info_t *info)
     h->seq          = s_seq++;
     h->timestamp_us = (uint32_t)esp_timer_get_time();
     h->rssi         = rx->rssi;
-    h->agc_gain     = rx->agc_gain;
-    h->fft_gain     = rx->fft_gain;
+    /* agc_gain/fft_gain are NOT exposed by the public wifi_pkt_rx_ctrl_t in ESP-IDF v5.x --
+     * they exist only via a reverse-engineered path (pyespargos). We instead pin the CSI
+     * scale with manu_scale=true in the config, so no per-packet gain compensation is needed;
+     * these two fields stay zero and the Python gain_linear() returns 1.0. The spare byte
+     * carries noise_floor (dBm), which IS available and useful for an SNR sanity check. */
+    h->agc_gain     = 0;
+    h->fft_gain     = 0;
     h->sig_mode     = rx->sig_mode;
     h->cwb          = rx->cwb;
     h->n_sub        = CSI_HT40_N_SUB;
     h->valid        = ht40 ? 1 : 0;
-    h->reserved     = 0;
+    h->reserved     = (uint8_t)rx->noise_floor;
 
     /* Ship the RAW buffer; the laptop extracts the HT-LTF and does the fftshift. Only copy
      * a full HT40 record; anything shorter is a 20 MHz frame we do not want. */

@@ -20,6 +20,7 @@
 #include "esp_log.h"
 #include "esp_mac.h"
 #include "esp_wifi.h"
+#include "esp_private/wifi.h"     /* esp_wifi_internal_set_fix_rate (fix the TX MCS/BW) */
 #include "nvs_flash.h"
 #include "rom/ets_sys.h"          /* ets_delay_us -- pace with usleep-style, not vTaskDelay */
 
