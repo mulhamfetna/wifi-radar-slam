@@ -1,0 +1,7 @@
+CONFIG_IDF_TARGET="esp32s3"
+# CSI must be enabled in the Wi-Fi stack
+CONFIG_ESP_WIFI_CSI_ENABLED=y
+# Console on a separate UART so our binary CSI stream on UART0 is not polluted by logs.
+# (Alternatively route ESP_LOG to USB-Serial-JTAG; keep binary CSI on UART0.)
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+CONFIG_ESP_CONSOLE_UART_NONE=y

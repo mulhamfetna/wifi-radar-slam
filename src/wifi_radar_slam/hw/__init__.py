@@ -20,6 +20,9 @@ detect   : ``cfar_1d`` — a 1-D CA-CFAR on the delay profile using the SAME thr
            hardware detector is the same family as the simulation. Comparability is the
            point: a different detector would confound the hardware result with an algorithm
            change.
+csi      : the ESP32 binary CSI wire parser (``parse_stream``, ``CSIRecord``) matching
+           ``firmware/common/csi_wire.h``. Extracts the HT-LTF with our OWN index order
+           (Espressif's is disputed — esp-csi #224), validated by the Rung-0.5 check.
 """
 from .config import CSIConfig, ESP32_HT40
 
