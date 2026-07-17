@@ -30,6 +30,7 @@
 #include "esp_timer.h"
 #include "esp_wifi.h"
 #include "nvs_flash.h"
+#include "driver/uart.h"
 
 #include "csi_wire.h"
 
@@ -37,9 +38,11 @@ static const char *TAG = "csi_rx";
 
 /* ------- user config (match the TX) -------------------------------------- */
 #define CSI_CHANNEL   1                    /* 2.4 GHz channel; TX must match     */
-/* Binary CSI shares the console UART. At the 115200 default this sustains ~28 HT40 records/s
- * (baud-limited: 384-byte records). Raising CONFIG_ESP_CONSOLE_UART_BAUDRATE lifts throughput
- * once a stable higher FTDI baud is dialed in -- see docs/results-paper4-first-light.md. */
+#define CSI_UART_NUM  UART_NUM_0           /* -> FTDI/COM port -> /dev/ttyUSB*   */
+#define CSI_UART_BAUD 460800               /* set explicitly (Kconfig default didn't stick).
+                                            * 460800 carries 100 rec/s * 402 B = 40 kB/s with
+                                            * headroom and is rock-solid on the FTDI FT232R.
+                                            * The host must open the port at THIS baud. */
 /* TX board STA MAC (esptool read_mac): 28:84:85:48:40:20. Filter on it. */
 static const uint8_t TX_MAC[6] = {0x28, 0x84, 0x85, 0x48, 0x40, 0x20};
 
@@ -101,11 +104,26 @@ static void writer_task(void *arg)
     csi_msg_t msg;
     for (;;) {
         if (xQueueReceive(s_csi_queue, &msg, portMAX_DELAY) == pdTRUE) {
-            /* one contiguous write of the whole record (header+payload) to stdout=UART0 */
-            fwrite(&msg, 1, sizeof(msg), stdout);
-            fflush(stdout);
+            /* one contiguous write of the whole record via the UART driver (explicit baud) */
+            uart_write_bytes(CSI_UART_NUM, (const char *)&msg, sizeof(msg));
         }
     }
+}
+
+static void uart_init(void)
+{
+    /* Reconfigure UART0 to CSI_UART_BAUD and install the driver. Console (ESP_LOG) then also
+     * uses this baud; the 'CSI1' magic framing lets the parser skip the occasional log line. */
+    uart_config_t cfg = {
+        .baud_rate  = CSI_UART_BAUD,
+        .data_bits  = UART_DATA_8_BITS,
+        .parity     = UART_PARITY_DISABLE,
+        .stop_bits  = UART_STOP_BITS_1,
+        .flow_ctrl  = UART_HW_FLOWCTRL_DISABLE,
+        .source_clk = UART_SCLK_DEFAULT,
+    };
+    uart_driver_install(CSI_UART_NUM, 1024, 16384, 0, NULL, 0);   /* big TX ring buffer */
+    uart_param_config(CSI_UART_NUM, &cfg);
 }
 
 static void wifi_init(void)
@@ -142,7 +160,7 @@ static void wifi_init(void)
 void app_main(void)
 {
     ESP_ERROR_CHECK(nvs_flash_init());
-    setvbuf(stdout, NULL, _IOFBF, 2048);   /* full buffering: fewer, larger UART writes */
+    uart_init();                           /* UART0 at CSI_UART_BAUD */
 
     s_csi_queue = xQueueCreate(64, sizeof(csi_msg_t));
     if (s_csi_queue == NULL) {
