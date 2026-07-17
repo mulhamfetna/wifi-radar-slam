@@ -56,13 +56,19 @@ static void wifi_init(void)
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_start());
 
-    ESP_ERROR_CHECK(esp_wifi_set_channel(CSI_CHANNEL, WIFI_SECOND_CHAN_BELOW));
+    ESP_ERROR_CHECK(esp_wifi_set_channel(CSI_CHANNEL, WIFI_SECOND_CHAN_ABOVE));
     ESP_ERROR_CHECK(esp_wifi_set_bandwidth(WIFI_IF_STA, WIFI_BW_HT40));
 
-    /* Fix the data rate to an HT (11n) MCS at 40 MHz -- this is what yields an HT40 CSI
-     * record on the receiver. Without it the stack may fall back to a legacy 20 MHz rate. */
-    esp_wifi_config_11b_rate(WIFI_IF_STA, false);
-    ESP_ERROR_CHECK(esp_wifi_internal_set_fix_rate(WIFI_IF_STA, true, WIFI_PHY_RATE_MCS7_SGI));
+    /* Force an HT (802.11n) MCS rate on the 80211_tx path. This is what makes the transmitted
+     * frame carry an HT-LTF -- without it the stack sends LEGACY (non-HT) frames that have no
+     * HT-LTF, so a receiver with htltf_en/lltf_en=false generates NO CSI at all. Use the PUBLIC
+     * esp_wifi_config_80211_tx_rate (the internal set_fix_rate aborts on the unassociated STA).
+     * MCS7 LGI at HT40; the boards are inches apart so the high MCS decodes fine. */
+    esp_wifi_config_11b_rate(WIFI_IF_STA, false);   /* disable legacy 11b rates */
+    esp_err_t rerr = esp_wifi_config_80211_tx_rate(WIFI_IF_STA, WIFI_PHY_RATE_MCS7_LGI);
+    if (rerr != ESP_OK) {
+        ESP_LOGW(TAG, "config_80211_tx_rate failed (%d) -- frames may be legacy (no HT-LTF)", rerr);
+    }
 
     /* Put our own MAC into addr2 so the RX can filter on it -- print it so you can paste it
      * into the RX firmware's TX_MAC. */
@@ -76,14 +82,18 @@ static void wifi_init(void)
 static void tx_task(void *arg)
 {
     (void)arg;
-    const uint32_t period_us = 1000000U / TX_RATE_HZ;
+    uint32_t ok = 0, fail = 0, iter = 0;
+    /* Pace with vTaskDelay so the task YIELDS (a busy-wait starves IDLE -> task watchdog).
+     * 100 Hz = 10 ms; the default tick is coarse enough that vTaskDelay is perfect here. */
+    const TickType_t period = pdMS_TO_TICKS(1000 / TX_RATE_HZ);
     for (;;) {
-        /* en_sys_seq = true: let the stack assign the sequence number. */
         esp_err_t err = esp_wifi_80211_tx(WIFI_IF_STA, s_frame, sizeof(s_frame), true);
-        if (err != ESP_OK) {
-            ESP_LOGW(TAG, "80211_tx err %d", err);
+        if (err == ESP_OK) ok++; else fail++;
+        if ((++iter % 100) == 0) {
+            ESP_LOGI(TAG, "tx ok=%lu fail=%lu (last err %d)",
+                     (unsigned long)ok, (unsigned long)fail, err);
         }
-        ets_delay_us(period_us);   /* busy-wait pacing, per Espressif advice (esp-csi #114) */
+        vTaskDelay(period > 0 ? period : 1);
     }
 }
 
