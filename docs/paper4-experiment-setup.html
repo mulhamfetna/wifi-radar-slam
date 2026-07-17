@@ -1,0 +1,560 @@
+<title>Paper 4 — Static Bench Setup Sheet (Rung 1)</title>
+<style>
+  :root{
+    --ground:#F5F7F9; --panel:#FFFFFF; --ink:#10151B; --muted:#5B6672;
+    --hair:#D2DAE2; --hair-2:#E7ECF1;
+    --signal:#0E7C86; --signal-soft:#0e7c8622;
+    --echo:#C56A12; --echo-soft:#c56a1220;
+    --danger:#B8433A; --danger-soft:#b8433a18;
+    --chip:#eef2f5;
+    --shadow:0 1px 2px rgba(16,21,27,.06),0 8px 30px rgba(16,21,27,.05);
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#0B0F14; --panel:#121821; --ink:#E6EDF3; --muted:#8B98A7;
+      --hair:#26313C; --hair-2:#1a232c;
+      --signal:#3FC6D2; --signal-soft:#3fc6d222;
+      --echo:#EDA24A; --echo-soft:#eda24a1e;
+      --danger:#E5695E; --danger-soft:#e5695e18;
+      --chip:#1a232c;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0B0F14; --panel:#121821; --ink:#E6EDF3; --muted:#8B98A7;
+    --hair:#26313C; --hair-2:#1a232c;
+    --signal:#3FC6D2; --signal-soft:#3fc6d222;
+    --echo:#EDA24A; --echo-soft:#eda24a1e;
+    --danger:#E5695E; --danger-soft:#e5695e18;
+    --chip:#1a232c; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  }
+  :root[data-theme="light"]{
+    --ground:#F5F7F9; --panel:#FFFFFF; --ink:#10151B; --muted:#5B6672;
+    --hair:#D2DAE2; --hair-2:#E7ECF1;
+    --signal:#0E7C86; --signal-soft:#0e7c8622;
+    --echo:#C56A12; --echo-soft:#c56a1220;
+    --danger:#B8433A; --danger-soft:#b8433a18;
+    --chip:#eef2f5; --shadow:0 1px 2px rgba(16,21,27,.06),0 8px 30px rgba(16,21,27,.05);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+    line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:clamp(18px,4vw,44px)}
+  .mono{font-family:var(--mono)}
+
+  /* title block */
+  .titleblock{border:1.5px solid var(--ink);border-radius:6px;overflow:hidden;
+    background:var(--panel);box-shadow:var(--shadow)}
+  .tb-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;
+    padding:20px 22px;border-bottom:1.5px solid var(--ink)}
+  .tb-top h1{margin:0;font-size:clamp(20px,3vw,27px);letter-spacing:-.01em;
+    font-weight:750;text-wrap:balance}
+  .tb-top .sub{color:var(--muted);font-size:13.5px;margin-top:4px;max-width:52ch}
+  .tb-badge{font-family:var(--mono);font-size:11.5px;color:var(--signal);
+    border:1px solid var(--signal);border-radius:4px;padding:3px 8px;height:max-content;
+    letter-spacing:.04em;white-space:nowrap}
+  .tb-grid{display:grid;grid-template-columns:repeat(4,1fr);font-family:var(--mono);font-size:12px}
+  .tb-cell{padding:11px 14px;border-right:1px solid var(--hair);border-top:1px solid var(--hair)}
+  .tb-cell:nth-child(4n){border-right:none}
+  .tb-cell .k{color:var(--muted);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+  .tb-cell .v{color:var(--ink);font-size:13px;margin-top:2px}
+  @media(max-width:640px){.tb-grid{grid-template-columns:repeat(2,1fr)}
+    .tb-cell:nth-child(4n){border-right:1px solid var(--hair)}
+    .tb-cell:nth-child(2n){border-right:none}}
+
+  section{margin-top:34px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--muted);display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .eyebrow::before{content:"";width:22px;height:1.5px;background:var(--signal)}
+  h2{margin:.1em 0 .5em;font-size:20px;font-weight:700;letter-spacing:-.01em}
+  h2 .num{font-family:var(--mono);color:var(--signal);font-size:15px;margin-right:8px}
+  p{margin:.4em 0;max-width:68ch}
+  .lead{color:var(--muted)}
+
+  .panel{background:var(--panel);border:1px solid var(--hair);border-radius:10px;
+    box-shadow:var(--shadow);overflow:hidden}
+  .panel .cap{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+    padding:12px 16px;border-bottom:1px solid var(--hair);flex-wrap:wrap}
+  .panel .cap .t{font-weight:650;font-size:14.5px}
+  .panel .cap .n{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.05em}
+  .panel .body{padding:8px 12px 4px}
+  .fig{width:100%;height:auto;display:block}
+  .figfoot{padding:4px 16px 14px;color:var(--muted);font-size:12.5px;font-family:var(--mono)}
+
+  /* svg semantic classes */
+  .s-wall{stroke:var(--ink);stroke-width:2.5;fill:none;opacity:.55}
+  .s-hair{stroke:var(--hair);stroke-width:1}
+  .s-dim{stroke:var(--muted);stroke-width:1}
+  .s-dimtick{stroke:var(--muted);stroke-width:1}
+  .s-los{stroke:var(--signal);stroke-width:2.4;fill:none}
+  .s-echo{stroke:var(--echo);stroke-width:2.4;fill:none;stroke-dasharray:1 0}
+  .s-axis{stroke:var(--muted);stroke-width:1.2;stroke-dasharray:5 5;opacity:.7}
+  .fill-signal{fill:var(--signal)} .fill-echo{fill:var(--echo)} .fill-danger{fill:var(--danger)}
+  .fill-ink{fill:var(--ink)} .fill-muted{fill:var(--muted)} .fill-panel{fill:var(--panel)}
+  text{font-family:var(--mono);fill:var(--ink)}
+  .t-dim{font-size:13px;fill:var(--muted)}
+  .t-lab{font-size:13px;fill:var(--ink);font-weight:600}
+  .t-small{font-size:11px;fill:var(--muted)}
+  .t-sig{fill:var(--signal);font-size:12px;font-weight:600}
+  .t-echo{fill:var(--echo);font-size:12px;font-weight:600}
+  .comp{fill:var(--chip);stroke:var(--ink);stroke-width:1.5}
+  .plate{fill:var(--echo);stroke:var(--echo);stroke-width:1}
+
+  /* tables */
+  .tblwrap{overflow-x:auto;border:1px solid var(--hair);border-radius:10px;box-shadow:var(--shadow)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--panel);min-width:520px}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--hair-2)}
+  thead th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);border-bottom:1px solid var(--hair);background:var(--chip)}
+  tbody tr:last-child td{border-bottom:none}
+  td.num,th.num{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+  .row-h td{color:var(--echo);font-weight:600}
+
+  /* callouts */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  .note{border-left:3px solid var(--signal);background:var(--signal-soft);
+    padding:12px 16px;border-radius:0 8px 8px 0;font-size:13.5px}
+  .note.warn{border-color:var(--danger);background:var(--danger-soft)}
+  .note.echo{border-color:var(--echo);background:var(--echo-soft)}
+  .note b{font-weight:700}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+  .chip{font-family:var(--mono);font-size:12px;background:var(--chip);border:1px solid var(--hair);
+    border-radius:20px;padding:5px 12px}
+  .chip b{color:var(--signal)}
+
+  /* steps */
+  ol.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+  ol.steps li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:start}
+  ol.steps li::before{content:counter(s,decimal-leading-zero);font-family:var(--mono);font-size:12px;
+    color:var(--signal);border:1px solid var(--signal);border-radius:6px;height:30px;
+    display:flex;align-items:center;justify-content:center;font-weight:600}
+  ol.steps li .st{padding-top:3px}
+  ol.steps b{font-weight:650}
+
+  pre.cmd{font-family:var(--mono);font-size:13px;background:var(--ink);color:var(--ground);
+    padding:14px 16px;border-radius:8px;overflow-x:auto;margin:8px 0;line-height:1.7}
+  pre.cmd .c{color:#8fb7c9}
+  :root[data-theme="dark"] pre.cmd, :root:not([data-theme="light"]) pre.cmd{}
+  @media(prefers-color-scheme:dark){pre.cmd{background:#05080b;color:#cdd9e3}}
+
+  .check{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px}
+  .check li{display:grid;grid-template-columns:22px 1fr;gap:12px;font-size:13.5px}
+  .check li::before{content:"";width:15px;height:15px;border:1.5px solid var(--signal);border-radius:4px;
+    margin-top:4px}
+  footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--hair);color:var(--muted);
+    font-size:12px;font-family:var(--mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  a{color:var(--signal)}
+</style>
+
+<div class="wrap">
+
+  <!-- ============ TITLE BLOCK ============ -->
+  <div class="titleblock">
+    <div class="tb-top">
+      <div>
+        <h1>Static Bench — Field Setup Sheet</h1>
+        <div class="sub">Paper 4 · Rung 1, the atomic test: does a wall echo appear in ESP32 CSI?
+          Two boards, one metal plate, a straight corridor. Everything measured with a tape.</div>
+      </div>
+      <div class="tb-badge">DWG paper4-rung1 · rev A</div>
+    </div>
+    <div class="tb-grid">
+      <div class="tb-cell"><div class="k">Method</div><div class="v">Monostatic-in-effect<br>bistatic RCS w/ bkgnd sub.</div></div>
+      <div class="tb-cell"><div class="k">Bandwidth</div><div class="v">40 MHz (HT40)</div></div>
+      <div class="tb-cell"><div class="k">Range cell</div><div class="v">3.75 m (c/2B)</div></div>
+      <div class="tb-cell"><div class="k">Ground truth</div><div class="v">Tape measure</div></div>
+      <div class="tb-cell"><div class="k">TX board</div><div class="v">28:84:85:48:40:20</div></div>
+      <div class="tb-cell"><div class="k">RX board</div><div class="v">28:84:85:53:99:DC</div></div>
+      <div class="tb-cell"><div class="k">Baseline b</div><div class="v">0.50 m</div></div>
+      <div class="tb-cell"><div class="k">Plate d (start)</div><div class="v">12.0 m</div></div>
+    </div>
+  </div>
+
+  <!-- ============ 1. PLAN VIEW ============ -->
+  <section>
+    <div class="eyebrow">Drawing 1 of 4 — plan</div>
+    <h2><span class="num">A</span>Plan view — looking down from above</h2>
+    <p class="lead">The two boards sit together at the near end, <b class="mono">0.50 m</b> apart across
+      the corridor. The plate stands on the corridor axis <b class="mono">12.0 m</b> away, facing the
+      boards. Length is drawn to scale; the cross-corridor spacing is exaggerated so the two boards
+      and their signal paths are legible.</p>
+
+    <div class="panel">
+      <div class="cap"><span class="t">Top-down geometry</span><span class="n">scale: length 1:∼ · width n.t.s.</span></div>
+      <div class="body">
+        <svg class="fig" viewBox="0 0 900 380" role="img"
+             aria-label="Top-down plan of the two boards, the plate at 12 m, and the corridor.">
+          <!-- corridor walls -->
+          <line class="s-wall" x1="70" y1="70" x2="870" y2="70"/>
+          <line class="s-wall" x1="70" y1="310" x2="870" y2="310"/>
+          <!-- hatch on the far wall to read as 'wall' -->
+          <g class="s-hair">
+            <line x1="90" y1="62" x2="70" y2="78"/><line x1="150" y1="62" x2="130" y2="78"/>
+            <line x1="210" y1="62" x2="190" y2="78"/><line x1="270" y1="62" x2="250" y2="78"/>
+            <line x1="330" y1="62" x2="310" y2="78"/><line x1="390" y1="62" x2="370" y2="78"/>
+            <line x1="450" y1="62" x2="430" y2="78"/><line x1="510" y1="62" x2="490" y2="78"/>
+            <line x1="570" y1="62" x2="550" y2="78"/><line x1="630" y1="62" x2="610" y2="78"/>
+            <line x1="690" y1="62" x2="670" y2="78"/><line x1="750" y1="62" x2="730" y2="78"/>
+            <line x1="810" y1="62" x2="790" y2="78"/>
+          </g>
+          <!-- corridor axis -->
+          <line class="s-axis" x1="120" y1="190" x2="850" y2="190"/>
+          <polygon class="fill-muted" points="850,190 840,186 840,194"/>
+          <text class="t-small" x="792" y="205">corridor axis</text>
+
+          <!-- signal paths (draw under components) -->
+          <!-- echo: TX -> plate -> RX -->
+          <path class="s-echo" d="M120,158 L690,190 L120,222"/>
+          <!-- LOS: TX -> RX -->
+          <path class="s-los" d="M120,158 L120,222"/>
+
+          <!-- boards -->
+          <g>
+            <rect class="comp" x="96" y="146" width="48" height="24" rx="3"/>
+            <text class="t-sig" x="150" y="150">TX</text>
+            <text class="t-small" x="150" y="163">illuminator</text>
+            <rect class="comp" x="96" y="210" width="48" height="24" rx="3"/>
+            <text class="t-sig" x="150" y="226">RX</text>
+            <text class="t-small" x="150" y="239">CSI logger</text>
+          </g>
+
+          <!-- plate -->
+          <rect class="plate" x="686" y="150" width="8" height="80" rx="2"/>
+          <text class="t-echo" x="700" y="176">metal</text>
+          <text class="t-echo" x="700" y="190">plate</text>
+          <text class="t-small" x="700" y="204">≥30×30 cm</text>
+          <!-- plate face normal -->
+          <line class="s-dim" x1="686" y1="190" x2="656" y2="190"/>
+          <polygon class="fill-muted" points="656,190 666,186 666,194"/>
+
+          <!-- path labels -->
+          <text class="t-sig" x="70" y="194" transform="rotate(-90 70 194)">LOS b</text>
+          <text class="t-echo" x="400" y="168">echo path ≈ 2d</text>
+
+          <!-- DIMENSION: baseline 0.5 m -->
+          <g>
+            <line class="s-dim" x1="60" y1="146" x2="60" y2="234"/>
+            <line class="s-dimtick" x1="55" y1="146" x2="65" y2="146"/>
+            <line class="s-dimtick" x1="55" y1="234" x2="65" y2="234"/>
+            <rect class="fill-panel" x="20" y="182" width="34" height="16"/>
+            <text class="t-dim" x="26" y="194">0.50 m</text>
+          </g>
+
+          <!-- DIMENSION: plate distance 12 m -->
+          <g>
+            <line class="s-dim" x1="120" y1="345" x2="690" y2="345"/>
+            <line class="s-dimtick" x1="120" y1="338" x2="120" y2="352"/>
+            <line class="s-dimtick" x1="690" y1="338" x2="690" y2="352"/>
+            <rect class="fill-panel" x="366" y="337" width="78" height="16"/>
+            <text class="t-dim" x="372" y="349">d = 12.0 m</text>
+          </g>
+
+          <!-- DIMENSION: corridor length >=15 m -->
+          <g>
+            <line class="s-dim" x1="120" y1="42" x2="850" y2="42"/>
+            <line class="s-dimtick" x1="120" y1="35" x2="120" y2="49"/>
+            <line class="s-dimtick" x1="850" y1="35" x2="850" y2="49"/>
+            <rect class="fill-panel" x="420" y="34" width="150" height="16"/>
+            <text class="t-dim" x="426" y="46">clear length ≥ 15 m</text>
+          </g>
+
+          <!-- DIMENSION: corridor width -->
+          <g>
+            <line class="s-dim" x1="884" y1="70" x2="884" y2="310"/>
+            <line class="s-dimtick" x1="879" y1="70" x2="889" y2="70"/>
+            <line class="s-dimtick" x1="879" y1="310" x2="889" y2="310"/>
+            <text class="t-dim" x="884" y="194" transform="rotate(90 884 194)">width ≥ 2 m</text>
+          </g>
+        </svg>
+      </div>
+      <div class="figfoot">The 2.4° offset from the plate to each board (0.25 m over 12 m) is
+        negligible — a flat plate square to the axis returns the echo to both boards.</div>
+    </div>
+  </section>
+
+  <!-- ============ 2. ELEVATION ============ -->
+  <section>
+    <div class="eyebrow">Drawing 2 of 4 — elevation</div>
+    <h2><span class="num">B</span>Side elevation — heights, co-planar</h2>
+    <p class="lead">The critical height rule: <b>the boards' antennas and the centre of the plate sit at
+      the same height</b>, so the reflection stays in one horizontal plane and the echo comes straight
+      back. A tripod or a stack of boxes works — just measure it.</p>
+
+    <div class="panel">
+      <div class="cap"><span class="t">Vertical arrangement</span><span class="n">heights n.t.s. · keep coplanar</span></div>
+      <div class="body">
+        <svg class="fig" viewBox="0 0 900 300" role="img"
+             aria-label="Side elevation showing board height, plate height, and the common horizontal plane.">
+          <!-- floor -->
+          <line class="s-wall" x1="40" y1="250" x2="860" y2="250"/>
+          <g class="s-hair">
+            <line x1="60" y1="250" x2="44" y2="266"/><line x1="120" y1="250" x2="104" y2="266"/>
+            <line x1="180" y1="250" x2="164" y2="266"/><line x1="240" y1="250" x2="224" y2="266"/>
+            <line x1="300" y1="250" x2="284" y2="266"/><line x1="360" y1="250" x2="344" y2="266"/>
+            <line x1="420" y1="250" x2="404" y2="266"/><line x1="480" y1="250" x2="464" y2="266"/>
+            <line x1="540" y1="250" x2="524" y2="266"/><line x1="600" y1="250" x2="584" y2="266"/>
+            <line x1="660" y1="250" x2="644" y2="266"/><line x1="720" y1="250" x2="704" y2="266"/>
+            <line x1="780" y1="250" x2="764" y2="266"/><line x1="840" y1="250" x2="824" y2="266"/>
+          </g>
+          <text class="t-small" x="40" y="284">floor</text>
+
+          <!-- common plane -->
+          <line class="s-axis" x1="120" y1="140" x2="800" y2="140"/>
+          <text class="t-small" x="612" y="134">common horizontal plane</text>
+
+          <!-- tripod / table for boards -->
+          <g>
+            <line class="comp" x1="110" y1="152" x2="90" y2="250"/>
+            <line class="comp" x1="110" y1="152" x2="130" y2="250"/>
+            <rect class="comp" x="86" y="126" width="52" height="20" rx="3"/>
+            <text class="t-sig" x="112" y="118" text-anchor="middle">TX / RX</text>
+            <text class="t-small" x="112" y="169" text-anchor="middle">(stacked)</text>
+          </g>
+
+          <!-- plate on stand -->
+          <g>
+            <rect class="plate" x="726" y="96" width="10" height="88" rx="2"/>
+            <line class="comp" x1="731" y1="184" x2="711" y2="250"/>
+            <line class="comp" x1="731" y1="184" x2="751" y2="250"/>
+            <text class="t-echo" x="748" y="120">plate</text>
+          </g>
+
+          <!-- echo ray in-plane -->
+          <path class="s-echo" d="M138,140 L726,140"/>
+          <text class="t-echo" x="360" y="156">echo travels level → returns level</text>
+
+          <!-- board height dim -->
+          <g>
+            <line class="s-dim" x1="60" y1="136" x2="60" y2="250"/>
+            <line class="s-dimtick" x1="55" y1="136" x2="65" y2="136"/>
+            <line class="s-dimtick" x1="55" y1="250" x2="65" y2="250"/>
+            <rect class="fill-panel" x="20" y="185" width="46" height="16"/>
+            <text class="t-dim" x="24" y="197">h ≈ 1 m</text>
+          </g>
+          <!-- plate centre height dim -->
+          <g>
+            <line class="s-dim" x1="800" y1="140" x2="800" y2="250"/>
+            <line class="s-dimtick" x1="795" y1="140" x2="805" y2="140"/>
+            <line class="s-dimtick" x1="795" y1="250" x2="805" y2="250"/>
+            <rect class="fill-panel" x="806" y="187" width="70" height="16"/>
+            <text class="t-dim" x="810" y="199">= same h</text>
+          </g>
+        </svg>
+      </div>
+      <div class="figfoot">Exact height doesn't matter; matching the two heights does. ~1 m off the
+        floor keeps the LOS and echo clear of floor/ceiling clutter.</div>
+    </div>
+  </section>
+
+  <!-- ============ 3. RANGE GEOMETRY ============ -->
+  <section>
+    <div class="eyebrow">Drawing 3 of 4 — range geometry</div>
+    <h2><span class="num">C</span>Where the numbers come from</h2>
+    <div class="grid2">
+      <div class="panel">
+        <div class="cap"><span class="t">Path lengths</span><span class="n">b ≪ d</span></div>
+        <div class="body">
+          <svg class="fig" viewBox="0 0 440 300" role="img"
+               aria-label="Triangle of the LOS baseline and the two-way echo path to the plate.">
+            <!-- TX/RX near, plate far -->
+            <circle class="fill-signal" cx="70" cy="120" r="5"/>
+            <circle class="fill-signal" cx="70" cy="190" r="5"/>
+            <text class="t-sig" x="40" y="116">TX</text>
+            <text class="t-sig" x="40" y="200">RX</text>
+            <rect class="plate" x="372" y="140" width="8" height="30"/>
+            <text class="t-echo" x="356" y="132">plate</text>
+            <!-- LOS -->
+            <line class="s-los" x1="70" y1="120" x2="70" y2="190"/>
+            <text class="t-sig" x="20" y="158">b</text>
+            <!-- echo -->
+            <path class="s-echo" d="M70,120 L376,152 L70,190"/>
+            <text class="t-echo" x="200" y="120">|TX→plate| ≈ d</text>
+            <text class="t-echo" x="200" y="196">|plate→RX| ≈ d</text>
+            <!-- dim d -->
+            <line class="s-dim" x1="70" y1="250" x2="376" y2="250"/>
+            <line class="s-dimtick" x1="70" y1="244" x2="70" y2="256"/>
+            <line class="s-dimtick" x1="376" y1="244" x2="376" y2="256"/>
+            <text class="t-dim" x="196" y="270">d = 12.0 m</text>
+          </svg>
+        </div>
+        <div class="figfoot">Echo path ≈ 2d. Excess over LOS = 2d − b.</div>
+      </div>
+
+      <div class="panel">
+        <div class="cap"><span class="t">The measured quantity</span><span class="n">excess delay</span></div>
+        <div class="body" style="padding:18px 18px 8px">
+          <div class="chips">
+            <span class="chip">c = <b>2.998×10⁸</b> m/s</span>
+            <span class="chip">B = <b>40</b> MHz</span>
+          </div>
+          <table style="min-width:0;border:none;box-shadow:none;margin-top:4px">
+            <tbody>
+              <tr><td>Excess path</td><td class="num">2d − b = <b>23.5 m</b></td></tr>
+              <tr><td>Excess delay</td><td class="num">(2d−b)/c = <b>78 ns</b></td></tr>
+              <tr><td>Path cell (c/B)</td><td class="num">7.49 m</td></tr>
+              <tr><td>In cells</td><td class="num"><b>3.13</b></td></tr>
+              <tr class="row-h"><td>Range cell (c/2B)</td><td class="num">3.75 m</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="figfoot">This is the tap the differential should reveal.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. DELAY DOMAIN ============ -->
+  <section>
+    <div class="eyebrow">Drawing 4 of 4 — expected result</div>
+    <h2><span class="num">D</span>What you should see (differential delay profile)</h2>
+    <p class="lead">After <b>plate-in minus plate-out</b>, the direct path cancels and a single tap
+      remains at the echo's excess delay. Anything closer than one range cell (<b class="mono">3.75 m</b>)
+      is swallowed by the direct path — which is why the plate starts at 12 m.</p>
+
+    <div class="panel">
+      <div class="cap"><span class="t">Differential |CIR| — prediction</span><span class="n">x: excess path / delay</span></div>
+      <div class="body">
+        <svg class="fig" viewBox="0 0 900 300" role="img"
+             aria-label="Predicted differential delay profile with the echo tap at 23.5 m.">
+          <!-- axes -->
+          <line class="s-dim" x1="70" y1="240" x2="860" y2="240"/>
+          <line class="s-dim" x1="70" y1="40" x2="70" y2="240"/>
+          <!-- x gridlines every 5 m; scale: 0..30 m over 70..820 => 25 px/m -->
+          <g>
+            <line class="s-hair" x1="195" y1="40" x2="195" y2="240"/>
+            <line class="s-hair" x1="320" y1="40" x2="320" y2="240"/>
+            <line class="s-hair" x1="445" y1="40" x2="445" y2="240"/>
+            <line class="s-hair" x1="570" y1="40" x2="570" y2="240"/>
+            <line class="s-hair" x1="695" y1="40" x2="695" y2="240"/>
+            <line class="s-hair" x1="820" y1="40" x2="820" y2="240"/>
+          </g>
+          <g class="t-small" text-anchor="middle">
+            <text x="70" y="258">0</text><text x="195" y="258">5</text><text x="320" y="258">10</text>
+            <text x="445" y="258">15</text><text x="570" y="258">20</text><text x="695" y="258">25</text>
+            <text x="820" y="258">30</text>
+          </g>
+          <text class="t-small" x="820" y="278">excess path (m)</text>
+          <text class="t-small" x="70" y="278">delay:</text>
+          <g class="t-small" text-anchor="middle" fill="var(--muted)">
+            <text x="320" y="290">33 ns</text><text x="570" y="290">67 ns</text><text x="820" y="290">100 ns</text>
+          </g>
+          <text class="t-small" x="20" y="44" transform="rotate(-90 20 140)" text-anchor="middle">|CIR|</text>
+
+          <!-- buried zone 0..3.75 m -->
+          <rect class="fill-danger" x="70" y="40" width="94" height="200" opacity=".12"/>
+          <text class="t-small" x="76" y="60" fill="var(--danger)">buried</text>
+          <text class="t-small" x="76" y="74" fill="var(--danger)">&lt; 3.75 m</text>
+
+          <!-- LOS residual (cancels, small stub at 0) -->
+          <path class="s-los" d="M70,240 L70,150"/>
+          <text class="t-sig" x="76" y="146">LOS (cancels)</text>
+
+          <!-- echo tap at 23.5 m => x = 70 + 23.5*25 = 657.5 -->
+          <path class="s-echo" d="M600,240 C640,240 648,120 657,90 C666,120 674,240 715,240"
+                fill="var(--echo-soft)" stroke="var(--echo)" stroke-width="2.4"/>
+          <line class="s-dim" x1="657" y1="90" x2="657" y2="240" stroke-dasharray="3 3"/>
+          <circle class="fill-echo" cx="657" cy="90" r="4"/>
+          <text class="t-echo" x="657" y="80" text-anchor="middle">ECHO</text>
+          <text class="t-echo" x="657" y="26" text-anchor="middle">23.5 m · 78 ns</text>
+
+          <!-- resolution cell bracket -->
+          <g stroke="var(--muted)">
+            <line x1="657" y1="200" x2="750" y2="200"/>
+            <line x1="657" y1="195" x2="657" y2="205"/>
+            <line x1="750" y1="195" x2="750" y2="205"/>
+          </g>
+          <text class="t-small" x="662" y="216">1 cell = 7.5 m path</text>
+        </svg>
+      </div>
+      <div class="figfoot">Move the plate 8 → 10 → 12 → 14 m; the tap must slide 6.67 ns per metre.
+        No tap at any distance = the Rung‑1 kill criterion (report the negative result).</div>
+    </div>
+  </section>
+
+  <!-- ============ ELEMENTS TABLE ============ -->
+  <section>
+    <div class="eyebrow">Bill of materials</div>
+    <h2><span class="num">E</span>Elements &amp; dimensions</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>Item</th><th>Spec / dimension</th><th class="num">Qty</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>ESP32-S3 board</td><td>DevKitC-1, HT40 CSI, on <b>COM/UART port</b></td><td class="num">2</td><td>TX + RX; ~$16</td></tr>
+          <tr><td>Metal plate</td><td>flat, conductive, ≥ 30 × 30 cm</td><td class="num">1</td><td>baking tray; flat = specular</td></tr>
+          <tr><td>Tape measure</td><td>≥ 15 m (laser ± cm better)</td><td class="num">1</td><td>the ground-truth instrument</td></tr>
+          <tr><td>Tripods / stands</td><td>hold boards + plate at one height</td><td class="num">2</td><td>coplanar is the rule</td></tr>
+          <tr><td>USB cables + laptop</td><td>data-capable; venv installed</td><td class="num">1</td><td>runs the capture + analysis</td></tr>
+          <tr class="row-h"><td>Corridor (site)</td><td>straight ≥ 15 m, width ≥ 2 m</td><td class="num">1</td><td>the make-or-break requirement</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chips" style="margin-top:14px">
+      <span class="chip">baseline b = <b>0.50 m</b></span>
+      <span class="chip">plate d = <b>8 / 10 / 12 / 14 m</b></span>
+      <span class="chip">height h = <b>same for all</b></span>
+      <span class="chip">channel = <b>2.4 GHz #1</b></span>
+      <span class="chip">records = <b>1000 / recording</b></span>
+    </div>
+  </section>
+
+  <!-- ============ SITE CHECKLIST ============ -->
+  <section>
+    <div class="eyebrow">Finding a location</div>
+    <h2><span class="num">F</span>Site requirements — what to look for</h2>
+    <div class="grid2">
+      <div>
+        <ul class="check">
+          <li><b>Straight, clear ≥ 15 m.</b> A long hallway, warehouse aisle, empty parking lane, or gym.</li>
+          <li><b>Nothing within ~4 m</b> of the boards along the axis (closer than one range cell hides in the direct path).</li>
+          <li><b>Room to move the plate</b> to 8, 10, 12, 14 m and mark each spot.</li>
+          <li><b>Quiet during capture</b> — no people/carts crossing the path while recording (~10 s each).</li>
+          <li><b>Power</b> — a socket or a laptop battery; the boards run off USB.</li>
+        </ul>
+      </div>
+      <div class="note echo">
+        <b>Why not a small room?</b> At 40 MHz the range cell is 3.75 m. In a 4–5 m room every wall echo
+        lands in the same bin as the direct path and the differential shows nothing — you'd measure
+        <i>nothing</i>, not a null result. The site size is physics, not preference.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUN PROCEDURE ============ -->
+  <section>
+    <div class="eyebrow">On-site procedure</div>
+    <h2><span class="num">G</span>Setup &amp; run — hit-run steps</h2>
+    <ol class="steps">
+      <li><div class="st"><b>Place the boards</b> at the near end, 0.50 m apart, both facing down the
+        corridor. Plug both into the laptop via their <b>COM/UART</b> ports. They power on and the TX
+        starts transmitting automatically.</div></li>
+      <li><div class="st"><b>Confirm the link (Rung 0.5).</b> Boards can be on a table for this. Run the
+        check — it auto-finds the port and confirms one clean tap:</div></li>
+    </ol>
+    <pre class="cmd"><span class="c"># from the repo root</span>
+.venv/bin/python experiments/run_bench.py check</pre>
+    <ol class="steps" start="3" style="counter-reset:s 2">
+      <li><div class="st"><b>Set the geometry.</b> Boards 0.50 m apart; plate on the axis at 12 m, at the
+        same height, facing the boards. Measure each with the tape.</div></li>
+      <li><div class="st"><b>Run the atomic test.</b> It prompts you to record with the plate in, then to
+        remove it and record out — twice — then prints the detected echo vs the prediction:</div></li>
+    </ol>
+    <pre class="cmd">.venv/bin/python experiments/run_bench.py rung1 --plate 12</pre>
+    <ol class="steps" start="5" style="counter-reset:s 4">
+      <li><div class="st"><b>Read the result.</b> A tap near <b class="mono">23.5 m / 78 ns</b> = success
+        (first delay-resolved reflector from an ESP32). Then repeat at 10 and 14 m to confirm it tracks.</div></li>
+      <li><div class="st"><b>If nothing appears</b> at 10, 12 <i>and</i> 14 m — that is the honest Rung-1
+        kill criterion. Save the captures; the negative result is itself a finding.</div></li>
+    </ol>
+    <div class="note" style="margin-top:16px">
+      <b>Captures auto-save</b> to <span class="mono">data/hw_captures/</span> with timestamps, so every
+      run is reproducible offline with <span class="mono">experiments/run_hw_phantom.py</span>.
+    </div>
+  </section>
+
+  <footer>
+    <span>wifi-radar · paper 4 · branch paper4-hardware-testbed</span>
+    <span>Rung 1 setup · DWG rev A · tape-measured ground truth</span>
+  </footer>
+</div>
