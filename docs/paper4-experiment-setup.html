@@ -113,7 +113,7 @@
   .row-h td{color:var(--echo);font-weight:600}
 
   /* callouts */
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
   @media(max-width:720px){.grid2{grid-template-columns:1fr}}
   .note{border-left:3px solid var(--signal);background:var(--signal-soft);
     padding:12px 16px;border-radius:0 8px 8px 0;font-size:13.5px}
@@ -141,9 +141,10 @@
   @media(prefers-color-scheme:dark){pre.cmd{background:#05080b;color:#cdd9e3}}
 
   .check{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px}
-  .check li{display:grid;grid-template-columns:22px 1fr;gap:12px;font-size:13.5px}
-  .check li::before{content:"";width:15px;height:15px;border:1.5px solid var(--signal);border-radius:4px;
-    margin-top:4px}
+  .check li{display:flex;align-items:flex-start;gap:12px;font-size:13.5px}
+  .check li::before{content:"";flex:0 0 15px;width:15px;height:15px;border:1.5px solid var(--signal);
+    border-radius:4px;margin-top:4px}
+  .check li span{min-width:0}
   footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--hair);color:var(--muted);
     font-size:12px;font-family:var(--mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
   a{color:var(--signal)}
@@ -506,11 +507,11 @@
     <div class="grid2">
       <div>
         <ul class="check">
-          <li><b>Straight, clear ≥ 15 m.</b> A long hallway, warehouse aisle, empty parking lane, or gym.</li>
-          <li><b>Nothing within ~4 m</b> of the boards along the axis (closer than one range cell hides in the direct path).</li>
-          <li><b>Room to move the plate</b> to 8, 10, 12, 14 m and mark each spot.</li>
-          <li><b>Quiet during capture</b> — no people/carts crossing the path while recording (~10 s each).</li>
-          <li><b>Power</b> — a socket or a laptop battery; the boards run off USB.</li>
+          <li><span><b>Straight, clear ≥ 15 m.</b> A long hallway, warehouse aisle, empty parking lane, or gym.</span></li>
+          <li><span><b>Nothing within ~4 m</b> of the boards along the axis (closer than one range cell hides in the direct path).</span></li>
+          <li><span><b>Room to move the plate</b> to 8, 10, 12, 14 m and mark each spot.</span></li>
+          <li><span><b>Quiet during capture</b> — no people/carts crossing the path while recording (~10 s each).</span></li>
+          <li><span><b>Power</b> — a socket or a laptop battery; the boards run off USB.</span></li>
         </ul>
       </div>
       <div class="note echo">

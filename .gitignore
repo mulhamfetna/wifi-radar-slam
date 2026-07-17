@@ -47,3 +47,4 @@ papers/**/*.blg
 papers/**/*.out
 papers/**/*.bbl
 papers/**/*.synctex.gz
+docs/paper4-experiment-setup.standalone.html
