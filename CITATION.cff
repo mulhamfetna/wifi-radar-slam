@@ -1,20 +1,20 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "WiFi-Radar-for-SLAM: Ambient WiFi as a Radar Replacement for Automotive SLAM"
+title: "WiFi-Radar-for-SLAM: Ambient WiFi as a Cheap Radar for Automotive SLAM (simulation + ESP32 hardware)"
 abstract: >-
-  A physics-based (Sionna RT ray-traced) feasibility study and, subsequently, a
-  system for using ambient sub-7 GHz WiFi signals received on a moving vehicle to
-  build a 3D scan of the surroundings usable in place of radar in SLAM pipelines.
-  Vehicle localization is centimetre-level with a clean bandwidth/SNR operating
-  envelope, and with joint 2-D (delay-angle) MUSIC it reaches oracle quality from
-  realistic commodity CSI in sparse-multipath scenes. Mapping is characterised in
-  two tiers: with clean single-bounce (oracle) sensing the bistatic SLAM back-end
-  reconstructs reflecting surfaces to ~25-30 cm, while realistic commodity-CSI
-  sensing is bounded to ~4-5 m. A 60 GHz (1.76 GHz bandwidth) and a 16-antenna test
-  show this mapping floor is removed by neither wider bandwidth nor larger aperture:
-  it is a path-discrimination limit (separating genuine reflections from
-  line-of-sight/floor paths) of commodity CSI, not a resolution limit - identifying
-  the key open problem for WiFi-based mapping while localization remains practical.
+  A physics-based (Sionna RT ray-traced) study, extended with real ESP32-S3
+  hardware, of using ambient sub-7 GHz WiFi received on a moving vehicle as a
+  radar/LiDAR-replacement front-end for SLAM. Vehicle localization is
+  centimetre-level with a clean bandwidth/SNR operating envelope. Mapping, however,
+  hits a ceiling: with realistic commodity CSI, most detections are phantoms
+  (~89 %) plus a several-metre range bias - a front-end and geometry limit, not a
+  path-discrimination or resolution limit. Comparisons against real LiDAR (KITTI)
+  and a simulated 77 GHz FMCW radar show the ceiling is neither carrier-specific nor
+  WiFi-specific: the radio carrier does not matter, geometry does (a monostatic,
+  on-vehicle transmitter nearly eliminates the phantoms), and wider bandwidth makes
+  them worse. The phantom-rate claim is then reproduced on ~$30 of real ESP32-S3
+  silicon (HT40 CSI captured, parsed, and delay-profiled against a tape measure).
+  Consolidates four component studies into one body of work.
 type: software
 authors:
   - family-names: Fetna
@@ -52,3 +52,5 @@ keywords:
   - automotive radar
   - Sionna RT
   - multipath-based SLAM
+  - ESP32
+  - low-cost hardware testbed

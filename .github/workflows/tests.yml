@@ -1,0 +1,19 @@
+name: tests
+on:
+  push:
+    branches: [main, consolidation]
+  pull_request:
+    branches: [main, consolidation]
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      # Sionna (the 'sim' extra) is heavy + GPU-oriented; the Sionna tests importorskip,
+      # so CI installs only the pure-NumPy/sklearn deps and runs 199 tests (4 skip).
+      - run: pip install -e '.[ml,dev]'
+      - run: pytest -q
