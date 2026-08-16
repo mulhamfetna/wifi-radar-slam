@@ -12,6 +12,7 @@ not mix. Layout and conventions are set by
 | `1-wifi-radar-slam/` | Ambient WiFi as a Radar Replacement for Automotive SLAM (IEEE IoT-J) | **Submitted 2026-07-08**; submitted state frozen at `v0.7.1` / `paper1-submitted`. **ERRATUM disclosed 2026-07-12** — corrected manuscript on `main` |
 | `3-wifi-vs-radar/` | WiFi vs automotive mmWave radar for SLAM (completes the sensor triangle) | **Active** on branch `paper3-wifi-vs-radar` |
 | `2-wifi-vs-lidar/` | Can Ambient WiFi Replace LiDAR for Automotive SLAM? Localization Yes, Mapping No — and Why (IEEE IoT-J) | **Complete, FROZEN** at `paper2-v1.0.0` / `paper2-held`. **HELD** — not submitted until paper 1 resolves (see its `DOSSIER.md`) |
+| `4-wifi-hardware-testbed/` | A $30 WiFi Radar: measuring the phantom ceiling on real ESP32 silicon | **Active** on branch `paper4-hardware-testbed`. Hardware bring-up complete, **first light** achieved; awaiting a ≥15 m corridor for Rung 1 (see its `DOSSIER.md`) |
 
 ## Conventions
 - **Shared code stays on `main`.** Both papers `import wifi_radar_slam`. Paper-specific
