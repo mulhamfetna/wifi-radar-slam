@@ -1,3 +1,9 @@
+> ⬆️ **Superseded — folded into [`../../manuscript/`](../../manuscript/DOSSIER.md).** This
+> paper is retained as a **component draft** and the record of its own submission history. Its
+> findings live on in the consolidated journal paper; do not submit this standalone.
+
+---
+
 # Paper 4 — Dossier
 
 **Working title:** *A $30 WiFi Radar: Measuring the Phantom Ceiling on Real ESP32 Silicon*

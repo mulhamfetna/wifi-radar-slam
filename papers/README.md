@@ -1,12 +1,19 @@
 # Papers in this repository
 
+> ## 🔀 These four papers are being consolidated into **one** journal paper.
+> After IoT-J hard-rejected paper 1 with strong, constructive reviews (*"preliminary,
+> fragmented"*), the four component papers below are being folded into a single substantial
+> submission under [`../manuscript/`](../manuscript/DOSSIER.md). **Each folder here is retained
+> as its component draft and the record of its own submission history** — not for standalone
+> submission. See `../manuscript/DOSSIER.md` for the consolidated arc and the reviewer-response
+> ledger.
+
 This repository hosts **one shared codebase** (`../src`, `../experiments`,
-`../configs`, `../tests`, `../docs`, `../literature`) and **multiple manuscripts**,
-each isolated in its own folder here. The code is shared and evolves; the papers do
-not mix. Layout and conventions are set by
+`../configs`, `../tests`, `../docs`, `../literature`) and the manuscripts below. The code is
+shared and evolves. Layout and conventions are set by
 `../docs/superpowers/specs/2026-07-09-two-paper-repo-layout-design.md`.
 
-## Papers
+## Component papers (lineage of the consolidated paper)
 | Folder | Paper | Status |
 |--------|-------|--------|
 | `1-wifi-radar-slam/` | Ambient WiFi as a Radar Replacement for Automotive SLAM (IEEE IoT-J) | **Submitted 2026-07-08**; submitted state frozen at `v0.7.1` / `paper1-submitted`. **ERRATUM disclosed 2026-07-12** — corrected manuscript on `main` |

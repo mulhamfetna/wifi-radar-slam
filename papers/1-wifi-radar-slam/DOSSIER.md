@@ -1,3 +1,9 @@
+> ⬆️ **Superseded — folded into [`../../manuscript/`](../../manuscript/DOSSIER.md).** This
+> paper is retained as a **component draft** and the record of its own submission history. Its
+> findings live on in the consolidated journal paper; do not submit this standalone.
+
+---
+
 # Paper 1 — Dossier
 
 **Title:** *Ambient WiFi as a Radar Replacement for Automotive SLAM: A Physics-Based
