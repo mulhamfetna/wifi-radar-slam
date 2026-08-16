@@ -47,3 +47,6 @@ papers/**/*.blg
 papers/**/*.out
 papers/**/*.bbl
 papers/**/*.synctex.gz
+
+# private correspondence (IEEE decisions/reviews) -- never publish
+reviews/
