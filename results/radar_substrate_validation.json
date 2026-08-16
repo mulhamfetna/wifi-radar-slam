@@ -1,0 +1,48 @@
+{
+  "controlled_wall": {
+    "scene": "controlled_wall",
+    "pose": [
+      -8.0,
+      0.12605042016806678,
+      0.0
+    ],
+    "valid_paths_specular": 2,
+    "valid_paths_diffuse": 341743,
+    "ground_bounce_paths_dropped": 291994,
+    "n_detections": 1,
+    "err_to_nearest_surface_m": {
+      "min": 0.0757456875523253,
+      "median": 0.0757456875523253,
+      "max": 0.0757456875523253
+    },
+    "err_mirrored_m": {
+      "min": 0.1763944815861971,
+      "median": 0.1763944815861971
+    },
+    "angle_convention_mirrored": false,
+    "gate_passed": true
+  },
+  "street_canyon": {
+    "scene": "street_canyon",
+    "pose": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "valid_paths_specular": 4,
+    "valid_paths_diffuse": 883957,
+    "ground_bounce_paths_dropped": 536386,
+    "n_detections": 4,
+    "err_to_nearest_surface_m": {
+      "min": 0.5044962678511737,
+      "median": 1.2399392964671347,
+      "max": 1.9350035576624602
+    },
+    "err_mirrored_m": {
+      "min": 0.477127997125526,
+      "median": 1.3041338949023968
+    },
+    "angle_convention_mirrored": false,
+    "gate_passed": true
+  }
+}

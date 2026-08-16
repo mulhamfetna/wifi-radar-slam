@@ -1,0 +1,58 @@
+{
+  "sequence": "boreas-2020-11-26-13-58",
+  "n_frames": 2500,
+  "trajectory_m": 5008.423083118517,
+  "k": 40,
+  "max_range_m": 50.0,
+  "motion_compensated": true,
+  "map_voxel_m": 0.5,
+  "mean_points_per_scan": 15980.4584,
+  "yaw_convention_mean_err_deg": 1.4745224269245665,
+  "drift": {
+    "trans_pct": 84.92150893402068,
+    "rot_deg_per_100m": 15.732787354044465,
+    "n_segments": 1843,
+    "per_length": {
+      "100": [
+        97.54875934601311,
+        28.842981312062705
+      ],
+      "200": [
+        91.92904266224052,
+        21.313323003633982
+      ],
+      "300": [
+        87.6389523515076,
+        16.31862384836829
+      ],
+      "400": [
+        84.58394067457048,
+        13.029644009384677
+      ],
+      "500": [
+        82.5680191716469,
+        10.84472409614229
+      ],
+      "600": [
+        79.84627981161638,
+        11.646407716091407
+      ],
+      "700": [
+        77.49834920321956,
+        11.073096005343674
+      ],
+      "800": [
+        75.2150778958376,
+        10.911653878256633
+      ]
+    }
+  },
+  "rpe_m": 2.2884546459853885,
+  "aligned_ate_m": 830.6501864257647,
+  "sota_cited": {
+    "CFEAR (T-RO 2023, Oxford, radar-only, TUNED)": 1.09,
+    "CFEAR (T-RO 2023, Oxford, radar-only, untuned)": 1.16,
+    "DRO (arXiv 2504.20339, Boreas) -- GYRO-AIDED + direct-intensity, NOT comparable": 0.26
+  },
+  "verdict": "FAIL -- the radar baseline is a strawman. STOP: the ablation would be built on sand. Fix the back-end or reconsider the paper."
+}
