@@ -16,4 +16,4 @@ jobs:
       # Sionna (the 'sim' extra) is heavy + GPU-oriented; the Sionna tests importorskip,
       # so CI installs only the pure-NumPy/sklearn deps and runs 199 tests (4 skip).
       - run: pip install -e '.[ml,dev]'
-      - run: pytest -q
+      - run: python -m pytest -q
