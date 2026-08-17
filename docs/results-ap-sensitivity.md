@@ -23,22 +23,35 @@ localization (baseline ATE ≈ 0.09–0.12 m ≈ the corrected 0.098 m).
 
 ## What it says
 
-1. **Trajectory ATE is essentially insensitive to AP-position error** — flat within seed noise from
-   0 to **4 m** of AP coordinate error, in both regimes. WiFi-SLAM localization tolerates gross AP
-   mislocation.
-2. **Why:** in this pipeline the bistatic WiFi measurements are **refinement-only** — the particle
-   filter is anchored by the vehicle's odometry, and the measurements polish it rather than fix
-   absolute position. So AP-position error never reaches the trajectory. (Confirmed separately: with
-   odometry degraded, ATE grows but is *still* insensitive to AP error — the measurements cannot carry
-   localization regardless.)
-3. **Where the AP error does land — the map.** With the dense MUSIC map, accuracy degrades **gently and
-   monotonically** (3.952 → 4.101 m; +0.15 m / +3.8 % at 4 m AP error) and its variance grows
-   (std 0.006 → 0.093). The bistatic ellipse places reflectors relative to the AP, so AP error shifts
-   the map — but modestly, because a common AP offset partly cancels in the geometry.
-4. **The clean escape (paper 3):** the **monostatic** on-vehicle configuration needs **no AP positions
+1. **Trajectory ATE is insensitive to AP-position error — structurally.** ATE is flat within seed
+   noise not just to 4 m but all the way to **32 m** of AP error (larger than the scene itself), in
+   both regimes. This is not a lucky range: the particle filter **requires a motion model**, so it is
+   always **odometry-anchored**, and the bistatic measurements are **refinement-only** — they polish a
+   good estimate but cannot set absolute position. AP-position error therefore *cannot* reach the
+   trajectory in this architecture. (Confirmed: degrading the odometry inflates ATE uniformly but it is
+   *still* insensitive to AP error — the measurements cannot carry localization regardless of density.)
+2. **Where the AP error does land — the map, cleanly and monotonically.** The bistatic ellipse places
+   each reflector relative to its AP, so AP error shifts the map. Across the full range the MUSIC map
+   metrics degrade smoothly and roughly linearly (see the extended table): map accuracy, Chamfer and
+   completeness each worsen ~**+18 %** from σ = 0 to 32 m. This is the sensitivity the reviewer asked
+   about — and it is graceful, not a cliff.
+3. **The clean escape (paper 3):** the **monostatic** on-vehicle configuration needs **no AP positions
    at all** — the vehicle illuminates and hears its own echoes — and it is also the lower-phantom
-   geometry. AP-position uncertainty is a property of the *bistatic/ambient* mode, and the programme's
+   geometry. AP-position uncertainty is a property of the *bistatic/ambient* mode; the programme's
    preferred geometry removes it entirely.
+
+### Extended break-point (realistic MUSIC, 6 seeds) — the map degradation curve
+
+| AP error σ (m) | ATE (m) | map acc (m) | Chamfer (m) | completeness (m) |
+|---:|---:|---:|---:|---:|
+| 0  | 0.095 | 3.95 | 6.64 | 9.33 |
+| 4  | 0.110 | 4.11 | 6.82 | 9.53 |
+| 8  | 0.153 | 4.21 | 6.98 | 9.75 |
+| 16 | 0.118 | 4.30 | 7.23 | 10.16 |
+| 32 | 0.100 | 4.65 | 7.82 | 10.98 |
+
+**ATE never trends; the three map metrics rise monotonically.** The trajectory is immune; the map
+degrades gracefully.
 
 ## Tolerance statement (for the manuscript / rebuttal)
 
