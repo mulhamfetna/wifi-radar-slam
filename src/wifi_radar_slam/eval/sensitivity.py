@@ -55,6 +55,22 @@ def oracle_detections(ds: CsiDataset) -> list[np.ndarray]:
     return out
 
 
+def music_detections(ds: CsiDataset, n_paths: int = 3, joint: bool = True) -> list[np.ndarray]:
+    """Per-frame REALISTIC detections from the dataset's cached CSI via the MUSIC front-end.
+
+    Sionna-free (``sensing.frontend`` is pure NumPy). Denser than the oracle (~9 vs ~2.4
+    detections/frame) and carries the front-end's estimation error, so it is the realistic
+    complement to ``oracle_detections`` for the sensitivity sweeps.
+    """
+    from ..config import RFConfig
+    from ..sensing.frontend import extract_detections
+    m = ds.meta
+    rf = RFConfig(carrier_hz=float(m["carrier_hz"]), bandwidth_hz=float(m["bandwidth_hz"]),
+                  n_subcarriers=int(m["n_subcarriers"]), n_rx_antennas=int(m["n_rx_antennas"]),
+                  antenna_spacing_frac=float(m["antenna_spacing_frac"]))
+    return extract_detections(ds.csi, rf, n_paths=n_paths, joint=joint)
+
+
 def perturb_ap_positions(ap_positions: np.ndarray, sigma_m: float,
                          rng: np.random.Generator) -> np.ndarray:
     """Return a copy of the AP positions with i.i.d. Gaussian error (std ``sigma_m``) on x,y."""
@@ -76,9 +92,22 @@ def blackout(detections: list[np.ndarray], start: int, length: int) -> list[np.n
 
 
 def localize(detections: list[np.ndarray], ap_positions: np.ndarray, ds: CsiDataset,
-             rng: np.random.Generator, dt: float = DEFAULT_DT, n_particles: int = 200):
-    """Run the actual particle-filter SLAM with GT-derived odometry. Returns (est_traj, est_map)."""
+             rng: np.random.Generator, dt: float = DEFAULT_DT, n_particles: int = 200,
+             odom_noise_std: float = 0.0):
+    """Run the actual particle-filter SLAM. Returns (est_traj, est_map).
+
+    ``odom_noise_std`` sets the regime:
+      - **0 (operational):** GT-derived odometry — the vehicle's own motion carries the PF, so
+        localization is robust and the bistatic measurements only refine.
+      - **> 0 (measurement-driven):** i.i.d. Gaussian error (std, m/frame) is added to the
+        odometry velocity, so it drifts (a random walk in position) and the PF must lean on the
+        bistatic measurements to stay on track. This is the regime in which AP-position error and
+        measurement blackouts actually degrade the *trajectory* — the sensitivity the reviewer asked
+        to quantify.
+    """
     velocity = velocity_from_poses(ds.poses, dt)
+    if odom_noise_std > 0:
+        velocity = velocity + rng.normal(0.0, odom_noise_std, size=velocity.shape)
     return run_slam(detections, ap_positions, velocity, dt, rng,
                     n_particles=n_particles, init_pose=ds.poses[0])
 

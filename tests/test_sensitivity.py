@@ -49,6 +49,23 @@ def test_baseline_localization_tracks(ds, dets):
     assert m["ate_m"] < 0.5          # grounded: baseline ~0.15 m
 
 
+def test_music_detections_are_denser_and_sionna_free(ds):
+    """The realistic MUSIC front-end runs on cached CSI (no Sionna) and yields denser detections."""
+    dj = S.music_detections(ds, joint=True)
+    assert len(dj) == ds.poses.shape[0]
+    rows = np.vstack([d for d in dj if len(d)])
+    assert rows.shape[1] == 3
+    assert np.mean([len(d) for d in dj]) > 4.0        # denser than oracle (~2.4)
+
+
+def test_odom_noise_degrades_a_bad_estimate(ds, dets):
+    """Large odometry noise makes the (refinement-only) PF unable to hold the trajectory ->
+    ATE grows, confirming the measurement-driven regime behaves as designed."""
+    clean, _ = S.localize(dets, ds.ap_positions, ds, np.random.default_rng(0), odom_noise_std=0.0)
+    noisy, _ = S.localize(dets, ds.ap_positions, ds, np.random.default_rng(0), odom_noise_std=8.0)
+    assert S.ate(noisy, ds.poses) > 3 * S.ate(clean, ds.poses)
+
+
 def test_pf_dead_reckons_through_a_blackout(ds, dets):
     """With vehicle odometry, a 30-frame total measurement blackout does NOT blow up the
     trajectory — the PF dead-reckons through it and stays bounded. (The sensitivity the
