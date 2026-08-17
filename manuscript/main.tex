@@ -260,57 +260,126 @@ moves it. The mapping ceiling is therefore a property of the \emph{front-end}, n
 
 %% ===========================================================================
 \section{The Mapping Ceiling and Its Mechanism}\label{sec:mech}
-%% [R1.5] what makes a detection a valid landmark / when mapping fails.
-%% TODO prose. Core table:
-\begin{table}[t]\centering
-\caption{The mapping ceiling decomposes into three mechanisms; the smallest is the one
-paper~1 named. (controlled / street)}
+The mapping failure is the central puzzle: under oracle sensing the same geometry maps to
+$0.25$\,m, yet under realistic CSI it collapses to occupancy IoU ${\approx}0$. Something in the
+front-end destroys the map. Locating it precisely --- and identifying \emph{which} of the plausible
+culprits actually dominates --- is this section's contribution, and it also answers directly when a
+reflector detection can and cannot be promoted to a landmark.
+
+\subsection{A learned discriminator cannot fix it}
+The feasibility study attributed the floor to \emph{path discrimination} (telling a genuine facade
+reflection from LOS, floor, and multi-bounce returns) and argued that this label is learnable. The
+natural next step is to close the loop: put the discriminator \emph{inside} the mapping pipeline.
+It does not help. A ladder of filters over the MUSIC detections --- none, a physics heuristic, a
+random forest, and a small neural network --- gating which detections enter the map while leaving
+the particle weights (and hence localization) untouched, \emph{leaves the occupancy IoU at
+$0.000$}: the learned rungs reject nearly everything and empty the map. Trained only on features a
+single-ULA delay--azimuth front-end can actually measure, the discriminator's held-out F1 is
+$0.00$--$0.45$. The earlier optimism came from a feature (arrival \emph{elevation}) that such a
+front-end never estimates, and from classifying \emph{true ray-traced paths} rather than the
+\emph{MUSIC detections} the deployed system must classify --- which, as we now show, are not the
+same objects.
+
+\subsection{Isolating the cause}
+We match every MUSIC detection to its nearest true path, and for those matching a genuine
+single-bounce facade path we triangulate the same path twice --- once with the ray tracer's true
+delay and azimuth, once with MUSIC's estimates --- so any degradation is \emph{pure estimation
+error with discrimination held perfect} (Table~\ref{tab:ceiling}). Three mechanisms emerge, in
+order of importance. \textbf{(1) Phantoms ($\approx89\%$) dominate:} nearly nine in ten MUSIC
+detections match \emph{no real propagation path at all} --- they are estimator artefacts. One
+cannot select the real paths from a set in which most detections are not real paths, which is
+exactly why the discriminator fails. \textbf{(2) Range bias ($6.45$\,m median, controlled):} even
+correctly-identified facade paths are mislocated --- true parameters place $100\%$ of them within
+$1$\,m, MUSIC's place $2.4\%$ --- a \emph{bias}, not a resolution bound, so bandwidth does not fix
+it (Sec.~\ref{sec:feas}-D). \textbf{(3) Discrimination ($2$--$8\%$)} --- the previously assumed
+culprit --- is the \emph{smallest} term. A filter selects; it can neither invent the real paths
+$89\%$ of detections lack nor correct the bias, so a valid landmark track cannot be sustained under
+realistic CSI however the promotion threshold is tuned.
+
+\begin{table}[t]\centering\footnotesize
+\caption{Isolating the mapping ceiling. Discrimination --- the previously assumed culprit --- is
+the smallest of three mechanisms.}
 \label{tab:ceiling}
-\begin{tabular}{@{}lll@{}}
+\begin{tabular}{@{}lcc@{}}
 \toprule
-Mechanism & Magnitude & Role \\ \midrule
-Phantom detections     & $89.2\% / 89.5\%$ & \textbf{dominant} (no real path) \\
-Estimation range bias  & $6.45$\,m (controlled) & ruins correct paths \\
-Path discrimination    & $2\text{--}8\%$ & real, but \emph{smallest} \\
+ & Controlled & Street \\ \midrule
+\emph{Phantom} (matches no real path)        & \textbf{89.2\%} & \textbf{89.5\%} \\
+Non-facade real path (\emph{discrimination}) & 2.2\% & 8.4\% \\
+True facade path                             & 8.6\% & 2.0\% \\ \midrule
+Triangulated $<1$\,m, \emph{true} params     & 100\% & 100\% \\
+Triangulated $<1$\,m, \emph{MUSIC} params    & \textbf{2.4\%} & 76.7\% \\
+MUSIC range error (median)                   & $6.45$\,m & $2.11$\,m \\
 \bottomrule
 \end{tabular}
 \end{table}
-%% TODO: "cannot discriminate among real paths when most detections are not real paths";
-%% learned filter (heuristic/RF/MLP) fails identically; KITTI LiDAR anchor 1.16 m ATE / 394 m.
 
-\subsection{Universality: WiFi vs 77\,GHz radar}
-%% TODO. The ablation table (carrier does nothing; geometry everything; bandwidth worse):
-\begin{table}[t]\centering
-\caption{Ablation on one substrate (controlled\_wall, 3 seeds). Geometry, not carrier or
-bandwidth, sets the phantom rate.}
+\subsection{An external anchor}
+Lest the whole comparison be a simulation artefact, the LiDAR back-end that shares this substrate
+is validated on real KITTI data at $1.16$\,m ATE over $394$\,m (${\approx}0.3\%$ drift), matching
+published LiDAR-odometry performance. The substrate is anchored to reality on at least one arm.
+
+\subsection{Universality: the ceiling is carrier-independent, geometry sets it}\label{sec:univ}
+Is the ceiling a property of WiFi, or of RF sensing on limited data? We run the same substrate
+against a 77\,GHz FMCW radar and ablate the front-end, geometry, carrier, and bandwidth
+independently (Table~\ref{tab:ablation}). Three readings stand out. \textbf{Carrier does nothing}
+(B$\rightarrow$C: $5.2$\,GHz and $77$\,GHz give the same $\approx0\%$) --- which licenses building
+the hardware testbed at $2.4$\,GHz. \textbf{Geometry is everything} (A$\rightarrow$B: moving the
+transmitter from off-vehicle to on-vehicle drops the phantom rate from $18.2\%$ to $0.1\%$, a
+$180\times$ reduction). \textbf{More bandwidth is worse} (C$\rightarrow$D: $4$\,GHz gives $9.0\%$
+where $160$\,MHz gave $0.0\%$ --- more resolvable cells, more false alarms). And MUSIC (cell~M)
+reproduces the total mapping failure (IoU $0.003$) even under ground-truth poses: the ceiling is
+the \emph{front-end plus geometry}, not WiFi and not RF sensing.
+
+\begin{table}[t]\centering\footnotesize
+\caption{Ablation on one substrate (3 seeds), scored under ground-truth poses. Geometry, not
+carrier or bandwidth, sets the phantom rate.}
 \label{tab:ablation}
 \begin{tabular}{@{}llll@{}}
 \toprule
-Cell & Front-end / geometry & Carrier/BW & Phantom rate \\ \midrule
-M & MUSIC, bistatic     & 5.2\,GHz/160\,MHz & --- (IoU 0.003) \\
-A & CFAR, bistatic      & 5.2\,GHz/160\,MHz & $18.2\pm0.6\%$ \\
-B & CFAR, monostatic    & 5.2\,GHz/160\,MHz & $\mathbf{0.1\pm0.2\%}$ \\
-C & CFAR, monostatic    & 77\,GHz/160\,MHz  & $0.0\%$ \\
-D & CFAR, monostatic    & 77\,GHz/\textbf{4\,GHz} & $9.0\pm1.5\%$ \\
+Cell & Front-end / geometry & Carrier / BW & Phantom rate \\ \midrule
+M & MUSIC, bistatic     & 5.2\,GHz / 160\,MHz & --- (IoU 0.003) \\
+A & CFAR, bistatic      & 5.2\,GHz / 160\,MHz & $18.2\pm0.6\%$ \\
+B & CFAR, monostatic    & 5.2\,GHz / 160\,MHz & $\mathbf{0.1\pm0.2\%}$ \\
+C & CFAR, monostatic    & 77\,GHz / 160\,MHz  & $0.0\%$ \\
+D & CFAR, monostatic    & 77\,GHz / \textbf{4\,GHz} & $9.0\pm1.5\%$ \\
 \bottomrule
 \end{tabular}
 \end{table}
-%% NOTE: paper-3 SLAM back-end cannot recover radar yaw (flat cost) -> ablation scored under
-%% ground-truth poses; state this honestly.
+A caveat we state plainly: our point-to-point ICP back-end cannot recover \emph{rotation} from
+spinning-radar point clouds (the yaw cost is flat), so Table~\ref{tab:ablation} is scored under
+ground-truth poses. That is a feature here, not a bug --- it isolates the front-end and geometry,
+which is exactly what the phantom rate measures.
 
 \subsection{Robustness to AP-position error and measurement loss}\label{sec:robust}
-%% [R1.6] [R1.7] — the two new experiments.
-%% TODO prose. Figures:
+Two concerns follow directly from the bistatic geometry: the ellipse \eqref{eq:bistatic} depends on
+AP position, and a moving vehicle will suffer occlusions. We quantify both by perturbing the
+estimator on the nominal scene (eight and four seeds respectively).
+
+\textbf{AP-position error} does not reach the trajectory (Fig.~\ref{fig:ap}). Absolute trajectory
+error is flat within seed noise for AP errors up to $32$\,m --- larger than the scene --- in both
+the oracle and dense-MUSIC regimes. The robustness is \emph{structural}: the particle filter
+requires a motion model, so it is always odometry-anchored, and the bistatic measurements are
+refinement-only; they cannot set absolute position, so AP error cannot corrupt it. The dependence
+instead lands on the \emph{map}, which degrades gently and monotonically (${\approx}+18\%$ across
+map accuracy, Chamfer, and completeness from $0$ to $32$\,m). And the monostatic geometry
+(Sec.~\ref{sec:univ}) removes the AP dependence outright --- it needs no AP position at all.
+
+\textbf{Sudden measurement loss} is absorbed the same way (Fig.~\ref{fig:blk}). A \emph{total}
+blackout of all detections for up to $40$ frames ($17\%$ of the run) adds only ${\approx}0.1$--$0.14$\,m
+of drift --- nearly constant in blackout length --- and the filter re-locks immediately once
+measurements return. WiFi-SLAM inherits the vehicle's odometry resilience to dropout.
+
 \begin{figure}[t]\centering
 \includegraphics[width=\columnwidth]{ap_sensitivity.png}
-\caption{[R1.6] Trajectory ATE is insensitive to AP-position error to 32\,m (structural:
-odometry-anchored, refinement-only measurements); the map degrades gently and monotonically.}
+\caption{AP-position sensitivity. Trajectory ATE is insensitive to AP-position error out to
+$32$\,m in both regimes (localization is odometry-anchored, measurements refinement-only); the map
+degrades gently and monotonically.}
 \label{fig:ap}
 \end{figure}
 \begin{figure}[t]\centering
 \includegraphics[width=\columnwidth]{blockage_robustness.png}
-\caption{[R1.7] The particle filter dead-reckons through a total measurement blackout:
-a 40-frame (17\% of run) outage adds ${\approx}0.1$\,m drift and re-locks immediately.}
+\caption{Blockage robustness. The particle filter dead-reckons through a total measurement
+blackout: a $40$-frame ($17\%$ of run) outage adds ${\approx}0.1$\,m drift and re-locks immediately.}
 \label{fig:blk}
 \end{figure}
 
