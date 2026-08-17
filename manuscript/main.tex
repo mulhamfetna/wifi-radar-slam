@@ -226,10 +226,37 @@ is licensed by the carrier-independence result (Table~\ref{tab:ablation}, B$\rig
 in Sec.~\ref{sec:hw}.
 
 %% ===========================================================================
-\section{Feasibility: Localization Works, Mapping Is Two-Tier}
-%% TODO. Use CORRECTED numbers: joint-MUSIC realistic ATE 0.098 +/- 0.028 m (NOT 0.027);
-%% oracle map ~25-30 cm; realistic map ~4-5 m; 60 GHz + 16-antenna test removes neither ->
-%% not a bandwidth/aperture limit.
+\section{Feasibility: Localization Works, Mapping Is Two-Tier}\label{sec:feas}
+
+\subsection{Localization operating envelope}
+Ambient WiFi localizes the vehicle to centimetre level. Sweeping bandwidth shows the expected
+monotonic ${\sim}20\times$ ATE improvement, from $0.78$\,m at 20\,MHz to $0.038$\,m at 160\,MHz
+($0.093$\,m at the nominal 40\,MHz), tracking the range resolution $\Delta R=c/2B$; SNR gives the
+same clean trend ($2.02$\,m at 0\,dB to $0.076$\,m at 30\,dB), and more access points and higher
+speeds help. Localization has a clean operating envelope --- it works wherever the link budget
+does.
+
+\subsection{Realistic sensing: joint delay--angle MUSIC}
+Separate 1-D delay and 1-D angle estimates paired by sorted index mis-associate in multipath and
+scatter phantom reflectors: this naive front-end reaches only $0.73$\,m ATE. Joint 2-D MUSIC,
+which recovers each path's delay and angle together, lifts realistic-CSI localization ${\sim}7\times$
+to $\mathbf{0.098\pm0.028}$\,m (five seeds, controlled scene, 160\,MHz) --- \emph{approaching} but
+not matching the oracle-sensing $0.049\pm0.027$\,m. So realistic commodity CSI localizes at a few
+centimetres, close to the information limit of the geometry.
+
+\subsection{Mapping is two-tier}
+Mapping splits sharply by front-end. With \emph{oracle} single-bounce sensing the bistatic
+back-end reconstructs reflecting surfaces to ${\approx}25$--$30$\,cm (controlled: $0.25$\,m
+accuracy, $0.79$ occupancy IoU; street: $0.30$\,m) --- the geometry is sound. With \emph{realistic}
+commodity CSI, map accuracy collapses to ${\approx}4.8$\,m. The same estimator that localizes to
+centimetres maps to metres.
+
+\subsection{It is not a bandwidth or aperture limit}
+The obvious hypothesis --- insufficient resolution --- is wrong. Repeating the realistic-CSI map at
+60\,GHz with $1.76$\,GHz of bandwidth, and again with a $16$-antenna array, leaves the ${\approx}4.8$\,m
+floor essentially unchanged: neither an order of magnitude more bandwidth nor a larger aperture
+moves it. The mapping ceiling is therefore a property of the \emph{front-end}, not of resolution
+--- which motivates asking exactly \emph{what} the front-end does wrong (Sec.~\ref{sec:mech}).
 
 %% ===========================================================================
 \section{The Mapping Ceiling and Its Mechanism}\label{sec:mech}
