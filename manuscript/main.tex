@@ -62,8 +62,39 @@ automotive, ESP32, low-cost hardware, multipath.
 
 %% ===========================================================================
 \section{Introduction}
-%% TODO prose. Establish: the question; why WiFi (ambient, on-vehicle, free TX); the split
-%% (localization works / mapping fails) as the headline.
+\IEEEPARstart{T}{he} exteroceptive sensors that anchor vehicle SLAM --- LiDAR and radar ---
+are also the costly part of the perception stack. A research-grade spinning LiDAR runs into the
+thousands of dollars and an automotive radar into the tens to hundreds, while the WiFi silicon a
+vehicle already carries costs tens. If ambient WiFi --- signals radiated anyway, by
+infrastructure that already exists, received on an antenna already on the vehicle --- could stand
+in for those sensors, the sensing bill for autonomy would change by orders of magnitude. This
+paper asks the question without hedging: \emph{can ambient sub-7\,GHz WiFi replace radar or LiDAR
+as a SLAM front-end?}
+
+The honest answer is neither ``yes'' nor ``no'' but a boundary, and the boundary is the
+contribution. WiFi replaces the costly sensors for one half of SLAM --- localization --- and
+fails at the other --- mapping --- and the failure is not where the literature, including our own
+earlier feasibility study \cite{fetna2026wifiradar}, assumed it was. We locate that failure
+precisely, show it is \emph{not specific to WiFi}, and then reproduce the underlying reading on
+real hardware.
+
+\emph{Localization} is centimetre-level and, we show, \emph{structurally} robust: because the
+estimator is anchored by vehicle odometry and the bistatic CSI measurements are
+refinement-only, absolute trajectory error is insensitive to access-point (AP) position error up
+to tens of metres and to sudden, total measurement blackouts. \emph{Mapping} hits a hard ceiling:
+with realistic commodity CSI, the overwhelming majority of detections (${\approx}89\%$) are
+\emph{phantoms} --- they match no real propagation path --- accompanied by a several-metre range
+bias. This is a front-end and geometry limit, not a path-discrimination or resolution limit, and
+a learned filter cannot repair it, because one cannot select real paths from a set in which most
+detections are not real paths.
+
+To test whether this ceiling is a property of WiFi or of RF sensing more broadly, we run the
+\emph{same} substrate against real LiDAR (KITTI \cite{geiger2012kitti}) and a simulated 77\,GHz
+FMCW radar. The result is decisive: the radio carrier does not matter, geometry does --- a
+\emph{monostatic}, on-vehicle transmitter nearly eliminates the phantoms --- and wider bandwidth
+makes them \emph{worse}. Finally, licensed by that carrier-independence, we move the claim off
+simulation entirely and capture, parse, and delay-profile real HT40 CSI on two \$30 ESP32-S3
+boards.
 
 \subsection*{Contributions}   %% [R1.1] novelty, stated at a methodological level
 \begin{itemize}
@@ -83,9 +114,35 @@ automotive, ESP32, low-cost hardware, multipath.
 \end{itemize}
 
 %% ===========================================================================
-\section{Related Work}
-%% TODO: passive WiFi radar (indoor/static/infra); ISAC; WiFi-SLAM (fingerprint = infra);
-%% range-only SLAM assumptions; the gap this paper occupies.
+\section{Related Work}\label{sec:related}
+
+\textbf{WiFi/CSI sensing} is mature but overwhelmingly \emph{indoor, static, and
+infrastructure-fixed}. Through-the-wall and device-free sensing
+\cite{chetty2012ttwifi,zhao2018rfpose,zhao2018rfpose3d}, CSI-based ranging and imaging
+\cite{li2021standalone,wang2025csipower,maatta2024csipointcloud}, and pose or point-cloud
+recovery \cite{geng2022denseposewifi,yan2024personinwifi3d} all assume fixed transmitters and a
+static or slowly-varying scene. None places the sensing platform on a moving vehicle outdoors.
+
+\textbf{WiFi-based SLAM} takes two forms. Channel- and multipath-based SLAM treats reflectors as
+virtual anchors \cite{gentner2016channelslam,ulmschneider2017multipath,leitinger2024mpslamcoop,%
+li2024bpmpslam}, and radio-fingerprint or P2SLAM approaches localize against known access points
+\cite{arun2022p2slam,liu2023radiofingerprintslam} --- both \emph{infrastructure-bound}: they need
+the transmitters' positions and are demonstrated indoors. The alternative uses WiFi only to
+\emph{assist} a primary ranging sensor (LiDAR or IMU)
+\cite{arun2022viwid,ismail2022wifilidarslam,li2025ekfwifilidarimu}, not to replace it. No prior
+work evaluates WiFi as a stand-alone, on-vehicle, outdoor \emph{replacement} front-end.
+
+\textbf{Integrated sensing and communication (ISAC/JCAS)} envisions the same waveform serving
+communication and sensing \cite{liu2022isac,zhang2021jcassurvey,xiong2023scfundamental,%
+overview2024ieee80211bf}, but its SLAM instantiations are early \cite{gounis2026slamcomms}. At
+mmWave, 60\,GHz 802.11ad has been repurposed as a radar \cite{kumari2018adradar,han2022adimaging};
+the only \emph{moving-platform} passive radar we are aware of uses 5G, not WiFi
+\cite{maksymiuk2024movingpr}.
+
+\textbf{The gap.} On-vehicle, mobile, outdoor WiFi (802.11) as a radar/LiDAR replacement for SLAM
+is an unoccupied point in this design space. This paper occupies it, and --- unlike the
+infrastructure-bound line above --- shows that the strongest configuration (monostatic,
+on-vehicle transmitter) needs \emph{no} known AP positions at all.
 
 %% ===========================================================================
 \section{Method: One Substrate, Three Sensors, One Testbed}
@@ -186,9 +243,7 @@ a 40-frame (17\% of run) outage adds ${\approx}0.1$\,m drift and re-locks immedi
 All code, configs, and result data are in the repository above (AGPL-3.0); the simulation is
 Sionna~RT; the hardware pipeline and firmware are included.
 
-%% Bibliography activates once sections carry \cite{...} (refs.bib is in place). Until then an
-%% empty thebibliography errors, so it is commented for the skeleton stage.
-%% \bibliographystyle{IEEEtran}
-%% \bibliography{refs}
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
 
 \end{document}
