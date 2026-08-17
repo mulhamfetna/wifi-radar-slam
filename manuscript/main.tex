@@ -145,15 +145,85 @@ infrastructure-bound line above --- shows that the strongest configuration (mono
 on-vehicle transmitter) needs \emph{no} known AP positions at all.
 
 %% ===========================================================================
-\section{Method: One Substrate, Three Sensors, One Testbed}
-\subsection{Ray-traced channel and scenes}          %% TODO
-\subsection{CSI front-end: joint 2-D (delay--angle) MUSIC}  %% TODO
-\subsection{Bistatic-ellipse mapping and particle-filter SLAM}  %% TODO
+\section{Method: One Substrate, Three Sensors, One Testbed}\label{sec:method}
+A single substrate --- identical scenes, trajectories, footprint ground truth, and metric
+suite --- carries WiFi, LiDAR, and 77\,GHz radar, so differences are attributable to the sensor,
+not the harness. The same detection chain then runs on real ESP32 hardware.
+
+\subsection{Bistatic geometry}
+A vehicle carrying a receive antenna array drives through an outdoor scene illuminated by
+$N_\mathrm{AP}$ ambient WiFi access points at known positions. Each specular component follows an
+access point $\rightarrow$ reflector $\rightarrow$ vehicle path, so the measured path length
+$\rho=\lVert\mathbf{p}_\mathrm{AP}-\mathbf{r}\rVert+\lVert\mathbf{r}-\mathbf{p}_\mathrm{veh}\rVert$
+places the reflector $\mathbf{r}$ on an ellipse with foci at the AP and the vehicle. Given the
+arrival azimuth $\phi$, the reflector range $s$ along $\hat{\mathbf u}(\phi)$ solves
+\begin{equation}
+s=\frac{\rho^2-d_\mathrm{AP}^2}{2\big(\rho-\mathbf{d}_\mathrm{AP}\!\cdot\!\hat{\mathbf u}(\phi)\big)},
+\qquad \mathbf{d}_\mathrm{AP}=\mathbf{p}_\mathrm{AP}-\mathbf{p}_\mathrm{veh},
+\label{eq:bistatic}
+\end{equation}
+with $d_\mathrm{AP}=\lVert\mathbf{d}_\mathrm{AP}\rVert$; direct-path ($s\le0$) and implausible
+solves are rejected. A \emph{monostatic} variant places the transmitter on the vehicle itself
+($\mathbf{p}_\mathrm{AP}\!\to\!\mathbf{p}_\mathrm{veh}$): the measurement becomes a round-trip
+range, and \eqref{eq:bistatic} needs no external AP position at all --- a fact that turns out to
+decide both the phantom rate (Sec.~\ref{sec:mech}) and the AP-error robustness (Sec.~\ref{sec:robust}).
+
+\subsection{Ray-traced channel and scenes}
+Channels are generated with Sionna~RT~2.0 (Mitsuba/Dr.Jit), which ray-traces the scene to produce
+per-path delays, angles, and interaction types and the frequency-domain channel across
+$N_\mathrm{sc}$ subcarriers and $N_\mathrm{rx}$ antennas per vehicle pose; additive white
+Gaussian noise is applied at a configured SNR. Radar is electromagnetic, so the same tracer
+models it natively; LiDAR requires an optical (diffuse-scattering) treatment
+(Sec.~\ref{sec:method}-E).
+
+\subsection{CSI front-end: joint 2-D (delay--angle) MUSIC}
+We compare two sensing tiers. The \emph{oracle} front-end reads Sionna's true single-scatter path
+parameters, isolating the geometry from estimation error. The \emph{realistic} front-end
+estimates delay and azimuth from noisy CSI with MUSIC. A key refinement is \emph{joint 2-D
+(delay--angle) MUSIC} with 2-D spatial smoothing (SVD subspace; delay grid bounded to the
+unambiguous $1/\Delta f$ range), which recovers each path's delay and angle \emph{together}, so
+association is intrinsic rather than paired by sorted index. Array-relative electrical angles map
+to world azimuth by $\sin\beta=-\sin\theta$ for the lateral ULA.
+
+\subsection{Bistatic-ellipse mapping and particle-filter SLAM}
+A Rao--Blackwellized particle filter propagates the vehicle pose from odometry and weights
+particles by the bistatic consistency \eqref{eq:bistatic} of each detection; triangulated
+reflectors are accumulated and consensus-filtered into a landmark map. We report trajectory error
+(ATE, RPE) and, for the map, symmetric Chamfer distance, occupancy IoU, and \emph{directional}
+accuracy and completeness (a passive-WiFi map illuminates only a subset of surfaces). Map ground
+truth is each scene object's facade footprint.
+
 \subsection{Complexity and real-time feasibility}   %% [R1.4]
-%% TODO: 2D-MUSIC + spatial-smoothing cost; the CFAR alternative; on-chip budget
-%% (194 kflop/sweep, 26 KB, ~250x headroom on ESP32-S3).
-\subsection{LiDAR and 77\,GHz radar baselines}      %% TODO
-\subsection{ESP32-S3 hardware testbed}              %% TODO (points to Sec. VI)
+The 2-D MUSIC front-end is the cost driver: per AP per frame it forms a spatially-smoothed
+covariance over the delay $\times$ angle grid and takes its eigendecomposition, an
+$\mathcal{O}(N^3)$ operation in the smoothed dimension $N$. Two facts keep this practical. First,
+$N$ is small (a bounded delay grid and a single ULA), and the work is per-AP-per-frame and
+embarrassingly parallel. Second --- and more consequentially --- Sec.~\ref{sec:mech} shows that
+MUSIC is precisely what \emph{creates} the mapping phantoms, and that a calibrated
+constant-false-alarm-rate (CFAR) detector in the monostatic geometry both removes most phantoms
+\emph{and} is far cheaper: the monostatic delay-domain chain we port to hardware costs
+${\approx}194$\,kflop and ${\approx}26$\,KB per sweep, which an ESP32-S3 executes with
+${\approx}250\times$ headroom. Real-time on-vehicle execution and the mapping fix therefore point
+the same way.
+
+\subsection{LiDAR and 77\,GHz radar baselines}
+The LiDAR baseline is an Ouster-class spinning sensor, ray-traced with a diffuse-scattering model
+and a scan-to-map ICP back-end that is \emph{externally validated} on real KITTI sequences
+(${\approx}0.3\%$ drift), so its simulated numbers are anchored to reality. The radar baseline is
+a 77\,GHz FMCW sensor with a range--azimuth CFAR chain. One honest caveat propagates from the
+radar study: our point-to-point ICP back-end cannot recover \emph{rotation} from spinning-radar
+point clouds (the yaw cost is flat), so the radar/WiFi mapping ablation (Table~\ref{tab:ablation})
+is scored under \emph{ground-truth poses} --- it isolates the front-end and geometry, which is
+exactly the quantity of interest.
+
+\subsection{ESP32-S3 hardware testbed}
+Two \$30 ESP32-S3 boards realise the monostatic geometry directly: one illuminates (HT40, 40\,MHz)
+and one logs CSI ${\approx}0.5$\,m away, so the round-trip delay taps \emph{are} echo ranges. Only
+the \emph{excess} delay (relative to the line-of-sight arrival) is needed, and that is preserved
+on commodity CSI even though absolute time-of-flight is not; the $0.5$\,m baseline is under $7\%$
+of one 40\,MHz range cell, so the rig is monostatic to within measurement. Using 2.4\,GHz hardware
+is licensed by the carrier-independence result (Table~\ref{tab:ablation}, B$\rightarrow$C). Details
+in Sec.~\ref{sec:hw}.
 
 %% ===========================================================================
 \section{Feasibility: Localization Works, Mapping Is Two-Tier}
