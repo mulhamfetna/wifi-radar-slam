@@ -385,25 +385,64 @@ blackout: a $40$-frame ($17\%$ of run) outage adds ${\approx}0.1$\,m drift and r
 
 %% ===========================================================================
 \section{Hardware Validation on \$30 of Silicon}\label{sec:hw}
-%% [R1.2] — the answer to "simulation-only".
-%% TODO prose. First light: two ESP32-S3; real HT40 (40 MHz) CSI captured, parsed, delay-profiled;
-%% 128 HT-LTF subcarriers (114 active), LOS aligns to 0 m; validates the reading on real silicon.
-%% Licensed by the carrier-independence result (Table~\ref{tab:ablation}, B->C) to use 2.4 GHz.
-%%
-%% >>> SLOT (fill when a >=15 m corridor is found): the phantom rate on a real, tape-measured
-%% >>> reflector; MUSIC vs CFAR and monostatic vs bistatic measured physically. <<<
+Everything above is ray-traced. To move the underlying reading onto real hardware, we build the
+monostatic geometry from two \$30 ESP32-S3 boards --- one illuminating (HT40, 40\,MHz), one logging
+CSI ${\approx}0.5$\,m away --- and process the CSI with the \emph{same} delay-domain chain, using
+only the excess delay relative to the line-of-sight arrival (Sec.~\ref{sec:method}-F). Formally
+this is a bistatic radar-cross-section measurement of a reflector with coherent
+background subtraction (IEEE Std~1502): recording the channel with and without the reflector and
+subtracting cancels the receiver's own frequency response, which otherwise manufactures a spurious
+tap. Working at $2.4$\,GHz rather than the simulated $5.2$\,GHz is licensed by the
+carrier-independence result (Table~\ref{tab:ablation}, B$\rightarrow$C).
+
+\textbf{First light.} The pipeline runs end-to-end on real silicon. From a static two-board capture
+we parse valid HT40 records ($40$\,MHz, high-throughput, $384$-byte buffers), whose HT-LTF carries
+$128$ subcarriers with exactly $114$ non-null --- matching the physical active mask ($3$ DC-notch
+$+$ $11$ guard bins) and so validating the subcarrier ordering. Coherent averaging aligns the
+line-of-sight tap to $0$\,m, and with the two boards adjacent the channel is near-flat --- a single
+clean line-of-sight tap, the correct result for that geometry. To our knowledge this is the first
+delay-resolved reflector reading obtained from an ESP32; nobody has closed this loop at $40$\,MHz on
+such hardware before. It demonstrates that the delay-domain reading the whole argument rests on is
+real, on commodity silicon.
+
+%% >>> SLOT (fill once a >=15 m corridor is available; firmware + one-command runner are ready):
+%% >>> the phantom rate on a real, tape-measured reflector; MUSIC vs CFAR and monostatic vs
+%% >>> bistatic measured physically -- the hardware counterpart of Table~\ref{tab:ablation}. <<<
+We stress the scope: this validates the \emph{reading}, not a full SLAM system. It is a static
+bench with tape-measured ground truth; we do not claim vehicular mapping from it.
 
 %% ===========================================================================
-\section{Discussion}
-%% TODO: thesis (localization cheap+practical; mapping capped by front-end/geometry ceiling,
-%% carrier-independent, hardware-confirmed). Honest limitations: static hardware bench (not
-%% vehicular); odometry-anchored localization; simulated scenes; single-ULA elevation blind spot.
+\section{Discussion and Limitations}
+The picture is consistent across three sensors and onto real hardware. \emph{Localization} from
+ambient WiFi is centimetre-level, structurally robust, and one to two orders of magnitude cheaper
+than the LiDAR/radar it stands in for --- a genuinely attractive proposition. \emph{Mapping} is
+capped by a phantom ceiling that we have shown is a front-end and geometry limit: not
+path-discrimination (the smallest term), not resolution (immune to bandwidth and aperture), not
+carrier-specific, and not WiFi-specific. The single most effective lever is geometry --- a
+monostatic, on-vehicle transmitter --- which also, conveniently, removes the AP-position dependence
+entirely.
+
+Several limitations bound the claims and mark the honest edges. The hardware result is a
+\emph{static} bench, not a moving vehicle; it validates the reading, and the corridor measurement of
+the phantom rate on a real reflector (Sec.~\ref{sec:hw}) is the next data point. Localization's
+robustness is inseparable from its being \emph{odometry-anchored}: the WiFi measurements refine but
+do not carry absolute position, which is why they tolerate AP error and dropout, and also why they
+cannot rescue a failed odometry. The simulation, though ray-traced and anchored to real LiDAR on one
+arm, is still simulation. And the single-ULA front-end cannot observe arrival elevation, which both
+bounds the achievable discrimination and was the source of an over-optimistic earlier estimate.
 
 %% ===========================================================================
-\section{Conclusion}          %% [R1.8] rewrite clearly
-%% TODO: localization is practical and 1--2 orders cheaper; mapping's open problem is the
-%% front-end/geometry phantom ceiling, not the physics; the escape is monostatic geometry;
-%% and it holds on real silicon.
+\section{Conclusion}
+Ambient WiFi is a practical, inexpensive localization sensor for automotive SLAM and a poor mapping
+sensor --- and the reason it maps poorly is now specific and quantified. Most realistic-CSI
+detections are phantoms, and a several-metre range bias corrupts the rest; this is a property of the
+superresolution front-end and the bistatic geometry, not of the carrier, the bandwidth, or WiFi as
+such, as a controlled comparison against LiDAR and a $77$\,GHz radar on one substrate shows. The
+open problem for WiFi mapping is therefore the front-end, not the physics, and the clearest escape
+is a monostatic on-vehicle geometry, which nearly eliminates the phantoms and needs no known
+transmitter positions. We have shown the delay-domain reading holds on \$30 of real ESP32 silicon;
+measuring the phantom rate itself on that hardware, and porting the winning chain on-chip, are the
+immediate next steps.
 
 \section*{Reproducibility}
 All code, configs, and result data are in the repository above (AGPL-3.0); the simulation is

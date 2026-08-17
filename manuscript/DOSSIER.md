@@ -3,7 +3,7 @@
 **Working title:** *Ambient WiFi as a Cheap Radar for SLAM: From Physics Feasibility to $30
 Hardware — Why Localization Works, Mapping Hits a Phantom Ceiling, and What That Ceiling Is*
 **Author:** Mulham Fetna (ORCID 0009-0006-4432-798X)
-**Status:** **ASSEMBLING.** Consolidates the four component papers (`../papers/1..4/`) into one
+**Status:** **COMPLETE FIRST DRAFT (6 pp, builds).** Consolidates the four component papers (`../papers/1..4/`) into one
 substantial journal submission, in response to the IoT-J reject-with-strong-reviews on paper 1.
 
 This is the authoritative record for the consolidated paper. The four `papers/N/DOSSIER.md`
@@ -59,7 +59,11 @@ Two genuinely-new experiments (R1.6, R1.7) are tracked as GitHub issues (Sub-pro
 
 - **A — repo/GitHub structure:** in progress (this branch, `consolidation`).
 - **B — experiments (R1.6, R1.7):** not started; filed as issues.
-- **C — manuscript assembly:** not started (this dossier is the seed).
+- **C — manuscript assembly:** COMPLETE FIRST DRAFT — all sections drafted in `main.tex`
+  (Intro, Related Work, Method, Feasibility, Mechanism+Universality+Robustness, Hardware,
+  Discussion, Conclusion); 6 pp; the only open content is the hardware phantom-rate SLOT (Sec. VI),
+  filled once a >=15 m corridor runs Rung 1. Next: port to ieeeaccess.cls; figures for the sim
+  results; polish.
 - **Venue:** TBD — **not** IoT-J (rejection bars it). Candidates to weigh later.
 
 ## Guardrails
