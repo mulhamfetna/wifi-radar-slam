@@ -1,0 +1,194 @@
+%% Consolidated journal paper — SKELETON (fill sections marked TODO).
+%% Drafting class: IEEEtran (builds offline). PORT to ieeeaccess.cls for IEEE Access submission.
+%% Build: pdflatex main; bibtex main; pdflatex main; pdflatex main
+\documentclass[journal]{IEEEtran}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\graphicspath{{figures/}}
+
+%% ---- reviewer-response map (IoT-J IoT-70358-2026, R1) ----------------------
+%% R1.1 novelty            -> Sec. I (Contributions)
+%% R1.2 physical validation-> Sec. VI (Hardware)   [first light now; phantom-rate SLOT]
+%% R1.3 fragmentation      -> this consolidation
+%% R1.4 MUSIC complexity   -> Sec. III-D
+%% R1.5 landmark / mapping -> Sec. V (Mechanism)
+%% R1.6 AP-position error  -> Sec. V-D (Robustness)  [docs/results-ap-sensitivity.md]
+%% R1.7 blockage / dropout -> Sec. V-D (Robustness)  [docs/results-blockage-robustness.md]
+%% R1.8 conclusions        -> Sec. VIII
+%% -----------------------------------------------------------------------------
+
+\begin{document}
+
+\title{Ambient WiFi as a Cheap Radar for Automotive SLAM:\\
+Centimetre Localization, a Phantom Ceiling on Mapping,\\
+and What That Ceiling Is --- in Simulation and on \$30 of Silicon}
+
+\author{Mulham~Fetna%
+\thanks{M.\ Fetna (ORCID 0009-0006-4432-798X), e-mail: contact@mulhamfetna.com.
+Code and data: \url{https://github.com/mulhamfetna/wifi-radar-slam} (AGPL-3.0).}}
+
+\markboth{Preprint --- consolidated manuscript (skeleton)}{Fetna: Ambient WiFi as a Cheap Radar for SLAM}
+\maketitle
+
+\begin{abstract}
+%% WRITTEN — refine at revision.
+We ask whether ambient sub-7\,GHz WiFi, received on a moving vehicle and processed with
+commodity channel state information (CSI), can serve as a low-cost radar/LiDAR replacement for
+simultaneous localization and mapping (SLAM). Using a physics-based, ray-traced (Sionna~RT)
+substrate and, for the first time in this line of work, a \$30 ESP32 hardware testbed, we find a
+consistent split. \emph{Localization} is centimetre-level and, we show, structurally robust:
+because the estimator is odometry-anchored and the bistatic CSI measurements are refinement-only,
+absolute trajectory error is insensitive to access-point--position error up to tens of metres and
+to sudden, total measurement blackouts. \emph{Mapping}, by contrast, hits a hard ceiling: with
+realistic commodity CSI, most detections are phantoms (${\approx}89\%$) accompanied by a
+several-metre range bias --- a front-end and geometry limit, not a path-discrimination or
+resolution limit, and one a learned filter cannot repair. Comparing the same substrate against
+real LiDAR (KITTI) and a simulated 77\,GHz FMCW radar shows the ceiling is neither
+carrier-specific nor WiFi-specific: the radio carrier does not matter, geometry does (a monostatic
+on-vehicle transmitter nearly eliminates the phantoms), and wider bandwidth makes them worse.
+Finally, we reproduce the delay-domain reading on real ESP32 silicon. The practical message: WiFi
+localization rivals far costlier sensors, while WiFi mapping is capped by a front-end/geometry
+phantom ceiling that we characterize and, in part, show how to escape.
+\end{abstract}
+
+\begin{IEEEkeywords}
+WiFi sensing, channel state information, SLAM, passive radar, integrated sensing and communication,
+automotive, ESP32, low-cost hardware, multipath.
+\end{IEEEkeywords}
+
+%% ===========================================================================
+\section{Introduction}
+%% TODO prose. Establish: the question; why WiFi (ambient, on-vehicle, free TX); the split
+%% (localization works / mapping fails) as the headline.
+
+\subsection*{Contributions}   %% [R1.1] novelty, stated at a methodological level
+\begin{itemize}
+  \item A physics-based feasibility study of on-vehicle, mobile, outdoor WiFi as a SLAM
+        front-end --- an unoccupied point in the design space (prior passive-WiFi-radar is
+        indoor/static/infrastructure-fixed; the one moving-platform passive radar uses 5G).
+  \item Identification and mechanism of the \emph{mapping phantom ceiling}
+        (${\approx}89\%$ phantom detections $+$ range bias), and proof it is not a
+        discrimination or resolution limit and not repairable by a learned filter.
+  \item Evidence the ceiling is \emph{universal}: carrier-independent and not WiFi-specific,
+        via a controlled comparison against LiDAR and a 77\,GHz radar on one substrate;
+        geometry (monostatic vs bistatic), not carrier or bandwidth, is decisive.
+  \item A robustness characterization: localization is structurally tolerant of
+        access-point--position error and measurement blackouts (Sec.~\ref{sec:robust}).
+  \item The first delay-resolved reflector reading from an ESP32 on \$30 of hardware,
+        moving the claim off simulation (Sec.~\ref{sec:hw}).
+\end{itemize}
+
+%% ===========================================================================
+\section{Related Work}
+%% TODO: passive WiFi radar (indoor/static/infra); ISAC; WiFi-SLAM (fingerprint = infra);
+%% range-only SLAM assumptions; the gap this paper occupies.
+
+%% ===========================================================================
+\section{Method: One Substrate, Three Sensors, One Testbed}
+\subsection{Ray-traced channel and scenes}          %% TODO
+\subsection{CSI front-end: joint 2-D (delay--angle) MUSIC}  %% TODO
+\subsection{Bistatic-ellipse mapping and particle-filter SLAM}  %% TODO
+\subsection{Complexity and real-time feasibility}   %% [R1.4]
+%% TODO: 2D-MUSIC + spatial-smoothing cost; the CFAR alternative; on-chip budget
+%% (194 kflop/sweep, 26 KB, ~250x headroom on ESP32-S3).
+\subsection{LiDAR and 77\,GHz radar baselines}      %% TODO
+\subsection{ESP32-S3 hardware testbed}              %% TODO (points to Sec. VI)
+
+%% ===========================================================================
+\section{Feasibility: Localization Works, Mapping Is Two-Tier}
+%% TODO. Use CORRECTED numbers: joint-MUSIC realistic ATE 0.098 +/- 0.028 m (NOT 0.027);
+%% oracle map ~25-30 cm; realistic map ~4-5 m; 60 GHz + 16-antenna test removes neither ->
+%% not a bandwidth/aperture limit.
+
+%% ===========================================================================
+\section{The Mapping Ceiling and Its Mechanism}\label{sec:mech}
+%% [R1.5] what makes a detection a valid landmark / when mapping fails.
+%% TODO prose. Core table:
+\begin{table}[t]\centering
+\caption{The mapping ceiling decomposes into three mechanisms; the smallest is the one
+paper~1 named. (controlled / street)}
+\label{tab:ceiling}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Mechanism & Magnitude & Role \\ \midrule
+Phantom detections     & $89.2\% / 89.5\%$ & \textbf{dominant} (no real path) \\
+Estimation range bias  & $6.45$\,m (controlled) & ruins correct paths \\
+Path discrimination    & $2\text{--}8\%$ & real, but \emph{smallest} \\
+\bottomrule
+\end{tabular}
+\end{table}
+%% TODO: "cannot discriminate among real paths when most detections are not real paths";
+%% learned filter (heuristic/RF/MLP) fails identically; KITTI LiDAR anchor 1.16 m ATE / 394 m.
+
+\subsection{Universality: WiFi vs 77\,GHz radar}
+%% TODO. The ablation table (carrier does nothing; geometry everything; bandwidth worse):
+\begin{table}[t]\centering
+\caption{Ablation on one substrate (controlled\_wall, 3 seeds). Geometry, not carrier or
+bandwidth, sets the phantom rate.}
+\label{tab:ablation}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Cell & Front-end / geometry & Carrier/BW & Phantom rate \\ \midrule
+M & MUSIC, bistatic     & 5.2\,GHz/160\,MHz & --- (IoU 0.003) \\
+A & CFAR, bistatic      & 5.2\,GHz/160\,MHz & $18.2\pm0.6\%$ \\
+B & CFAR, monostatic    & 5.2\,GHz/160\,MHz & $\mathbf{0.1\pm0.2\%}$ \\
+C & CFAR, monostatic    & 77\,GHz/160\,MHz  & $0.0\%$ \\
+D & CFAR, monostatic    & 77\,GHz/\textbf{4\,GHz} & $9.0\pm1.5\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+%% NOTE: paper-3 SLAM back-end cannot recover radar yaw (flat cost) -> ablation scored under
+%% ground-truth poses; state this honestly.
+
+\subsection{Robustness to AP-position error and measurement loss}\label{sec:robust}
+%% [R1.6] [R1.7] — the two new experiments.
+%% TODO prose. Figures:
+\begin{figure}[t]\centering
+\includegraphics[width=\columnwidth]{ap_sensitivity.png}
+\caption{[R1.6] Trajectory ATE is insensitive to AP-position error to 32\,m (structural:
+odometry-anchored, refinement-only measurements); the map degrades gently and monotonically.}
+\label{fig:ap}
+\end{figure}
+\begin{figure}[t]\centering
+\includegraphics[width=\columnwidth]{blockage_robustness.png}
+\caption{[R1.7] The particle filter dead-reckons through a total measurement blackout:
+a 40-frame (17\% of run) outage adds ${\approx}0.1$\,m drift and re-locks immediately.}
+\label{fig:blk}
+\end{figure}
+
+%% ===========================================================================
+\section{Hardware Validation on \$30 of Silicon}\label{sec:hw}
+%% [R1.2] — the answer to "simulation-only".
+%% TODO prose. First light: two ESP32-S3; real HT40 (40 MHz) CSI captured, parsed, delay-profiled;
+%% 128 HT-LTF subcarriers (114 active), LOS aligns to 0 m; validates the reading on real silicon.
+%% Licensed by the carrier-independence result (Table~\ref{tab:ablation}, B->C) to use 2.4 GHz.
+%%
+%% >>> SLOT (fill when a >=15 m corridor is found): the phantom rate on a real, tape-measured
+%% >>> reflector; MUSIC vs CFAR and monostatic vs bistatic measured physically. <<<
+
+%% ===========================================================================
+\section{Discussion}
+%% TODO: thesis (localization cheap+practical; mapping capped by front-end/geometry ceiling,
+%% carrier-independent, hardware-confirmed). Honest limitations: static hardware bench (not
+%% vehicular); odometry-anchored localization; simulated scenes; single-ULA elevation blind spot.
+
+%% ===========================================================================
+\section{Conclusion}          %% [R1.8] rewrite clearly
+%% TODO: localization is practical and 1--2 orders cheaper; mapping's open problem is the
+%% front-end/geometry phantom ceiling, not the physics; the escape is monostatic geometry;
+%% and it holds on real silicon.
+
+\section*{Reproducibility}
+All code, configs, and result data are in the repository above (AGPL-3.0); the simulation is
+Sionna~RT; the hardware pipeline and firmware are included.
+
+%% Bibliography activates once sections carry \cite{...} (refs.bib is in place). Until then an
+%% empty thebibliography errors, so it is commented for the skeleton stage.
+%% \bibliographystyle{IEEEtran}
+%% \bibliography{refs}
+
+\end{document}
