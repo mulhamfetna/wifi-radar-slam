@@ -44,21 +44,22 @@ by a front-end + geometry phantom ceiling that is **not** carrier-specific and *
 
 | pt | ask | disposition |
 |----|-----|-------------|
-| R1.1 | novelty vs prior art | **write** — articulate the phantom-ceiling universality + hardware |
+| R1.1 | novelty vs prior art | **drafted** — Sec. I Contributions + Related Work |
 | R1.2 | simulation-only; no physical validation | **answered** by stage 4 (real ESP32 CSI) |
 | R1.3 | fragmented contributions | **answered** by consolidation itself |
 | R1.4 | 2D-MUSIC complexity / real-time | **partly** — on-chip budget (paper 4) + MUSIC-is-the-problem (2/3) |
 | R1.5 | landmark promotion / when mapping fails | **answered** by stage 2 (phantom + bias mechanism) |
-| R1.6 | AP-position uncertainty tolerance | **experiment (open)** — sensitivity sweep; monostatic sidesteps it |
-| R1.7 | blockage → PF resilience to measurement loss | **experiment (open)** — occlusion robustness |
-| R1.8 | rewrite conclusions | **write** |
+| R1.6 | AP-position uncertainty tolerance | **done** — ATE flat to 32 m; map degrades gently; Sec. V-F |
+| R1.7 | blockage → PF resilience to measurement loss | **done** — dead-reckons a 40-frame blackout; Sec. V-F |
+| R1.8 | rewrite conclusions | **drafted** — Sec. VIII |
 
 Two genuinely-new experiments (R1.6, R1.7) are tracked as GitHub issues (Sub-project B).
 
 ## Status
 
-- **A — repo/GitHub structure:** in progress (this branch, `consolidation`).
-- **B — experiments (R1.6, R1.7):** not started; filed as issues.
+- **A — repo/GitHub structure:** ✅ done (branch `consolidation`, PR #10, CI green).
+- **B — experiments (R1.6, R1.7):** ✅ done — results in `docs/results-ap-sensitivity.md`,
+  `docs/results-blockage-robustness.md`; issues #6/#7 commented.
 - **C — manuscript assembly:** COMPLETE FIRST DRAFT — all sections drafted in `main.tex`
   (Intro, Related Work, Method, Feasibility, Mechanism+Universality+Robustness, Hardware,
   Discussion, Conclusion); 6 pp; the only open content is the hardware phantom-rate SLOT (Sec. VI),
