@@ -52,6 +52,13 @@ no undefined citations, no undefined control sequences.
 portals reject an alpha channel); the PDF is vector. Three bands: the verdict
 (localization vs mapping), the mechanism (the geometry ablation), the hardware anchor.
 
+**Caption** (55 words by `wc -w`, of which two are the standalone em-dashes — 53 actual words):
+
+> Ambient WiFi on a moving vehicle localizes to 0.098 m — a statistical tie with LiDAR at
+> 84–600× lower sensor cost — yet its map scores zero: ≈89 % of realistic-CSI detections are
+> phantoms (controlled scene). Ablation isolates the cause as geometry, not carrier, and wider
+> bandwidth worsens it. Reproduced on two $30 ESP32-S3 boards.
+
 Every value is transcribed from `main.tex` — the controlled-scene rows of the WiFi-versus-LiDAR
 table and the phantom-rate ablation cells. The script recomputes nothing, so the figure cannot
 drift from the paper by silent recomputation; **it can drift if the paper's numbers change**, so
