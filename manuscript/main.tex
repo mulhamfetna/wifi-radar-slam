@@ -1,63 +1,40 @@
-%% Consolidated journal paper. Target: IEEE Access.
+%% Consolidated journal paper -- IEEE Access submission.
 %% Build: pdflatex main; bibtex main; pdflatex main; pdflatex main
+%% Class + assets from ACCESS_latex_template_20260513 (ieeeaccess.cls, fonts, spotcolor).
 %%
-%% ============================ IEEE ACCESS PORT ==============================
-%% Currently typeset with IEEEtran so it builds offline. IEEE Access requires THEIR class,
-%% which IEEE ships only in the Author Center template zip (not on CTAN).
-%% To port -- 4 mechanical steps, no content changes:
-%%   1. Download the IEEE Access LaTeX template zip from the IEEE Author Center
-%%      (template-selector.ieee.org -> IEEE Access) and copy ieeeaccess.cls beside this file.
-%%   2. Replace the \documentclass line below with:  \documentclass{ieeeaccess}
-%%   3. Uncomment the IEEE Access front-matter block below and delete the IEEEtran
-%%      \author/\markboth lines (Access uses \address/\corresp/\history/\doi instead).
-%%   4. Rebuild. Body, figures, tables, bibliography and the biography all carry over
-%%      unchanged (Access uses the same \IEEEbiography macros).
-%%
-%% ---- IEEE Access front matter (uncomment on port) ----
-% \history{Date of publication xxxx 00, 0000, date of current version xxxx 00, 0000.}
-% \doi{10.1109/ACCESS.2026.DOI}
-% \title{Ambient WiFi as a Cheap Radar for Automotive SLAM: Centimetre Localization, a Phantom
-%        Ceiling on Mapping, and What That Ceiling Is --- in Simulation and on \$30 of Silicon}
-% \author{\uppercase{Mulham Fetna}\authorrefmark{1}, (ORCID 0009-0006-4432-798X)}
-% \address[1]{[DEPARTMENT], [INSTITUTION], [CITY], [COUNTRY] (e-mail: contact@mulhamfetna.com)}
-% \tfootnote{Code, data, and firmware are released openly under AGPL-3.0 at
-%            https://github.com/mulhamfetna/wifi-radar-slam.}
-% \corresp{Corresponding author: Mulham Fetna (e-mail: contact@mulhamfetna.com).}
-% \titlepgskip=-15pt
-%% ============================================================================
-\documentclass[journal]{IEEEtran}
-
+%% ---- reviewer-response map (IoT-J IoT-70358-2026, R1) ----------------------
+%% R1.1 novelty -> Sec. I (Contributions) + Sec. II   R1.2 physical validation -> Sec. X
+%% R1.3 fragmentation -> this consolidation           R1.4 MUSIC complexity -> Sec. III-E
+%% R1.5 landmark/mapping -> Sec. IX                   R1.6/R1.7 robustness -> Sec. IX-F
+%% R1.8 conclusions -> Sec. XIII
+%% -----------------------------------------------------------------------------
+\documentclass{ieeeaccess}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
-\usepackage{amsmath,amssymb}
+\usepackage{textcomp}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{url}
-\usepackage[hidelinks]{hyperref}
 \graphicspath{{figures/}}
-
-%% ---- reviewer-response map (IoT-J IoT-70358-2026, R1) ----------------------
-%% R1.1 novelty            -> Sec. I (Contributions) + Sec. II
-%% R1.2 physical validation-> Sec. X (Hardware, first light); corridor measurement -> Sec. XII
-%% R1.3 fragmentation      -> this consolidation (13 sections, 7 figs, 4 tables)
-%% R1.4 MUSIC complexity   -> Sec. III-E
-%% R1.5 landmark / mapping -> Sec. IX (Mechanism)
-%% R1.6 AP-position error  -> Sec. IX-F (Robustness)
-%% R1.7 blockage / dropout -> Sec. IX-F (Robustness)
-%% R1.8 conclusions        -> Sec. XIII
-%% -----------------------------------------------------------------------------
 
 \begin{document}
 
-\title{Ambient WiFi as a Cheap Radar for Automotive SLAM:\\
-Centimetre Localization, a Phantom Ceiling on Mapping,\\
-and What That Ceiling Is --- in Simulation and on \$30 of Silicon}
+\history{Date of publication xxxx 00, 0000, date of current version xxxx 00, 0000.}
+\doi{10.1109/ACCESS.2026.DOI}
 
-\author{Mulham~Fetna%
-\thanks{M.\ Fetna (ORCID 0009-0006-4432-798X), e-mail: contact@mulhamfetna.com.
-Code and data: \url{https://github.com/mulhamfetna/wifi-radar-slam} (AGPL-3.0).}}
+\title{Ambient WiFi as a Cheap Radar for Automotive SLAM: Centimetre Localization, a Phantom
+Ceiling on Mapping, and What That Ceiling Is --- in Simulation and on \$30 of Silicon}
 
-\markboth{Preprint --- submitted manuscript}{Fetna: Ambient WiFi as a Cheap Radar for SLAM}
-\maketitle
+\author{\uppercase{Mulham Fetna}\authorrefmark{1}}
+\address[1]{Department of Mechatronics Engineering, University of Aleppo, Aleppo, Syria
+(e-mail: contact@mulhamfetna.com)}
+\tfootnote{The code, data, and firmware supporting this article are released openly under
+AGPL-3.0 at \url{https://github.com/mulhamfetna/wifi-radar-slam} and archived with persistent
+DOIs. This article consolidates and extends the author's earlier unpublished feasibility
+manuscript, which is cited and publicly available in that repository.}
+
+\corresp{Corresponding author: Mulham Fetna (e-mail: contact@mulhamfetna.com).}
 
 \begin{abstract}
 We ask whether ambient sub-7\,GHz WiFi, received on a moving vehicle and processed with
@@ -79,14 +56,18 @@ localization rivals far costlier sensors, while WiFi mapping is capped by a fron
 phantom ceiling that we characterize and, in part, show how to escape.
 \end{abstract}
 
-\begin{IEEEkeywords}
+\begin{keywords}
 WiFi sensing, channel state information, SLAM, passive radar, integrated sensing and communication,
 automotive, ESP32, low-cost hardware, multipath.
-\end{IEEEkeywords}
+\end{keywords}
+
+\titlepgskip=-21pt
+
+\maketitle
 
 %% ===========================================================================
 \section{Introduction}
-\IEEEPARstart{T}{he} exteroceptive sensors that anchor vehicle SLAM --- LiDAR and radar ---
+\PARstart{T}{he} exteroceptive sensors that anchor vehicle SLAM --- LiDAR and radar ---
 are also the costly part of the perception stack. A research-grade spinning LiDAR runs into the
 thousands of dollars and an automotive radar into the tens to hundreds, while the WiFi silicon a
 vehicle already carries costs tens. If ambient WiFi --- signals radiated anyway, by
@@ -675,5 +656,7 @@ hardware. He advocates open, reproducible research: the code, data, and firmware
 work are released under a copyleft licence and archived with persistent DOIs.
 (ORCID 0009-0006-4432-798X.)
 \end{IEEEbiographynophoto}
+
+\EOD
 
 \end{document}

@@ -61,3 +61,10 @@ manuscript/*.blg
 manuscript/*.bbl
 manuscript/*.out
 manuscript/*.synctex.gz
+
+# IEEE Access template assets (redistributed by IEEE; fetched from their Author Center zip)
+manuscript/t1-*.pfb
+manuscript/t1-*.tfm
+manuscript/t1*.fd
+manuscript/*.map
+ACCESS_latex_template_*.zip
