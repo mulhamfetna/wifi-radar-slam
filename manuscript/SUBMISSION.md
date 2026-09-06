@@ -1,0 +1,191 @@
+# Consolidated paper — submission package
+
+**Target:** IEEE Access (open access)
+**Title:** *Ambient WiFi as a Cheap Radar for Automotive SLAM: Centimetre Localization, a
+Phantom Ceiling on Mapping, and What That Ceiling Is — in Simulation and on $30 of Silicon*
+**Author:** Mulham Fetna · Department of Mechatronics Engineering, University of Aleppo,
+Aleppo, Syria · ORCID 0009-0006-4432-798X · contact@mulhamfetna.com
+
+## STATUS: READY TO SUBMIT
+
+The manuscript was read and confirmed by the author on 2026-09-06. Everything in the repository
+is done. What remains (below, *Three things to check off-repo*) is outside the repo.
+
+---
+
+## Package contents — what to upload
+
+| File | Portal slot | Size |
+|---|---|---|
+| `ACCESS-submission-source.zip` | LaTeX source | 1.3 MB |
+| `main.pdf` | Manuscript PDF | 672 KB |
+| `cover-letter.pdf` | Cover letter | 112 KB |
+
+Both source **and** PDF are required, and their content must match exactly (checklist #1).
+The 40 MB per-file cap is not close to binding.
+
+`ACCESS-submission-source.zip` is a **derived artifact** — it is gitignored, not committed.
+Rebuild it from `manuscript/` with:
+
+```sh
+rm -rf /tmp/access-submission && mkdir -p /tmp/access-submission/figures
+cp main.tex refs.bib main.bbl ieeeaccess.cls IEEEtran.cls IEEEtran.bst spotcolor.sty \
+   logo.png notaglinelogo.png bullet.png t1-*.pfb t1-*.tfm t1*.fd *.map /tmp/access-submission/
+cp figures/ap_sensitivity.png figures/blockage_robustness.png figures/paper2_fig*.pdf \
+   figures/author-photo.jpg /tmp/access-submission/figures/
+rm -f ACCESS-submission-source.zip
+(cd /tmp/access-submission && zip -qr "$OLDPWD/ACCESS-submission-source.zip" .)
+```
+
+It deliberately excludes `main.pdf` (uploaded separately), `author-photo-original.jpg` (1.9 MB,
+unused), and the build intermediates. It has been test-compiled in an empty directory: 9 pp,
+no undefined citations, no undefined control sequences.
+
+> If you prepare in **Overleaf**, IEEE's own note applies: unzip the file *from inside Overleaf*,
+> not on the desktop first.
+
+## Portal field values
+
+Submission goes through the **IEEE Author Portal** (`author.ieee.org`) — not ScholarOne. Sign in
+with the IEEE Account linked to your ORCID; link the ORCID *before* starting, not midway.
+
+| Field | Value |
+|---|---|
+| Manuscript type | **Research Article** *(checklist #13 — the type list has no "Regular Article")* |
+| Authors | Mulham Fetna (sole author, corresponding) |
+| Affiliation | Department of Mechatronics Engineering, University of Aleppo, Aleppo, Syria |
+| Funding | **None to declare** — there is no acknowledgment/funding section in the article |
+| Opposed reviewers | none |
+| Video / graphical abstract | none |
+| Supplemental material | none — reproducibility is carried by the repo + DOIs, cited in `\tfootnote` |
+
+Title, abstract and keywords are **typed into the portal separately from the file** — it does not
+read them out of the LaTeX. Paste the abstract as plain text and strip the markup
+(`\,`, `\emph{}`, `${\approx}89\%$` → `≈89%`).
+
+**Keywords (9; checklist #12 allows 3–10).** These drive Associate Editor matching, so they matter:
+
+1. WiFi sensing
+2. Channel state information
+3. SLAM
+4. Passive radar
+5. Integrated sensing and communication
+6. Automotive
+7. ESP32
+8. Low-cost hardware
+9. Multipath
+
+## The two questions that need a deliberate answer
+
+- **"Is this an extended version of your own prior work?" → Yes.** `cover-letter.md` discloses the
+  two earlier **unpublished** drafts, the fact that they are publicly readable in the repository
+  (so an automated similarity check will match against them), and the corrected ATE value. Answer
+  the portal question *consistently with the letter*. Inconsistency between the two is what raises
+  an ethics flag — not the similarity itself, which is permitted below 35 %.
+- **"Under consideration elsewhere?" → No.**
+
+**Checklist #16 does not apply.** The "list of updates" requirement is for articles previously
+rejected *by IEEE Access* with encouragement to resubmit ("refer to the original rejection
+letter"). Paper 1 was rejected by IoT-J, a different journal, and the cover letter already
+discloses the relationship. Do not attach a response-to-IoT-J-reviewers document; it invites
+comparison to a rejection at another venue for no procedural benefit.
+
+## Compliance against the IEEE Access submission checklist
+
+Source: `../IEEE-Access-Submission-Checklist.pdf` (committed). Its header warns that submissions
+not following the guidelines are *"returned to draft or immediately rejected"*, so this is not
+advisory.
+
+| # | Requirement | State |
+|---|---|---|
+| 1, 2 | Official template, double column single spaced; source + PDF; ≤ 40 MB | ✅ `ieeeaccess.cls`; 1.3 MB / 672 KB |
+| 3, 5 | Author list considered; all authors in source *and* PDF | ✅ sole author |
+| 4 | ORCID **publicly visible and populated** | ⬜ verify on orcid.org |
+| 6 | Short biography for **all** authors, below the references | ✅ `IEEEbiography` with photo |
+| 7 | Thorough grammar review | ⬜ Paperpal Preflight pass recommended |
+| 8 | References accurate, relevant, **not retracted** | ⬜ 39 entries — run a retraction check |
+| 9 | Not submitted elsewhere | ✅ stated in the cover letter |
+| 10 | Supplementary material ready | n/a |
+| 11 | **Acronyms defined at first use in the article, even if defined in the abstract** | ✅ fixed 2026-09-06 (see below) |
+| 12 | 3–10 keywords | ✅ 9 |
+| 13 | Manuscript type selected | ✅ Research Article |
+| 14 | Opposed reviewers | n/a |
+| 15 | Video ≤ 100 MB ready at submission | n/a |
+| 16 | "List of updates" after a prior *Access* rejection | n/a — see above |
+| 17 | No page limit, but keep under 20 pp | ✅ **9 pp** |
+| 18 | No Lena image | ✅ |
+
+### Item 11 — the defect that was fixed
+
+Fourteen acronyms were used in the body with no body-level expansion. Defining them in the
+abstract is explicitly *not* sufficient. Now expanded at first body use:
+
+SLAM · CSI · FMCW · JCAS · MUSIC · ATE · RPE · ICP · LOS · HT-LTF · ULA · SNR · SVD · IMU
+
+Text-only change; verified against a from-scratch build of the previous revision — still 9 pp,
+same 22 overfull hboxes (pre-existing, from the title block), none introduced.
+
+**If you edit `main.tex` further, re-run the audit** — first body use vs. first body definition:
+
+```sh
+cd manuscript
+for pair in "SLAM:simultaneous localization" "CSI:channel state information" \
+            "FMCW:frequency-modulated" "MUSIC:MUltiple SIgnal"; do
+  a=${pair%%:*}; e=${pair#*:}
+  f=$(awk 'NR>62' main.tex | grep -n -w -m1 "$a" | cut -d: -f1)
+  d=$(awk 'NR>62' main.tex | grep -n -m1 "$e" | cut -d: -f1)
+  [ -n "$d" ] && [ "$d" -le "$f" ] && echo "$a OK" || echo "$a ** UNDEFINED **"
+done
+```
+
+(Line 62 is the end of the `keywords` block — the audit must start *after* the abstract, since
+abstract definitions do not count.)
+
+## Three things to check off-repo
+
+The checklist is silent on all three, and each is consequential:
+
+1. **The article processing charge.** IEEE Access is open access and bills an APC on acceptance.
+   Check the current rate on their site before submitting, not after acceptance.
+2. **Waiver / discount eligibility.** IEEE reduces APCs for authors in Research4Life countries.
+   Confirm Syria's current status, and if it is ambiguous, email IEEE Access support *before*
+   submitting rather than after a decision.
+3. **The revision policy.** IEEE Access is understood to allow a **single** revision round — if
+   the revised manuscript is not accepted it is rejected with no further resubmission. Confirm
+   this. If it holds, a "revise" decision has to be answered exhaustively the first time.
+
+On (3): the Rung 1 corridor experiment (`../papers/4-wifi-hardware-testbed/DOSSIER.md`) is exactly
+what a reviewer might ask for. With only one revision round, having already run it during the
+review window would be worth a great deal.
+
+## Headline numbers (for the submission form / abstract fields)
+
+| Claim | Value |
+|---|---|
+| WiFi localization, realistic CSI | **0.098 ± 0.028 m** — parity with a mid-range LiDAR |
+| Mapping ceiling | **≈89 % phantom detections** + several-metre range bias |
+| Geometry, not carrier | bistatic **18.2 %** → monostatic **0.1 %** phantoms |
+| Cost advantage | **84–600×** vs the simulated LiDAR tier |
+| Real-LiDAR anchor | KITTI seq-04: **1.16 m ATE / 394 m** (≈0.3 % drift) |
+| AP-position tolerance | ATE flat to **32 m** of AP error; map degrades ~**+18 %** |
+| Hardware | real HT40 CSI on 2 × ESP32-S3: **128 subcarriers, 114 active** |
+
+## Honesty guards deliberately retained
+
+Not to be softened for submission — they are why the paper is defensible:
+
+- Simulation-led; the hardware result is a **static bench** that validates the *reading*, not a
+  SLAM system. Stated as such, not implied otherwise.
+- WiFi **matches** LiDAR on localization; it does not beat it.
+- The mapping result is a **negative result**, reported with its mechanism rather than tuned away.
+- Paper 1's erratum is disclosed in the cover letter, and the **corrected** 0.098 m is used
+  throughout.
+- The point-ICP back-end **cannot recover radar yaw** — a documented negative result, kept.
+
+## Post-submission
+
+- Cut a Zenodo release and record the DOI (`docs/`, and the `\tfootnote` URL already points at
+  the repository).
+- Rung 1 stays open, blocked on a ≥ 15 m corridor. It is **not** a submission blocker: Sec. VI
+  stands on the first-light result, which is what answers reviewer R1.2 (*"simulation-only, no
+  physical validation"*).

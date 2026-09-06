@@ -66,6 +66,10 @@ Two genuinely-new experiments (R1.6, R1.7) are tracked as GitHub issues (Sub-pro
   confirmed by the author 2026-09-06.
 - **Venue:** IEEE Access (its class and author-guidance requirements are what the manuscript is
   built against). **Not** IoT-J — the paper-1 rejection bars resubmission there.
+- **D — submission:** package assembled and audited against
+  `../IEEE-Access-Submission-Checklist.pdf`; procedure, portal field values and the compliance
+  table live in `SUBMISSION.md`. Checklist item 11 (acronyms defined at first use in the body,
+  not just the abstract) had 14 violations — fixed 2026-09-06.
 - **Open (post-submission):** the hardware phantom-rate SLOT (Sec. VI) is written as a
   simulation-anchored claim with the static-bench first-light result; the full Rung 1 number
   needs a >=15 m corridor and is scoped as a follow-up, not a submission blocker.
