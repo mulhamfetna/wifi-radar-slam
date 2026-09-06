@@ -21,6 +21,7 @@ is done. What remains (below, *Three things to check off-repo*) is outside the r
 | `main.pdf` | Manuscript PDF | 672 KB |
 | `cover-letter.pdf` | Cover letter | 112 KB |
 | `figures/graphical-abstract.png` | Graphical abstract — **verify the slot exists first** | 452 KB |
+| `graphical-abstract-caption.pdf` | Graphical-abstract caption (`.txt` fallback alongside) | 36 KB |
 
 Both source **and** PDF are required, and their content must match exactly (checklist #1).
 The 40 MB per-file cap is not close to binding.
@@ -52,7 +53,18 @@ no undefined citations, no undefined control sequences.
 portals reject an alpha channel); the PDF is vector. Three bands: the verdict
 (localization vs mapping), the mechanism (the geometry ablation), the hardware anchor.
 
-**Caption** (55 words by `wc -w`, of which two are the standalone em-dashes — 53 actual words):
+**Caption** — 53 words (`wc -w` says 55; two of those are the standalone em-dashes).
+Portals that take a caption file accept one of `.txt / .pdf / .doc / .docx / .rtf`, so it is
+kept as **`graphical-abstract-caption.pdf`** (primary — rendered via xelatex, so the em-dash,
+en-dash, `×`, `≈` and `·` are guaranteed to survive) with **`graphical-abstract-caption.txt`**
+(UTF-8) as the fallback for a field that rejects PDF. Source: `graphical-abstract-caption.md`;
+re-render with:
+
+```sh
+pandoc graphical-abstract-caption.md -o graphical-abstract-caption.pdf \
+  --pdf-engine=xelatex -V geometry:margin=1in -V fontsize=11pt -V mainfont="DejaVu Serif"
+```
+
 
 > Ambient WiFi on a moving vehicle localizes to 0.098 m — a statistical tie with LiDAR at
 > 84–600× lower sensor cost — yet its map scores zero: ≈89 % of realistic-CSI detections are
