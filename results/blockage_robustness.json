@@ -1,0 +1,92 @@
+{
+  "n_seeds": 4,
+  "lengths_frames": [
+    0,
+    2,
+    5,
+    10,
+    20,
+    40
+  ],
+  "starts": [
+    80,
+    160
+  ],
+  "recover_frames": 10,
+  "oracle": [
+    {
+      "length_frames": 0,
+      "drift_during_mean": 1.2079226507921703e-13,
+      "recover_after_mean": 0.008410868242447538,
+      "full_ate_mean": 0.07614327596006536
+    },
+    {
+      "length_frames": 2,
+      "drift_during_mean": 0.08591877804725694,
+      "recover_after_mean": 0.08574249156438742,
+      "full_ate_mean": 0.09005229547051048
+    },
+    {
+      "length_frames": 5,
+      "drift_during_mean": 0.08663928351243198,
+      "recover_after_mean": 0.08728860833171925,
+      "full_ate_mean": 0.09183135888636837
+    },
+    {
+      "length_frames": 10,
+      "drift_during_mean": 0.08835390897856031,
+      "recover_after_mean": 0.09440201948353033,
+      "full_ate_mean": 0.11525172188255667
+    },
+    {
+      "length_frames": 20,
+      "drift_during_mean": 0.09040698773028731,
+      "recover_after_mean": 0.09399114169405898,
+      "full_ate_mean": 0.09031405502854646
+    },
+    {
+      "length_frames": 40,
+      "drift_during_mean": 0.09415829384826138,
+      "recover_after_mean": 0.10794491669221469,
+      "full_ate_mean": 0.10472580042116919
+    }
+  ],
+  "music": [
+    {
+      "length_frames": 0,
+      "drift_during_mean": 1.2079226507921703e-13,
+      "recover_after_mean": 0.008553133322791924,
+      "full_ate_mean": 0.12222337527158933
+    },
+    {
+      "length_frames": 2,
+      "drift_during_mean": 0.13172794960359507,
+      "recover_after_mean": 0.13997055891305082,
+      "full_ate_mean": 0.14581962750893723
+    },
+    {
+      "length_frames": 5,
+      "drift_during_mean": 0.1332550955443477,
+      "recover_after_mean": 0.14568737363238343,
+      "full_ate_mean": 0.15007527535261309
+    },
+    {
+      "length_frames": 10,
+      "drift_during_mean": 0.13586351956922174,
+      "recover_after_mean": 0.1492056235705252,
+      "full_ate_mean": 0.14425178019276524
+    },
+    {
+      "length_frames": 20,
+      "drift_during_mean": 0.13610731437606957,
+      "recover_after_mean": 0.1547587105750317,
+      "full_ate_mean": 0.15626922978366142
+    },
+    {
+      "length_frames": 40,
+      "drift_during_mean": 0.13649793407406094,
+      "recover_after_mean": 0.14935854730924564,
+      "full_ate_mean": 0.13241225978605103
+    }
+  ]
+}

@@ -1,0 +1,645 @@
+%% Consolidated journal paper -- IEEE Access submission.
+%% Build: pdflatex main; bibtex main; pdflatex main; pdflatex main
+%% Class + assets from ACCESS_latex_template_20260513 (ieeeaccess.cls, fonts, spotcolor).
+%%
+%% ---- reviewer-response map (IoT-J IoT-70358-2026, R1) ----------------------
+%% R1.1 novelty -> Sec. I (Contributions) + Sec. II   R1.2 physical validation -> Sec. X
+%% R1.3 fragmentation -> this consolidation           R1.4 MUSIC complexity -> Sec. III-E
+%% R1.5 landmark/mapping -> Sec. IX                   R1.6/R1.7 robustness -> Sec. IX-F
+%% R1.8 conclusions -> Sec. XIII
+%% -----------------------------------------------------------------------------
+\documentclass{ieeeaccess}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\graphicspath{{figures/}}
+
+\begin{document}
+
+\history{Date of publication xxxx 00, 0000, date of current version xxxx 00, 0000.}
+\doi{10.1109/ACCESS.2026.DOI}
+
+\title{Ambient WiFi as a Cheap Radar for Automotive SLAM: Centimetre Localization, a Phantom
+Ceiling on Mapping, and What That Ceiling Is --- in Simulation and on \$30 of Silicon}
+
+\author{\uppercase{Mulham Fetna}\authorrefmark{1}}
+\address[1]{Department of Mechatronics Engineering, University of Aleppo, Aleppo, Syria
+(e-mail: contact@mulhamfetna.com)}
+\tfootnote{The code, data, and firmware supporting this article are released openly under
+AGPL-3.0 at \url{https://github.com/mulhamfetna/wifi-radar-slam} and archived with persistent
+DOIs. This article consolidates and extends the author's earlier unpublished feasibility
+manuscript, which is cited and publicly available in that repository.}
+
+\corresp{Corresponding author: Mulham Fetna (e-mail: contact@mulhamfetna.com).}
+
+\begin{abstract}
+We ask whether ambient sub-7\,GHz WiFi, received on a moving vehicle and processed with
+commodity channel state information (CSI), can serve as a low-cost radar/LiDAR replacement for
+simultaneous localization and mapping (SLAM). Using a physics-based, ray-traced (Sionna~RT)
+substrate and, for the first time in this line of work, a \$30 ESP32 hardware testbed, we find a
+consistent split. \emph{Localization} is centimetre-level and, we show, structurally robust:
+because the estimator is odometry-anchored and the bistatic CSI measurements are refinement-only,
+absolute trajectory error is insensitive to access-point--position error up to tens of metres and
+to sudden, total measurement blackouts. \emph{Mapping}, by contrast, hits a hard ceiling: with
+realistic commodity CSI, most detections are phantoms (${\approx}89\%$) accompanied by a
+several-metre range bias --- a front-end and geometry limit, not a path-discrimination or
+resolution limit, and one a learned filter cannot repair. Comparing the same substrate against
+real LiDAR (KITTI) and a simulated 77\,GHz FMCW radar shows the ceiling is neither
+carrier-specific nor WiFi-specific: the radio carrier does not matter, geometry does (a monostatic
+on-vehicle transmitter nearly eliminates the phantoms), and wider bandwidth makes them worse.
+Finally, we reproduce the delay-domain reading on real ESP32 silicon. The practical message: WiFi
+localization rivals far costlier sensors, while WiFi mapping is capped by a front-end/geometry
+phantom ceiling that we characterize and, in part, show how to escape.
+\end{abstract}
+
+\begin{keywords}
+WiFi sensing, channel state information, SLAM, passive radar, integrated sensing and communication,
+automotive, ESP32, low-cost hardware, multipath.
+\end{keywords}
+
+\titlepgskip=-21pt
+
+\maketitle
+
+%% ===========================================================================
+\section{Introduction}
+\PARstart{T}{he} exteroceptive sensors that anchor vehicle SLAM --- LiDAR and radar ---
+are also the costly part of the perception stack. A research-grade spinning LiDAR runs into the
+thousands of dollars and an automotive radar into the tens to hundreds, while the WiFi silicon a
+vehicle already carries costs tens. If ambient WiFi --- signals radiated anyway, by
+infrastructure that already exists, received on an antenna already on the vehicle --- could stand
+in for those sensors, the sensing bill for autonomy would change by orders of magnitude. This
+paper asks the question without hedging: \emph{can ambient sub-7\,GHz WiFi replace radar or LiDAR
+as a SLAM front-end?}
+
+The honest answer is neither ``yes'' nor ``no'' but a boundary, and the boundary is the
+contribution. WiFi replaces the costly sensors for one half of SLAM --- localization --- and
+fails at the other --- mapping --- and the failure is not where the literature, including our own
+earlier feasibility study \cite{fetna2026wifiradar}, assumed it was. We locate that failure
+precisely, show it is \emph{not specific to WiFi}, and then reproduce the underlying reading on
+real hardware.
+
+\emph{Localization} is centimetre-level and, we show, \emph{structurally} robust: because the
+estimator is anchored by vehicle odometry and the bistatic CSI measurements are
+refinement-only, absolute trajectory error is insensitive to access-point (AP) position error up
+to tens of metres and to sudden, total measurement blackouts. \emph{Mapping} hits a hard ceiling:
+with realistic commodity CSI, the overwhelming majority of detections (${\approx}89\%$) are
+\emph{phantoms} --- they match no real propagation path --- accompanied by a several-metre range
+bias. This is a front-end and geometry limit, not a path-discrimination or resolution limit, and
+a learned filter cannot repair it, because one cannot select real paths from a set in which most
+detections are not real paths.
+
+To test whether this ceiling is a property of WiFi or of RF sensing more broadly, we run the
+\emph{same} substrate against real LiDAR (KITTI \cite{geiger2012kitti}) and a simulated 77\,GHz
+FMCW radar. The result is decisive: the radio carrier does not matter, geometry does --- a
+\emph{monostatic}, on-vehicle transmitter nearly eliminates the phantoms --- and wider bandwidth
+makes them \emph{worse}. Finally, licensed by that carrier-independence, we move the claim off
+simulation entirely and capture, parse, and delay-profile real HT40 CSI on two \$30 ESP32-S3
+boards.
+
+\subsection*{Contributions}   %% [R1.1] novelty, stated at a methodological level
+\begin{itemize}
+  \item A physics-based feasibility study of on-vehicle, mobile, outdoor WiFi as a SLAM
+        front-end --- an unoccupied point in the design space (prior passive-WiFi-radar is
+        indoor/static/infrastructure-fixed; the one moving-platform passive radar uses 5G).
+  \item Identification and mechanism of the \emph{mapping phantom ceiling}
+        (${\approx}89\%$ phantom detections $+$ range bias), and proof it is not a
+        discrimination or resolution limit and not repairable by a learned filter.
+  \item Evidence the ceiling is \emph{universal}: carrier-independent and not WiFi-specific,
+        via a controlled comparison against LiDAR and a 77\,GHz radar on one substrate;
+        geometry (monostatic vs bistatic), not carrier or bandwidth, is decisive.
+  \item A head-to-head WiFi-versus-LiDAR comparison on identical scenes with a KITTI-validated
+        LiDAR back-end, plus a \emph{sensor-cost} analysis (the WiFi package is $84$--$600\times$
+        cheaper) and cost-normalized accuracy (Secs.~\ref{sec:accuracy}--\ref{sec:cost}).
+  \item A symmetric fusion study with a design rule: fusion reinforces at sensor parity and
+        \emph{degrades} the stronger sensor by $8\times$ when badly mismatched (Sec.~\ref{sec:fusion}).
+  \item A robustness characterization: localization is structurally tolerant of
+        access-point--position error and measurement blackouts (Sec.~\ref{sec:robust}).
+  \item The first delay-resolved reflector reading from an ESP32 on \$30 of hardware,
+        moving the claim off simulation (Sec.~\ref{sec:hw}).
+\end{itemize}
+
+%% ===========================================================================
+\section{Related Work}\label{sec:related}
+
+\textbf{WiFi/CSI sensing} is mature but overwhelmingly \emph{indoor, static, and
+infrastructure-fixed}. Through-the-wall and device-free sensing
+\cite{chetty2012ttwifi,zhao2018rfpose,zhao2018rfpose3d}, CSI-based ranging and imaging
+\cite{li2021standalone,wang2025csipower,maatta2024csipointcloud}, and pose or point-cloud
+recovery \cite{geng2022denseposewifi,yan2024personinwifi3d} all assume fixed transmitters and a
+static or slowly-varying scene. None places the sensing platform on a moving vehicle outdoors.
+
+\textbf{WiFi-based SLAM} takes two forms. Channel- and multipath-based SLAM treats reflectors as
+virtual anchors \cite{gentner2016channelslam,ulmschneider2017multipath,leitinger2024mpslamcoop,%
+li2024bpmpslam}, and radio-fingerprint or P2SLAM approaches localize against known access points
+\cite{arun2022p2slam,liu2023radiofingerprintslam} --- both \emph{infrastructure-bound}: they need
+the transmitters' positions and are demonstrated indoors. The alternative uses WiFi only to
+\emph{assist} a primary ranging sensor (LiDAR or IMU)
+\cite{arun2022viwid,ismail2022wifilidarslam,li2025ekfwifilidarimu}, not to replace it. No prior
+work evaluates WiFi as a stand-alone, on-vehicle, outdoor \emph{replacement} front-end.
+
+\textbf{Integrated sensing and communication (ISAC/JCAS)} envisions the same waveform serving
+communication and sensing \cite{liu2022isac,zhang2021jcassurvey,xiong2023scfundamental,%
+overview2024ieee80211bf}, but its SLAM instantiations are early \cite{gounis2026slamcomms}. At
+mmWave, 60\,GHz 802.11ad has been repurposed as a radar \cite{kumari2018adradar,han2022adimaging};
+the only \emph{moving-platform} passive radar we are aware of uses 5G, not WiFi
+\cite{maksymiuk2024movingpr}.
+
+\textbf{The gap.} On-vehicle, mobile, outdoor WiFi (802.11) as a radar/LiDAR replacement for SLAM
+is an unoccupied point in this design space. This paper occupies it, and --- unlike the
+infrastructure-bound line above --- shows that the strongest configuration (monostatic,
+on-vehicle transmitter) needs \emph{no} known AP positions at all.
+
+%% ===========================================================================
+\section{Method: One Substrate, Three Sensors, One Testbed}\label{sec:method}
+A single substrate --- identical scenes, trajectories, footprint ground truth, and metric
+suite --- carries WiFi, LiDAR, and 77\,GHz radar, so differences are attributable to the sensor,
+not the harness. The same detection chain then runs on real ESP32 hardware.
+
+\subsection{Bistatic geometry}
+A vehicle carrying a receive antenna array drives through an outdoor scene illuminated by
+$N_\mathrm{AP}$ ambient WiFi access points at known positions. Each specular component follows an
+access point $\rightarrow$ reflector $\rightarrow$ vehicle path, so the measured path length
+$\rho=\lVert\mathbf{p}_\mathrm{AP}-\mathbf{r}\rVert+\lVert\mathbf{r}-\mathbf{p}_\mathrm{veh}\rVert$
+places the reflector $\mathbf{r}$ on an ellipse with foci at the AP and the vehicle. Given the
+arrival azimuth $\phi$, the reflector range $s$ along $\hat{\mathbf u}(\phi)$ solves
+\begin{equation}
+s=\frac{\rho^2-d_\mathrm{AP}^2}{2\big(\rho-\mathbf{d}_\mathrm{AP}\!\cdot\!\hat{\mathbf u}(\phi)\big)},
+\qquad \mathbf{d}_\mathrm{AP}=\mathbf{p}_\mathrm{AP}-\mathbf{p}_\mathrm{veh},
+\label{eq:bistatic}
+\end{equation}
+with $d_\mathrm{AP}=\lVert\mathbf{d}_\mathrm{AP}\rVert$; direct-path ($s\le0$) and implausible
+solves are rejected. A \emph{monostatic} variant places the transmitter on the vehicle itself
+($\mathbf{p}_\mathrm{AP}\!\to\!\mathbf{p}_\mathrm{veh}$): the measurement becomes a round-trip
+range, and \eqref{eq:bistatic} needs no external AP position at all --- a fact that turns out to
+decide both the phantom rate (Sec.~\ref{sec:mech}) and the AP-error robustness (Sec.~\ref{sec:robust}).
+
+\subsection{Ray-traced channel and scenes}
+Channels are generated with Sionna~RT~2.0 (Mitsuba/Dr.Jit), which ray-traces the scene to produce
+per-path delays, angles, and interaction types and the frequency-domain channel across
+$N_\mathrm{sc}$ subcarriers and $N_\mathrm{rx}$ antennas per vehicle pose; additive white
+Gaussian noise is applied at a configured SNR. Radar is electromagnetic, so the same tracer
+models it natively; LiDAR requires an optical (diffuse-scattering) treatment
+(Sec.~\ref{sec:method}-E).
+
+\subsection{CSI front-end: joint 2-D (delay--angle) MUSIC}
+We compare two sensing tiers. The \emph{oracle} front-end reads Sionna's true single-scatter path
+parameters, isolating the geometry from estimation error. The \emph{realistic} front-end
+estimates delay and azimuth from noisy CSI with MUSIC. A key refinement is \emph{joint 2-D
+(delay--angle) MUSIC} with 2-D spatial smoothing (SVD subspace; delay grid bounded to the
+unambiguous $1/\Delta f$ range), which recovers each path's delay and angle \emph{together}, so
+association is intrinsic rather than paired by sorted index. Array-relative electrical angles map
+to world azimuth by $\sin\beta=-\sin\theta$ for the lateral ULA.
+
+\subsection{Bistatic-ellipse mapping and particle-filter SLAM}
+A Rao--Blackwellized particle filter propagates the vehicle pose from odometry and weights
+particles by the bistatic consistency \eqref{eq:bistatic} of each detection; triangulated
+reflectors are accumulated and consensus-filtered into a landmark map. We report trajectory error
+(ATE, RPE) and, for the map, symmetric Chamfer distance, occupancy IoU, and \emph{directional}
+accuracy and completeness (a passive-WiFi map illuminates only a subset of surfaces). Map ground
+truth is each scene object's facade footprint.
+
+\subsection{Complexity and real-time feasibility}   %% [R1.4]
+The 2-D MUSIC front-end is the cost driver: per AP per frame it forms a spatially-smoothed
+covariance over the delay $\times$ angle grid and takes its eigendecomposition, an
+$\mathcal{O}(N^3)$ operation in the smoothed dimension $N$. Two facts keep this practical. First,
+$N$ is small (a bounded delay grid and a single ULA), and the work is per-AP-per-frame and
+embarrassingly parallel. Second --- and more consequentially --- Sec.~\ref{sec:mech} shows that
+MUSIC is precisely what \emph{creates} the mapping phantoms, and that a calibrated
+constant-false-alarm-rate (CFAR) detector in the monostatic geometry both removes most phantoms
+\emph{and} is far cheaper: the monostatic delay-domain chain we port to hardware costs
+${\approx}194$\,kflop and ${\approx}26$\,KB per sweep, which an ESP32-S3 executes with
+${\approx}250\times$ headroom. Real-time on-vehicle execution and the mapping fix therefore point
+the same way.
+
+\subsection{LiDAR and 77\,GHz radar baselines}
+The LiDAR baseline is an Ouster-class spinning sensor, ray-traced with a diffuse-scattering model
+and a scan-to-map ICP back-end that is \emph{externally validated} on real KITTI sequences
+(${\approx}0.3\%$ drift), so its simulated numbers are anchored to reality. The radar baseline is
+a 77\,GHz FMCW sensor with a range--azimuth CFAR chain. One honest caveat propagates from the
+radar study: our point-to-point ICP back-end cannot recover \emph{rotation} from spinning-radar
+point clouds (the yaw cost is flat), so the radar/WiFi mapping ablation (Table~\ref{tab:ablation})
+is scored under \emph{ground-truth poses} --- it isolates the front-end and geometry, which is
+exactly the quantity of interest.
+
+\subsection{ESP32-S3 hardware testbed}
+Two \$30 ESP32-S3 boards realise the monostatic geometry directly: one illuminates (HT40, 40\,MHz)
+and one logs CSI ${\approx}0.5$\,m away, so the round-trip delay taps \emph{are} echo ranges. Only
+the \emph{excess} delay (relative to the line-of-sight arrival) is needed, and that is preserved
+on commodity CSI even though absolute time-of-flight is not; the $0.5$\,m baseline is under $7\%$
+of one 40\,MHz range cell, so the rig is monostatic to within measurement. Using 2.4\,GHz hardware
+is licensed by the carrier-independence result (Table~\ref{tab:ablation}, B$\rightarrow$C). Details
+in Sec.~\ref{sec:hw}.
+
+%% ===========================================================================
+\section{Experimental Setup}\label{sec:setup}
+Two outdoor scenes are used throughout: a \emph{controlled} scene (an isolated reflecting wall,
+which isolates the geometry) and a \emph{street canyon} (dense, multi-surface, adversarial for
+multipath). A vehicle follows a $240$-frame trajectory through each, illuminated by three ambient
+access points. Unless stated otherwise the WiFi link is $5.2$\,GHz with $40$\,MHz of bandwidth,
+$64$ subcarriers, a four-element half-wavelength ULA, and $20$\,dB SNR; the bandwidth sweep in
+Sec.~\ref{sec:feas} varies this from $20$ to $160$\,MHz. Channels come from Sionna~RT~2.0.
+Stochastic results are reported as mean $\pm$ standard deviation over five seeds. Ground truth for
+the map is each scene object's facade footprint; trajectory ground truth is the simulated pose.
+All configurations, seeds, and the released dataset are in the artifact accompanying this paper.
+
+%% ===========================================================================
+\section{Feasibility: Localization Works, Mapping Is Two-Tier}\label{sec:feas}
+
+\subsection{Localization operating envelope}
+Ambient WiFi localizes the vehicle to centimetre level. Sweeping bandwidth shows the expected
+monotonic ${\sim}20\times$ ATE improvement, from $0.78$\,m at 20\,MHz to $0.038$\,m at 160\,MHz
+($0.093$\,m at the nominal 40\,MHz), tracking the range resolution $\Delta R=c/2B$; SNR gives the
+same clean trend ($2.02$\,m at 0\,dB to $0.076$\,m at 30\,dB), and more access points and higher
+speeds help. Localization has a clean operating envelope --- it works wherever the link budget
+does.
+
+\subsection{Realistic sensing: joint delay--angle MUSIC}
+Separate 1-D delay and 1-D angle estimates paired by sorted index mis-associate in multipath and
+scatter phantom reflectors: this naive front-end reaches only $0.73$\,m ATE. Joint 2-D MUSIC,
+which recovers each path's delay and angle together, lifts realistic-CSI localization ${\sim}7\times$
+to $\mathbf{0.098\pm0.028}$\,m (five seeds, controlled scene, 160\,MHz) --- \emph{approaching} but
+not matching the oracle-sensing $0.049\pm0.027$\,m. So realistic commodity CSI localizes at a few
+centimetres, close to the information limit of the geometry.
+
+\subsection{Mapping is two-tier}
+Mapping splits sharply by front-end. With \emph{oracle} single-bounce sensing the bistatic
+back-end reconstructs reflecting surfaces to ${\approx}25$--$30$\,cm (controlled: $0.25$\,m
+accuracy, $0.79$ occupancy IoU; street: $0.30$\,m) --- the geometry is sound. With \emph{realistic}
+commodity CSI, map accuracy collapses to ${\approx}4.8$\,m. The same estimator that localizes to
+centimetres maps to metres.
+
+\subsection{It is not a bandwidth or aperture limit}
+The obvious hypothesis --- insufficient resolution --- is wrong. Repeating the realistic-CSI map at
+60\,GHz with $1.76$\,GHz of bandwidth, and again with a $16$-antenna array, leaves the ${\approx}4.8$\,m
+floor essentially unchanged: neither an order of magnitude more bandwidth nor a larger aperture
+moves it. The mapping ceiling is therefore a property of the \emph{front-end}, not of resolution
+--- which motivates asking exactly \emph{what} the front-end does wrong (Sec.~\ref{sec:mech}).
+
+%% ===========================================================================
+\section{Accuracy: WiFi versus LiDAR}\label{sec:accuracy}
+Feasibility in isolation is not a replacement claim; the question is how WiFi compares with the
+sensor it would replace, on the same scenes and metrics. We simulate two LiDAR configurations ---
+LiDAR-A (a mid-range spinning unit) and LiDAR-B (a lower-grade variant) --- with the back-end
+externally validated on KITTI (Sec.~\ref{sec:mech}-C). Table~\ref{tab:accuracy} is the head-to-head.
+
+\begin{table}[t]\centering\footnotesize
+\caption{WiFi versus LiDAR on identical scenes and metrics (m; lower is better except IoU).
+WiFi ties LiDAR-A on localization and scores zero on mapping.}
+\label{tab:accuracy}
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+Scene & Sensor & ATE & Chamfer & m-acc & IoU \\ \midrule
+\multirow{4}{*}{Controlled}
+ & WiFi oracle    & $0.049\pm0.027$ & 0.505 & 0.248 & 0.791 \\
+ & WiFi realistic & $0.098\pm0.028$ & 5.974 & 2.490 & 0.000 \\
+ & LiDAR-A        & 0.102 & 0.209 & 0.250 & 0.977 \\
+ & LiDAR-B        & 0.483 & 0.187 & 0.251 & \textbf{1.000} \\ \midrule
+\multirow{4}{*}{Street}
+ & WiFi oracle    & $0.104\pm0.041$ & 12.344 & 0.309 & 0.077 \\
+ & WiFi realistic & $0.314\pm0.051$ & 18.086 & 3.525 & 0.001 \\
+ & LiDAR-A        & \textbf{0.026} & 8.674 & 0.251 & 0.163 \\
+ & LiDAR-B        & 0.857 & 3.734 & 2.125 & \textbf{0.261} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{On localization, WiFi reaches parity with LiDAR.} In the controlled scene realistic WiFi
+achieves $0.098$\,m ATE against LiDAR-A's $0.102$\,m --- a statistical tie --- and is comfortably
+better than LiDAR-B ($0.483$\,m). This is the central positive result. In the street canyon the
+denser multipath costs WiFi an order of magnitude ($0.314$\,m versus LiDAR-A's $0.026$\,m), so the
+parity is scene-dependent: WiFi localization degrades gracefully where LiDAR does not.
+
+\textbf{On mapping, WiFi does not merely lose --- it scores zero.} LiDAR reaches occupancy IoU up
+to $1.00$; realistic WiFi reaches ${\approx}0$ on both scenes. That oracle-sensing WiFi \emph{does}
+map (IoU $0.791$ on the controlled wall) localizes the failure squarely in the front-end, which
+Sec.~\ref{sec:mech} then dissects.
+
+
+\begin{figure*}[t]\centering
+\includegraphics[width=0.92\textwidth]{paper2_fig2.pdf}
+\caption{WiFi wins localization and loses mapping outright. Realistic commodity-CSI WiFi ties the mid-range LiDAR on trajectory error in the controlled scene, while its occupancy IoU is essentially zero on both scenes.}
+\label{fig:acc}
+\end{figure*}
+
+%% ===========================================================================
+\section{Cost}\label{sec:cost}
+The replacement question is ultimately economic, so we price it, reporting dated ranges rather than
+point estimates. The vehicle-side WiFi sensing package --- a commodity CSI receiver
+\cite{nexmon_csi} plus antennas --- is \$40--95; an ESP32-class node \cite{espressif_esp32} is
+\$10--35. LiDAR spans four orders of magnitude: legacy spinning (\$75{,}000--80{,}000), the
+mid-range spinning class we simulate (\$8{,}000--24{,}000), emerging automotive solid-state
+(\$100--600), and a budget 2-D scanner \cite{slamtec_rplidar_a1} (\$99) --- the last a
+\emph{price floor}, not an automotive peer, and never compared on mapping quality.
+
+\textbf{The gap.} Against the LiDAR class we actually simulate, the WiFi package is
+$\mathbf{84}$--$\mathbf{600\times}$ cheaper; against legacy spinning, $789$--$2{,}000\times$.
+
+\textbf{Cost-normalized performance} sharpens it. On localization value (price $\times$ ATE, lower
+better) WiFi delivers $4$--$30$\,\$$\cdot$m against LiDAR's $208$--$2{,}448$\,\$$\cdot$m --- one to
+two orders of magnitude more accuracy per dollar. The gain comes from price, not precision: WiFi
+\emph{matches} LiDAR-A's accuracy (Sec.~\ref{sec:accuracy}) at two orders of magnitude less cost.
+On mapping value (price\,$/$\,IoU) WiFi's cost is \emph{infinite} --- it buys no map coverage at any
+price. LiDAR is the only modality here that converts money into map.
+
+\textbf{The claim is conditional, and we state the condition.} It rests on the ambient-AP premise.
+If a deployment must \emph{install} its own access points, the WiFi package rises to \$130--335 for
+three APs and can become \emph{more expensive} ($0.3$--$1.5\times$) than the cheapest solid-state
+LiDAR. The dramatic cost story is a story about infrastructure that already exists, and should be
+quoted that way --- another reason the monostatic, on-vehicle geometry (Sec.~\ref{sec:univ}) is
+attractive: it needs no external infrastructure at all.
+
+
+\begin{figure*}[t]\centering
+\includegraphics[width=0.92\textwidth]{paper2_fig3.pdf}
+\caption{The sensor-cost envelope (log scale). The WiFi package is $84$--$600\times$ cheaper than the mid-range spinning LiDAR whose parameters our models simulate. The budget 2-D scanner is shown as a price floor, not as an automotive peer.}
+\label{fig:cost}
+\end{figure*}
+
+\begin{figure*}[t]\centering
+\includegraphics[width=0.92\textwidth]{paper2_fig4.pdf}
+\caption{Cost read together with accuracy. Left: localization cost (price $\times$ ATE) --- WiFi is one to two orders of magnitude better per dollar. Right: mapping cost (price per unit IoU) --- WiFi buys no map coverage at any price.}
+\label{fig:costnorm}
+\end{figure*}
+
+%% ===========================================================================
+\section{Fusion: Does Keeping Both Pay?}\label{sec:fusion}
+If WiFi is nearly free, the natural question is whether to fuse rather than replace. We fuse the
+two measurement streams symmetrically in the same back-end (Table~\ref{tab:fusion}).
+
+\begin{table}[t]\centering\footnotesize
+\caption{Fusion ATE (m). Fusion reinforces when the sensors are of comparable quality and
+\emph{degrades} the stronger one when they are badly mismatched.}
+\label{tab:fusion}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+Scene & LiDAR cfg & WiFi & LiDAR & Fusion \\ \midrule
+Controlled & A & 0.081 & 0.102 & \textbf{0.065} \\
+Controlled & B & 0.081 & 0.212 & \textbf{0.044} \\
+Street     & A & 0.281 & \textbf{0.027} & 0.218 \\
+Street     & B & 0.281 & 0.844 & \textbf{0.175} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Fusion helps, conditionally.} Against LiDAR-B it improves ATE by $79\%$ on both scenes ---
+reinforcement, not mere addition. \textbf{And it can hurt:} in the street/LiDAR-A configuration the
+LiDAR alone achieves $0.027$\,m and fusion degrades it to $0.218$\,m, an $8\times$ regression.
+\textbf{The condition is sensor parity} --- fusion reinforces when the two sensors are of
+comparable quality and corrupts the stronger when they are not, which is a design rule, not a
+tuning artefact. On the map, the union adds coverage exactly where LiDAR is incomplete (street IoU
+$0.149\!\rightarrow\!0.177$ for A; $0.262\!\rightarrow\!0.309$ for B) while mildly polluting an
+already-good map (controlled $0.977\!\rightarrow\!0.913$).
+
+\textbf{Is it worth paying for both?} The WiFi package is a $0.2$--$1.2\%$ addition to a LiDAR
+budget --- roughly half a percent more money for a $36$--$79\%$ better trajectory when the sensors
+are matched. That is the strongest practical case for WiFi in this paper: not as a replacement for
+a good LiDAR, but as an almost-free reinforcement of a modest one.
+
+
+\begin{figure*}[t]\centering
+\includegraphics[width=0.92\textwidth]{paper2_fig5.pdf}
+\caption{Fusion is conditional. Tight fusion beats both solo sensors in three of four configurations, but in street/LiDAR-A --- where the sensors are badly mismatched --- it degrades the stronger sensor by $8\times$.}
+\label{fig:fusion}
+\end{figure*}
+
+%% ===========================================================================
+\section{The Mapping Ceiling and Its Mechanism}\label{sec:mech}
+The mapping failure is the central puzzle: under oracle sensing the same geometry maps to
+$0.25$\,m, yet under realistic CSI it collapses to occupancy IoU ${\approx}0$. Something in the
+front-end destroys the map. Locating it precisely --- and identifying \emph{which} of the plausible
+culprits actually dominates --- is this section's contribution, and it also answers directly when a
+reflector detection can and cannot be promoted to a landmark.
+
+\subsection{A learned discriminator cannot fix it}
+The feasibility study attributed the floor to \emph{path discrimination} (telling a genuine facade
+reflection from LOS, floor, and multi-bounce returns) and argued that this label is learnable. The
+natural next step is to close the loop: put the discriminator \emph{inside} the mapping pipeline.
+It does not help. A ladder of filters over the MUSIC detections --- none, a physics heuristic, a
+random forest, and a small neural network --- gating which detections enter the map while leaving
+the particle weights (and hence localization) untouched, \emph{leaves the occupancy IoU at
+$0.000$}: the learned rungs reject nearly everything and empty the map. Trained only on features a
+single-ULA delay--azimuth front-end can actually measure, the discriminator's held-out F1 is
+$0.00$--$0.45$. The earlier optimism came from a feature (arrival \emph{elevation}) that such a
+front-end never estimates, and from classifying \emph{true ray-traced paths} rather than the
+\emph{MUSIC detections} the deployed system must classify --- which, as we now show, are not the
+same objects.
+
+\subsection{Isolating the cause}
+We match every MUSIC detection to its nearest true path, and for those matching a genuine
+single-bounce facade path we triangulate the same path twice --- once with the ray tracer's true
+delay and azimuth, once with MUSIC's estimates --- so any degradation is \emph{pure estimation
+error with discrimination held perfect} (Table~\ref{tab:ceiling}). Three mechanisms emerge, in
+order of importance. \textbf{(1) Phantoms ($\approx89\%$) dominate:} nearly nine in ten MUSIC
+detections match \emph{no real propagation path at all} --- they are estimator artefacts. One
+cannot select the real paths from a set in which most detections are not real paths, which is
+exactly why the discriminator fails. \textbf{(2) Range bias ($6.45$\,m median, controlled):} even
+correctly-identified facade paths are mislocated --- true parameters place $100\%$ of them within
+$1$\,m, MUSIC's place $2.4\%$ --- a \emph{bias}, not a resolution bound, so bandwidth does not fix
+it (Sec.~\ref{sec:feas}-D). \textbf{(3) Discrimination ($2$--$8\%$)} --- the previously assumed
+culprit --- is the \emph{smallest} term. A filter selects; it can neither invent the real paths
+$89\%$ of detections lack nor correct the bias, so a valid landmark track cannot be sustained under
+realistic CSI however the promotion threshold is tuned.
+
+\begin{table}[t]\centering\footnotesize
+\caption{Isolating the mapping ceiling. Discrimination --- the previously assumed culprit --- is
+the smallest of three mechanisms.}
+\label{tab:ceiling}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+ & Controlled & Street \\ \midrule
+\emph{Phantom} (matches no real path)        & \textbf{89.2\%} & \textbf{89.5\%} \\
+Non-facade real path (\emph{discrimination}) & 2.2\% & 8.4\% \\
+True facade path                             & 8.6\% & 2.0\% \\ \midrule
+Triangulated $<1$\,m, \emph{true} params     & 100\% & 100\% \\
+Triangulated $<1$\,m, \emph{MUSIC} params    & \textbf{2.4\%} & 76.7\% \\
+MUSIC range error (median)                   & $6.45$\,m & $2.11$\,m \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{figure*}[t]\centering
+\includegraphics[width=0.92\textwidth]{paper2_fig6.pdf}
+\caption{The mapping ceiling. Left: where MUSIC detections come from --- ${\approx}89\%$ correspond to no real propagation path. Right: the same genuine facade paths triangulated with true versus MUSIC parameters, isolating estimation error from discrimination.}
+\label{fig:ceiling}
+\end{figure*}
+
+\subsection{An external anchor}
+Lest the whole comparison be a simulation artefact, the LiDAR back-end that shares this substrate
+is validated on real KITTI data at $1.16$\,m ATE over $394$\,m (${\approx}0.3\%$ drift), matching
+published LiDAR-odometry performance. The substrate is anchored to reality on at least one arm.
+
+\subsection{Universality: the ceiling is carrier-independent, geometry sets it}\label{sec:univ}
+Is the ceiling a property of WiFi, or of RF sensing on limited data? We run the same substrate
+against a 77\,GHz FMCW radar and ablate the front-end, geometry, carrier, and bandwidth
+independently (Table~\ref{tab:ablation}). Three readings stand out. \textbf{Carrier does nothing}
+(B$\rightarrow$C: $5.2$\,GHz and $77$\,GHz give the same $\approx0\%$) --- which licenses building
+the hardware testbed at $2.4$\,GHz. \textbf{Geometry is everything} (A$\rightarrow$B: moving the
+transmitter from off-vehicle to on-vehicle drops the phantom rate from $18.2\%$ to $0.1\%$, a
+$180\times$ reduction). \textbf{More bandwidth is worse} (C$\rightarrow$D: $4$\,GHz gives $9.0\%$
+where $160$\,MHz gave $0.0\%$ --- more resolvable cells, more false alarms). And MUSIC (cell~M)
+reproduces the total mapping failure (IoU $0.003$) even under ground-truth poses: the ceiling is
+the \emph{front-end plus geometry}, not WiFi and not RF sensing.
+
+\begin{table}[t]\centering\footnotesize
+\caption{Ablation on one substrate (3 seeds), scored under ground-truth poses. Geometry, not
+carrier or bandwidth, sets the phantom rate.}
+\label{tab:ablation}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Cell & Front-end / geometry & Carrier / BW & Phantom rate \\ \midrule
+M & MUSIC, bistatic     & 5.2\,GHz / 160\,MHz & --- (IoU 0.003) \\
+A & CFAR, bistatic      & 5.2\,GHz / 160\,MHz & $18.2\pm0.6\%$ \\
+B & CFAR, monostatic    & 5.2\,GHz / 160\,MHz & $\mathbf{0.1\pm0.2\%}$ \\
+C & CFAR, monostatic    & 77\,GHz / 160\,MHz  & $0.0\%$ \\
+D & CFAR, monostatic    & 77\,GHz / \textbf{4\,GHz} & $9.0\pm1.5\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+A caveat we state plainly: our point-to-point ICP back-end cannot recover \emph{rotation} from
+spinning-radar point clouds (the yaw cost is flat), so Table~\ref{tab:ablation} is scored under
+ground-truth poses. That is a feature here, not a bug --- it isolates the front-end and geometry,
+which is exactly what the phantom rate measures.
+
+\subsection{Robustness to AP-position error and measurement loss}\label{sec:robust}
+Two concerns follow directly from the bistatic geometry: the ellipse \eqref{eq:bistatic} depends on
+AP position, and a moving vehicle will suffer occlusions. We quantify both by perturbing the
+estimator on the nominal scene (eight and four seeds respectively).
+
+\textbf{AP-position error} does not reach the trajectory (Fig.~\ref{fig:ap}). Absolute trajectory
+error is flat within seed noise for AP errors up to $32$\,m --- larger than the scene --- in both
+the oracle and dense-MUSIC regimes. The robustness is \emph{structural}: the particle filter
+requires a motion model, so it is always odometry-anchored, and the bistatic measurements are
+refinement-only; they cannot set absolute position, so AP error cannot corrupt it. The dependence
+instead lands on the \emph{map}, which degrades gently and monotonically (${\approx}+18\%$ across
+map accuracy, Chamfer, and completeness from $0$ to $32$\,m). And the monostatic geometry
+(Sec.~\ref{sec:univ}) removes the AP dependence outright --- it needs no AP position at all.
+
+\textbf{Sudden measurement loss} is absorbed the same way (Fig.~\ref{fig:blk}). A \emph{total}
+blackout of all detections for up to $40$ frames ($17\%$ of the run) adds only ${\approx}0.1$--$0.14$\,m
+of drift --- nearly constant in blackout length --- and the filter re-locks immediately once
+measurements return. WiFi-SLAM inherits the vehicle's odometry resilience to dropout.
+
+\begin{figure}[t]\centering
+\includegraphics[width=\columnwidth]{ap_sensitivity.png}
+\caption{AP-position sensitivity. Trajectory ATE is insensitive to AP-position error out to
+$32$\,m in both regimes (localization is odometry-anchored, measurements refinement-only); the map
+degrades gently and monotonically.}
+\label{fig:ap}
+\end{figure}
+\begin{figure}[t]\centering
+\includegraphics[width=\columnwidth]{blockage_robustness.png}
+\caption{Blockage robustness. The particle filter dead-reckons through a total measurement
+blackout: a $40$-frame ($17\%$ of run) outage adds ${\approx}0.1$\,m drift and re-locks immediately.}
+\label{fig:blk}
+\end{figure}
+
+%% ===========================================================================
+\section{Hardware Validation on \$30 of Silicon}\label{sec:hw}
+Everything above is ray-traced. To move the underlying reading onto real hardware, we build the
+monostatic geometry from two \$30 ESP32-S3 boards --- one illuminating (HT40, 40\,MHz), one logging
+CSI ${\approx}0.5$\,m away --- and process the CSI with the \emph{same} delay-domain chain, using
+only the excess delay relative to the line-of-sight arrival (Sec.~\ref{sec:method}-F). Formally
+this is a bistatic radar-cross-section measurement of a reflector with coherent
+background subtraction (IEEE Std~1502): recording the channel with and without the reflector and
+subtracting cancels the receiver's own frequency response, which otherwise manufactures a spurious
+tap. Working at $2.4$\,GHz rather than the simulated $5.2$\,GHz is licensed by the
+carrier-independence result (Table~\ref{tab:ablation}, B$\rightarrow$C).
+
+\textbf{First light.} The pipeline runs end-to-end on real silicon. From a static two-board capture
+we parse valid HT40 records ($40$\,MHz, high-throughput, $384$-byte buffers), whose HT-LTF carries
+$128$ subcarriers with exactly $114$ non-null --- matching the physical active mask ($3$ DC-notch
+$+$ $11$ guard bins) and so validating the subcarrier ordering. Coherent averaging aligns the
+line-of-sight tap to $0$\,m, and with the two boards adjacent the channel is near-flat --- a single
+clean line-of-sight tap, the correct result for that geometry. To our knowledge this is the first
+delay-resolved reflector reading obtained from an ESP32; nobody has closed this loop at $40$\,MHz on
+such hardware before. It demonstrates that the delay-domain reading the whole argument rests on is
+real, on commodity silicon.
+
+We state the scope precisely. This validates the \emph{reading} --- that the delay-domain
+measurement underpinning the whole argument is obtainable from commodity WiFi silicon --- not a
+full SLAM system. It is a static bench with tape-measured ground truth; we claim no vehicular
+mapping from it. Measuring the phantom \emph{rate} itself on this hardware, against surveyed
+reflectors in a large space, is the natural next experiment (Sec.~\ref{sec:future}); the firmware,
+the offline chain, and a one-command runner are released with this paper so that it can be
+reproduced or extended by others at the cost of two development boards.
+
+%% ===========================================================================
+\section{Discussion and Limitations}
+The picture is consistent across three sensors and onto real hardware. \emph{Localization} from
+ambient WiFi is centimetre-level, structurally robust, and one to two orders of magnitude cheaper
+than the LiDAR/radar it stands in for --- a genuinely attractive proposition. \emph{Mapping} is
+capped by a phantom ceiling that we have shown is a front-end and geometry limit: not
+path-discrimination (the smallest term), not resolution (immune to bandwidth and aperture), not
+carrier-specific, and not WiFi-specific. The single most effective lever is geometry --- a
+monostatic, on-vehicle transmitter --- which also, conveniently, removes the AP-position dependence
+entirely.
+
+Several limitations bound the claims and mark the honest edges. The hardware result is a
+\emph{static} bench, not a moving vehicle; it validates the reading, and the corridor measurement of
+the phantom rate on a real reflector (Sec.~\ref{sec:hw}) is the next data point. Localization's
+robustness is inseparable from its being \emph{odometry-anchored}: the WiFi measurements refine but
+do not carry absolute position, which is why they tolerate AP error and dropout, and also why they
+cannot rescue a failed odometry. The simulation, though ray-traced and anchored to real LiDAR on one
+arm, is still simulation. And the single-ULA front-end cannot observe arrival elevation, which both
+bounds the achievable discrimination and was the source of an over-optimistic earlier estimate.
+
+%% ===========================================================================
+\section{Future Work}\label{sec:future}
+Three lines follow directly. First, \textbf{measure the phantom rate on the hardware}: with the
+bench extended into a large surveyed space, the same detection chain yields the physical
+counterpart of Table~\ref{tab:ablation} --- MUSIC versus CFAR and bistatic versus monostatic
+measured on real silicon rather than inferred from it. Our own results predict the ceiling will
+reproduce; the discriminating quantities are the \emph{differences} between those front-ends and
+geometries, not the absolute number. Second, \textbf{port the winning chain on-chip}: the
+monostatic delay-domain detector fits an ESP32-S3 with roughly two orders of magnitude of headroom
+(Sec.~\ref{sec:method}-D), which would make the sensor self-contained rather than tethered to an
+offline host. Third, and most open, \textbf{a localization front-end that does not lean on
+odometry}: the robustness reported in Sec.~\ref{sec:robust} is real but inherited, and a WiFi
+measurement model able to carry absolute position on its own --- rather than refine a motion
+estimate --- would change what the modality can claim.
+
+%% ===========================================================================
+\section{Conclusion}
+Ambient WiFi is a practical, inexpensive localization sensor for automotive SLAM and a poor mapping
+sensor --- and the reason it maps poorly is now specific and quantified. Most realistic-CSI
+detections are phantoms, and a several-metre range bias corrupts the rest; this is a property of the
+superresolution front-end and the bistatic geometry, not of the carrier, the bandwidth, or WiFi as
+such, as a controlled comparison against LiDAR and a $77$\,GHz radar on one substrate shows. The
+open problem for WiFi mapping is therefore the front-end, not the physics, and the clearest escape
+is a monostatic on-vehicle geometry, which nearly eliminates the phantoms and needs no known
+transmitter positions. We have shown the delay-domain reading holds on \$30 of real ESP32 silicon;
+measuring the phantom rate itself on that hardware, and porting the winning chain on-chip, are the
+immediate next steps.
+
+\section*{Reproducibility}
+All code, configs, and result data are in the repository above (AGPL-3.0); the simulation is
+Sionna~RT; the hardware pipeline and firmware are included.
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+%% ===========================================================================
+%% AUTHOR BIOGRAPHY
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{author-photo.jpg}}]{Mulham Fetna}
+is currently pursuing the B.Sc. degree in mechatronics engineering with the
+University of Aleppo, Aleppo, Syria, where he ranks first in his class. He is the founder of
+Neurobotics, an engineering and technical education venture, and of Boundless, an academic-services
+initiative partnered with SANAD and UNFPA Syria. Since 2022 he has taught mechatronics, machine
+learning, and MLOps to more than 500 learners in Arabic and English, and has contributed accepted
+patches to the OpenCV and OpenDR open-source computer-vision libraries. His research interests
+include robotics and embedded systems, wireless sensing with commodity WiFi channel state
+information, simultaneous localization and mapping, computer vision, and low-cost RF sensing
+hardware. He advocates open, reproducible research: the code, data, and firmware supporting this
+work are released under a copyleft licence and archived with persistent DOIs.
+(ORCID 0009-0006-4432-798X.)
+\end{IEEEbiography}
+
+\EOD
+
+\end{document}

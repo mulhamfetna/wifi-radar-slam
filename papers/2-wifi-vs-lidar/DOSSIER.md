@@ -1,3 +1,9 @@
+> ⬆️ **Superseded — folded into [`../../manuscript/`](../../manuscript/DOSSIER.md).** This
+> paper is retained as a **component draft** and the record of its own submission history. Its
+> findings live on in the consolidated journal paper; do not submit this standalone.
+
+---
+
 # Paper 2 — Dossier
 
 **Title:** *Can Ambient WiFi Replace LiDAR for Automotive SLAM? Localization Yes, Mapping
