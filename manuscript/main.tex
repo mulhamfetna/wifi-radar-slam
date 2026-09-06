@@ -67,7 +67,7 @@ automotive, ESP32, low-cost hardware, multipath.
 
 %% ===========================================================================
 \section{Introduction}
-\PARstart{T}{he} exteroceptive sensors that anchor vehicle SLAM --- LiDAR and radar ---
+\PARstart{T}{he} exteroceptive sensors that anchor vehicle simultaneous localization and mapping (SLAM) --- LiDAR and radar ---
 are also the costly part of the perception stack. A research-grade spinning LiDAR runs into the
 thousands of dollars and an automotive radar into the tens to hundreds, while the WiFi silicon a
 vehicle already carries costs tens. If ambient WiFi --- signals radiated anyway, by
@@ -84,7 +84,8 @@ precisely, show it is \emph{not specific to WiFi}, and then reproduce the underl
 real hardware.
 
 \emph{Localization} is centimetre-level and, we show, \emph{structurally} robust: because the
-estimator is anchored by vehicle odometry and the bistatic CSI measurements are
+estimator is anchored by vehicle odometry and the bistatic channel state information (CSI)
+measurements are
 refinement-only, absolute trajectory error is insensitive to access-point (AP) position error up
 to tens of metres and to sudden, total measurement blackouts. \emph{Mapping} hits a hard ceiling:
 with realistic commodity CSI, the overwhelming majority of detections (${\approx}89\%$) are
@@ -95,7 +96,7 @@ detections are not real paths.
 
 To test whether this ceiling is a property of WiFi or of RF sensing more broadly, we run the
 \emph{same} substrate against real LiDAR (KITTI \cite{geiger2012kitti}) and a simulated 77\,GHz
-FMCW radar. The result is decisive: the radio carrier does not matter, geometry does --- a
+frequency-modulated continuous-wave (FMCW) radar. The result is decisive: the radio carrier does not matter, geometry does --- a
 \emph{monostatic}, on-vehicle transmitter nearly eliminates the phantoms --- and wider bandwidth
 makes them \emph{worse}. Finally, licensed by that carrier-independence, we move the claim off
 simulation entirely and capture, parse, and delay-profile real HT40 CSI on two \$30 ESP32-S3
@@ -138,11 +139,12 @@ virtual anchors \cite{gentner2016channelslam,ulmschneider2017multipath,leitinger
 li2024bpmpslam}, and radio-fingerprint or P2SLAM approaches localize against known access points
 \cite{arun2022p2slam,liu2023radiofingerprintslam} --- both \emph{infrastructure-bound}: they need
 the transmitters' positions and are demonstrated indoors. The alternative uses WiFi only to
-\emph{assist} a primary ranging sensor (LiDAR or IMU)
+\emph{assist} a primary ranging sensor (LiDAR or inertial measurement unit, IMU)
 \cite{arun2022viwid,ismail2022wifilidarslam,li2025ekfwifilidarimu}, not to replace it. No prior
 work evaluates WiFi as a stand-alone, on-vehicle, outdoor \emph{replacement} front-end.
 
-\textbf{Integrated sensing and communication (ISAC/JCAS)} envisions the same waveform serving
+\textbf{Integrated sensing and communication (ISAC), also called joint communication and
+sensing (JCAS),} envisions the same waveform serving
 communication and sensing \cite{liu2022isac,zhang2021jcassurvey,xiong2023scfundamental,%
 overview2024ieee80211bf}, but its SLAM instantiations are early \cite{gounis2026slamcomms}. At
 mmWave, 60\,GHz 802.11ad has been repurposed as a radar \cite{kumari2018adradar,han2022adimaging};
@@ -182,24 +184,25 @@ decide both the phantom rate (Sec.~\ref{sec:mech}) and the AP-error robustness (
 Channels are generated with Sionna~RT~2.0 (Mitsuba/Dr.Jit), which ray-traces the scene to produce
 per-path delays, angles, and interaction types and the frequency-domain channel across
 $N_\mathrm{sc}$ subcarriers and $N_\mathrm{rx}$ antennas per vehicle pose; additive white
-Gaussian noise is applied at a configured SNR. Radar is electromagnetic, so the same tracer
+Gaussian noise is applied at a configured signal-to-noise ratio (SNR). Radar is electromagnetic, so the same tracer
 models it natively; LiDAR requires an optical (diffuse-scattering) treatment
 (Sec.~\ref{sec:method}-E).
 
-\subsection{CSI front-end: joint 2-D (delay--angle) MUSIC}
+\subsection{CSI front-end: joint 2-D (delay--angle) MUltiple SIgnal Classification (MUSIC)}
 We compare two sensing tiers. The \emph{oracle} front-end reads Sionna's true single-scatter path
 parameters, isolating the geometry from estimation error. The \emph{realistic} front-end
 estimates delay and azimuth from noisy CSI with MUSIC. A key refinement is \emph{joint 2-D
-(delay--angle) MUSIC} with 2-D spatial smoothing (SVD subspace; delay grid bounded to the
+(delay--angle) MUSIC} with 2-D spatial smoothing
+(singular-value-decomposition, SVD, subspace; delay grid bounded to the
 unambiguous $1/\Delta f$ range), which recovers each path's delay and angle \emph{together}, so
 association is intrinsic rather than paired by sorted index. Array-relative electrical angles map
-to world azimuth by $\sin\beta=-\sin\theta$ for the lateral ULA.
+to world azimuth by $\sin\beta=-\sin\theta$ for the lateral uniform linear array (ULA).
 
 \subsection{Bistatic-ellipse mapping and particle-filter SLAM}
 A Rao--Blackwellized particle filter propagates the vehicle pose from odometry and weights
 particles by the bistatic consistency \eqref{eq:bistatic} of each detection; triangulated
 reflectors are accumulated and consensus-filtered into a landmark map. We report trajectory error
-(ATE, RPE) and, for the map, symmetric Chamfer distance, occupancy IoU, and \emph{directional}
+(absolute trajectory error, ATE; relative pose error, RPE) and, for the map, symmetric Chamfer distance, occupancy IoU, and \emph{directional}
 accuracy and completeness (a passive-WiFi map illuminates only a subset of surfaces). Map ground
 truth is each scene object's facade footprint.
 
@@ -218,7 +221,7 @@ the same way.
 
 \subsection{LiDAR and 77\,GHz radar baselines}
 The LiDAR baseline is an Ouster-class spinning sensor, ray-traced with a diffuse-scattering model
-and a scan-to-map ICP back-end that is \emph{externally validated} on real KITTI sequences
+and a scan-to-map iterative-closest-point (ICP) back-end that is \emph{externally validated} on real KITTI sequences
 (${\approx}0.3\%$ drift), so its simulated numbers are anchored to reality. The radar baseline is
 a 77\,GHz FMCW sensor with a range--azimuth CFAR chain. One honest caveat propagates from the
 radar study: our point-to-point ICP back-end cannot recover \emph{rotation} from spinning-radar
@@ -229,7 +232,7 @@ exactly the quantity of interest.
 \subsection{ESP32-S3 hardware testbed}
 Two \$30 ESP32-S3 boards realise the monostatic geometry directly: one illuminates (HT40, 40\,MHz)
 and one logs CSI ${\approx}0.5$\,m away, so the round-trip delay taps \emph{are} echo ranges. Only
-the \emph{excess} delay (relative to the line-of-sight arrival) is needed, and that is preserved
+the \emph{excess} delay (relative to the line-of-sight, LOS, arrival) is needed, and that is preserved
 on commodity CSI even though absolute time-of-flight is not; the $0.5$\,m baseline is under $7\%$
 of one 40\,MHz range cell, so the rig is monostatic to within measurement. Using 2.4\,GHz hardware
 is licensed by the carrier-independence result (Table~\ref{tab:ablation}, B$\rightarrow$C). Details
@@ -552,7 +555,7 @@ tap. Working at $2.4$\,GHz rather than the simulated $5.2$\,GHz is licensed by t
 carrier-independence result (Table~\ref{tab:ablation}, B$\rightarrow$C).
 
 \textbf{First light.} The pipeline runs end-to-end on real silicon. From a static two-board capture
-we parse valid HT40 records ($40$\,MHz, high-throughput, $384$-byte buffers), whose HT-LTF carries
+we parse valid HT40 records ($40$\,MHz, high-throughput, $384$-byte buffers), whose high-throughput long training field (HT-LTF) carries
 $128$ subcarriers with exactly $114$ non-null --- matching the physical active mask ($3$ DC-notch
 $+$ $11$ guard bins) and so validating the subcarrier ordering. Coherent averaging aligns the
 line-of-sight tap to $0$\,m, and with the two boards adjacent the channel is near-flat --- a single
