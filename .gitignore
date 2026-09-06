@@ -68,3 +68,6 @@ manuscript/t1-*.tfm
 manuscript/t1*.fd
 manuscript/*.map
 ACCESS_latex_template_*.zip
+
+# IEEE author-guidance page (copyright IEEE) -- local reference only
+Preparing Your Article.md
