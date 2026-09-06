@@ -57,15 +57,18 @@ Two genuinely-new experiments (R1.6, R1.7) are tracked as GitHub issues (Sub-pro
 
 ## Status
 
-- **A — repo/GitHub structure:** ✅ done (branch `consolidation`, PR #10, CI green).
+- **A — repo/GitHub structure:** ✅ done (PR #10 **merged to `main`** 2026-09-06 as `12922d9`; CI green).
 - **B — experiments (R1.6, R1.7):** ✅ done — results in `docs/results-ap-sensitivity.md`,
   `docs/results-blockage-robustness.md`; issues #6/#7 commented.
-- **C — manuscript assembly:** COMPLETE FIRST DRAFT — all sections drafted in `main.tex`
-  (Intro, Related Work, Method, Feasibility, Mechanism+Universality+Robustness, Hardware,
-  Discussion, Conclusion); 6 pp; the only open content is the hardware phantom-rate SLOT (Sec. VI),
-  filled once a >=15 m corridor runs Rung 1. Next: port to ieeeaccess.cls; figures for the sim
-  results; polish.
-- **Venue:** TBD — **not** IoT-J (rejection bars it). Candidates to weigh later.
+- **C — manuscript assembly:** ✅ **SUBMISSION READY** — `main.tex` on the official
+  `ieeeaccess.cls`; 13 sections, 7 figures, 4 tables, 9 pp; author biography + photo in place;
+  `cover-letter.md` written (includes the required self-similarity disclosure). Read and
+  confirmed by the author 2026-09-06.
+- **Venue:** IEEE Access (its class and author-guidance requirements are what the manuscript is
+  built against). **Not** IoT-J — the paper-1 rejection bars resubmission there.
+- **Open (post-submission):** the hardware phantom-rate SLOT (Sec. VI) is written as a
+  simulation-anchored claim with the static-bench first-light result; the full Rung 1 number
+  needs a >=15 m corridor and is scoped as a follow-up, not a submission blocker.
 
 ## Guardrails
 
