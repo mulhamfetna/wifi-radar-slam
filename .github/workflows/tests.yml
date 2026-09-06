@@ -13,7 +13,9 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      # Sionna (the 'sim' extra) is heavy + GPU-oriented; the Sionna tests importorskip,
-      # so CI installs only the pure-NumPy/sklearn deps and runs 199 tests (4 skip).
+      # Sionna (the 'sim' extra) is heavy + GPU-oriented; the Sionna tests importorskip.
+      # The WiFiSLAM-Sim .npz is a release asset, not a repo file, so the sensitivity tests
+      # skip here too. CI installs the pure-NumPy/sklearn deps: 199 pass, 11 skip.
+      # Locally, with the dataset present: 206 pass, 4 skip.
       - run: pip install -e '.[ml,dev]'
       - run: python -m pytest -q

@@ -1,11 +1,22 @@
 """Unit tests for the reviewer-experiment harness (eval/sensitivity.py).
 
 Deterministic; runs on the cached WiFiSLAM-Sim dataset, no Sionna.
+
+The dataset is a release asset, not a repo file (see .gitignore: ``data/*.npz``), so these
+tests skip where it is absent -- CI, or a fresh clone. Regenerate it with
+``python experiments/make_dataset.py``, or fetch it from a release, and they run.
 """
+import os
+
 import numpy as np
 import pytest
 
 from wifi_radar_slam.eval import sensitivity as S
+
+pytestmark = pytest.mark.skipif(
+    not os.path.exists(S.DEFAULT_DATASET),
+    reason=f"{S.DEFAULT_DATASET} absent (release asset; see experiments/make_dataset.py)",
+)
 
 
 @pytest.fixture(scope="module")
