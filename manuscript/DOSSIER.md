@@ -3,7 +3,7 @@
 **Working title:** *Ambient WiFi as a Cheap Radar for SLAM: From Physics Feasibility to $30
 Hardware — Why Localization Works, Mapping Hits a Phantom Ceiling, and What That Ceiling Is*
 **Author:** Mulham Fetna (ORCID 0009-0006-4432-798X)
-**Status:** **COMPLETE FIRST DRAFT (6 pp, builds).** Consolidates the four component papers (`../papers/1..4/`) into one
+**Status:** **SUBMISSION DRAFT (9 pp, 13 sections, 7 figures, 4 tables; builds).** Consolidates the four component papers (`../papers/1..4/`) into one
 substantial journal submission, in response to the IoT-J reject-with-strong-reviews on paper 1.
 
 This is the authoritative record for the consolidated paper. The four `papers/N/DOSSIER.md`
