@@ -71,3 +71,6 @@ ACCESS_latex_template_*.zip
 
 # IEEE author-guidance page (copyright IEEE) -- local reference only
 Preparing Your Article.md
+
+# assembled submission bundle (derived from manuscript sources; rebuild with the zip step in DOSSIER)
+manuscript/ACCESS-submission-source.zip
