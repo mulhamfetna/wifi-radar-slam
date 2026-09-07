@@ -107,6 +107,26 @@ Title, abstract and keywords are **typed into the portal separately from the fil
 read them out of the LaTeX. Paste the abstract as plain text and strip the markup
 (`\,`, `\emph{}`, `${\approx}89\%$` → `≈89%`).
 
+**Subject categories (portal allows 2–5 — take all 5; they widen the Associate Editor pool).**
+In priority order:
+
+1. **Signal processing** — the method: joint 2-D delay–angle MUSIC, CFAR, delay-domain CIR
+2. **Sensors** — the object of study: WiFi as a sensor, characterized by its phantom rate
+3. **Robotics and automation** — SLAM: the particle filter, ATE, occupancy IoU
+4. **Vehicular and wireless technologies** — on-vehicle 802.11 sensing; the ESP32 testbed
+5. **Antennas and propagation** — ray tracing, multipath, the bistatic/monostatic geometry
+
+Slot 5 is the only real choice: *Antennas and propagation* vs *Intelligent transportation
+systems*. Propagation wins because the mechanism claim (the ceiling is geometry, not carrier
+or bandwidth) is both the most novel and the most attackable part, and a propagation reviewer
+can actually adjudicate it; slots 3–4 already reach the automotive readership. Take ITS instead
+only to be read as an automotive-perception paper rather than a sensing-physics one.
+
+Not chosen, and why: *Communications technology* (ISAC is related work, not the contribution),
+*Instrumentation and measurement* (the bench is one section), *Microwave theory and techniques*
+(we use 5.2/77 GHz but contribute no microwave technique), *Computers and information
+processing* (too generic to attract a useful editor).
+
 **Keywords (9; checklist #12 allows 3–10).** These drive Associate Editor matching, so they matter:
 
 1. WiFi sensing
