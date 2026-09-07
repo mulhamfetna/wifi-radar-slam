@@ -127,17 +127,51 @@ Not chosen, and why: *Communications technology* (ISAC is related work, not the 
 (we use 5.2/77 GHz but contribute no microwave technique), *Computers and information
 processing* (too generic to attract a useful editor).
 
-**Keywords (9; checklist #12 allows 3–10).** These drive Associate Editor matching, so they matter:
+**Keywords (10; checklist #12 allows 3–10).** These drive Associate Editor matching, so they
+matter. IEEE Access takes them from a **controlled vocabulary** — `key_words_list.md` in this
+directory — and free text is not accepted. Listed alphabetically, as the manuscript prints them:
 
-1. WiFi sensing
-2. Channel state information
-3. SLAM
-4. Passive radar
-5. Integrated sensing and communication
-6. Automotive
-7. ESP32
-8. Low-cost hardware
-9. Multipath
+1. Autonomous vehicles
+2. Bistatic radar
+3. Channel state information
+4. Direction-of-arrival estimation
+5. Millimeter wave radar
+6. Multipath channels
+7. Passive radar
+8. Ray tracing
+9. Simultaneous localization and mapping
+10. Wireless fidelity
+
+`\begin{keywords}` in `main.tex` carries the same ten, so the article and the portal agree.
+
+**Re-validate after any edit** — an entry that is merely plausible is rejected:
+
+```sh
+cd manuscript
+while IFS= read -r t; do
+  grep -q -x -F "$t" key_words_list.md && echo "OK   $t" || echo "BAD  $t"
+done <<'KW'
+Autonomous vehicles
+Bistatic radar
+Channel state information
+Direction-of-arrival estimation
+Millimeter wave radar
+Multipath channels
+Passive radar
+Ray tracing
+Simultaneous localization and mapping
+Wireless fidelity
+KW
+```
+
+An earlier draft used nine terms written from the abstract — *WiFi sensing, SLAM, integrated
+sensing and communication, automotive, ESP32, low-cost hardware, multipath* — and seven of the
+nine are not list entries. The vocabulary has no Wi-Fi term other than **Wireless fidelity**
+(or *Wireless LAN*), spells SLAM out in full, and has no ISAC entry at all; **Microcontrollers**
+is the only route to the ESP32 and was dropped as too weak to steer an editor. *Bistatic radar*,
+*Ray tracing* and *Millimeter wave radar* were added in their place — each names something the
+paper actually contributes, and each pulls toward the same editors as the chosen subject
+categories.
 
 ## The two questions that need a deliberate answer
 
