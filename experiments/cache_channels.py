@@ -50,7 +50,8 @@ def main(config_path: str, out_path: str | None = None, max_frames: int | None =
         p = solver(scene, max_depth=3, samples_per_src=n_samples,
                    seed=int(rng.integers(1, 2**31 - 1)))
         for bw in BANDWIDTHS:
-            h = np.asarray(p.cfr(frequencies=freqs[bw], normalize=False, out_type="numpy"))
+            h = np.asarray(p.cfr(frequencies=freqs[bw], normalize=False,
+                                     normalize_delays=True, out_type="numpy"))  # excess delays
             cfr[bw][f] = np.transpose(h[0, :, :, 0, 0, :], (1, 0, 2))
         inter = np.asarray(p.interactions.numpy())[:, 0]
         tau = np.asarray(p.tau.numpy())[0]; phir = np.asarray(p.phi_r.numpy())[0]

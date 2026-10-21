@@ -46,9 +46,28 @@ def _wrap(a):
     return (a + np.pi) % (2 * np.pi) - np.pi
 
 
+def _horizontal_length(excess, pose_xy, ap, rx_height):
+    """Commodity-CSI excess delay -> horizontal bistatic path length, per pose.
+
+    CSI only fixes delays relative to the first (line-of-sight) arrival, so the full 3-D
+    path length is ``excess + |AP - p|_3D``; dropping the AP-receiver height difference
+    (preserved by a wall bounce) gives the 2-D unfolded length the filter works in.
+    """
+    dh = ap[2] - rx_height
+    los3 = np.sqrt(np.sum((ap[:2] - pose_xy) ** 2, axis=-1) + dh ** 2)
+    return np.sqrt(np.maximum((excess + los3) ** 2 - dh ** 2, 1e-4))
+
+
 def run_fastslam(detections, ap_positions, velocity, timestep_s, rng,
-                 init_pose=None, params: FastSlamParams = FastSlamParams()):
+                 init_pose=None, params: FastSlamParams = FastSlamParams(),
+                 excess_delay: bool = False, rx_height: float = 1.5):
     """Returns ``(est_traj (n,3), est_map (k,2), info)``.
+
+    Detections are ``[length_m, azimuth_rad, ap_index]``. With ``excess_delay=False`` the
+    length is the *horizontal* bistatic path length (absolute delay, i.e. a synchronized
+    transmitter). With ``excess_delay=True`` it is the 3-D excess over the LOS arrival --
+    what commodity CSI actually provides -- and is converted per particle using the known
+    AP position.
 
     ``info`` holds ``landmarks`` (confirmed VA positions of the best particle),
     ``n_confirmed`` and ``n_detections_used``.
@@ -77,8 +96,10 @@ def run_fastslam(detections, ap_positions, velocity, timestep_s, rng,
         assoc = np.full((P, dets.shape[0]), -1)
         logw = np.zeros(P)
         taken = np.zeros((P, M), bool)             # one detection per landmark per frame
-        for j, (rho, phi, api) in enumerate(dets):
+        for j, (rho_in, phi, api) in enumerate(dets):
             api = int(api)
+            rho = (_horizontal_length(rho_in, pose, aps[api], rx_height) if excess_delay
+                   else np.full(P, rho_in))
             cand = act & (lap == api) & ~taken
             cols = np.where(cand.any(0))[0]
             hit = np.zeros(P, bool)
@@ -87,7 +108,7 @@ def run_fastslam(detections, ap_positions, velocity, timestep_s, rng,
                 Lc, Sc = L[:, cols], S[:, cols]
                 d = Lc - pose[:, None, :]
                 r2 = np.maximum(np.sum(d ** 2, -1), 1e-6); r = np.sqrt(r2)
-                nu = np.stack([rho - r, _wrap(phi - np.arctan2(d[..., 1], d[..., 0]))], -1)
+                nu = np.stack([rho[:, None] - r, _wrap(phi - np.arctan2(d[..., 1], d[..., 0]))], -1)
                 H = np.empty(d.shape[:2] + (2, 2))
                 H[..., 0, 0] = d[..., 0] / r; H[..., 0, 1] = d[..., 1] / r
                 H[..., 1, 0] = -d[..., 1] / r2; H[..., 1, 1] = d[..., 0] / r2
@@ -123,9 +144,12 @@ def run_fastslam(detections, ap_positions, velocity, timestep_s, rng,
                 slot = np.where(free.any(1), np.argmax(free, 1),
                                 np.argmin(np.where(act[p_], cnt[p_], 1 << 30), 1))
                 u = np.array([np.cos(phi), np.sin(phi)])
-                G = np.array([[u[0], -rho * u[1]], [u[1], rho * u[0]]])
-                L[p_, slot] = pose[p_] + rho * u
-                S[p_, slot] = G @ R @ G.T
+                rp = rho[p_]
+                G = np.zeros((len(p_), 2, 2))
+                G[:, 0, 0] = u[0]; G[:, 0, 1] = -rp * u[1]
+                G[:, 1, 0] = u[1]; G[:, 1, 1] = rp * u[0]
+                L[p_, slot] = pose[p_] + rp[:, None] * u
+                S[p_, slot] = G @ R @ np.swapaxes(G, -1, -2)
                 act[p_, slot] = True; cnt[p_, slot] = 1; last[p_, slot] = f
                 lap[p_, slot] = api
                 ids = next_id + np.arange(len(p_)); next_id += len(p_)
@@ -145,9 +169,11 @@ def run_fastslam(detections, ap_positions, velocity, timestep_s, rng,
         # record reflection points from the posterior mean pose, tagged by the best
         # particle's landmark id (resolved to confirmed/unconfirmed at the end)
         b = int(np.argmax(w))
-        for j, (rho, phi, api) in enumerate(dets):
+        for j, (rho_in, phi, api) in enumerate(dets):
             if assoc[b, j] < 0:
                 continue
+            rho = (float(_horizontal_length(rho_in, mean, aps[int(api)], rx_height))
+                   if excess_delay else rho_in)
             pt = _triangulate_bistatic(mean, aps[int(api)][:2], rho, phi)
             if pt is not None:
                 records.append((int(lid[b, assoc[b, j]]), pt))

@@ -114,3 +114,35 @@ def test_isolated_phantoms_never_promoted():
     _, _, info = run_fastslam(noisy, APS, vel, DT, np.random.default_rng(0),
                               init_pose=gt[0], params=FastSlamParams(promote_min_obs=5))
     assert info["n_confirmed"] <= 4 + 1     # the 4 real anchors (+ at most one fluke)
+
+
+def _excess_wall_detections(gt, aps, walls_y, rx_h=1.5):
+    """Commodity-CSI convention: path length EXCESS over the LOS arrival, 3-D."""
+    dets = []
+    for p in gt:
+        rows = []
+        for i, a in enumerate(aps):
+            dh = a[2] - rx_h
+            los = np.sqrt(np.sum((a[:2] - p[:2]) ** 2) + dh ** 2)
+            for w in walls_y:
+                if (a[1] - w) * (p[1] - w) <= 0:
+                    continue
+                va = np.array([a[0], 2 * w - a[1]])
+                d = va - p[:2]
+                rows.append([np.sqrt(d @ d + dh ** 2) - los, np.arctan2(d[1], d[0]), i])
+        dets.append(np.array(rows) if rows else np.empty((0, 3)))
+    return dets
+
+
+def test_excess_delay_mode_localizes_and_maps():
+    gt, vel = _straight()
+    dets = _excess_wall_detections(gt, APS, WALLS)
+    gains = []
+    for seed in range(3):
+        v = noisy_velocity(vel, DT, OdometryNoise(), np.random.default_rng(seed))
+        est, emap, info = run_fastslam(dets, APS, v, DT, np.random.default_rng(50 + seed),
+                                       init_pose=gt[0], excess_delay=True)
+        gains.append(ate(dead_reckon(v, DT, gt[0]), gt) - ate(est, gt))
+    assert np.mean(gains) > 0, gains
+    assert info["n_confirmed"] >= 3
+    assert np.median(np.min(np.abs(emap[:, 1][:, None] - np.array(WALLS)[None]), axis=1)) < 0.5

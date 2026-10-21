@@ -34,7 +34,13 @@ def simulate_csi(built: BuiltScene, rf: RFConfig, snr_db: float, rng) -> np.ndar
         rx.position = mi.Point3f(float(x), float(y), RX_HEIGHT_M)
         paths = solver(scene, max_depth=3, samples_per_src=n_samples,
                        seed=int(rng.integers(1, 2**31 - 1)))
-        h = np.asarray(paths.cfr(frequencies=freqs, normalize=False, out_type="numpy"))
+        # normalize_delays=True (Sionna's default, now explicit): delays are relative to the
+        # FIRST arrival, as on commodity CSI, which has no absolute time of flight. Detections
+        # from this CSI are therefore EXCESS path lengths over the LOS arrival -- a consumer
+        # must add |AP - p| (see slam.fastslam excess_delay=True). The pre-2026-10 pipeline
+        # read them as absolute bistatic lengths, which produced the reported "range bias".
+        h = np.asarray(paths.cfr(frequencies=freqs, normalize=False, normalize_delays=True,
+                                 out_type="numpy"))
         # (n_rx=1, n_rx_ant, n_tx=n_ap, n_tx_ant=1, n_time=1, n_sub) -> (n_ap, n_rx_ant, n_sub)
         h = h[0, :, :, 0, 0, :]                 # (n_rx_ant, n_ap, n_sub)
         csi[f] = np.transpose(h, (1, 0, 2))     # (n_ap, n_rx_ant, n_sub)
