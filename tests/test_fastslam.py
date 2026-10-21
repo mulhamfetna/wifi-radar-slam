@@ -146,3 +146,23 @@ def test_excess_delay_mode_localizes_and_maps():
     assert np.mean(gains) > 0, gains
     assert info["n_confirmed"] >= 3
     assert np.median(np.min(np.abs(emap[:, 1][:, None] - np.array(WALLS)[None]), axis=1)) < 0.5
+
+
+def test_ambiguous_azimuth_recovers_folded_detections():
+    """Single-ULA reports only the forward branch: fold every bearing to (-pi/2, pi/2]."""
+    gt, vel = _straight()
+    dets = _excess_wall_detections(gt, APS, WALLS)
+    folded = [d.copy() for d in dets]
+    for d in folded:
+        if len(d):
+            d[:, 1] = np.arcsin(np.sin(d[:, 1]))
+    res = {}
+    for amb in (False, True):
+        g = []
+        for seed in range(3):
+            v = noisy_velocity(vel, DT, OdometryNoise(), np.random.default_rng(seed))
+            est, _, _ = run_fastslam(folded, APS, v, DT, np.random.default_rng(70 + seed),
+                                     init_pose=gt[0], excess_delay=True, ambiguous_azimuth=amb)
+            g.append(ate(est, gt))
+        res[amb] = np.mean(g)
+    assert res[True] < res[False], res

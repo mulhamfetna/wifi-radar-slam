@@ -60,14 +60,18 @@ def _horizontal_length(excess, pose_xy, ap, rx_height):
 
 def run_fastslam(detections, ap_positions, velocity, timestep_s, rng,
                  init_pose=None, params: FastSlamParams = FastSlamParams(),
-                 excess_delay: bool = False, rx_height: float = 1.5):
+                 excess_delay: bool = False, rx_height: float = 1.5,
+                 ambiguous_azimuth: bool = False):
     """Returns ``(est_traj (n,3), est_map (k,2), info)``.
 
     Detections are ``[length_m, azimuth_rad, ap_index]``. With ``excess_delay=False`` the
     length is the *horizontal* bistatic path length (absolute delay, i.e. a synchronized
     transmitter). With ``excess_delay=True`` it is the 3-D excess over the LOS arrival --
     what commodity CSI actually provides -- and is converted per particle using the known
-    AP position.
+    AP position. ``ambiguous_azimuth=True`` models a single uniform linear array, which
+    reports only the forward branch: each detection is scored against both ``phi`` and its
+    front/back mirror ``pi - phi``, and an unexplained detection seeds one tentative anchor
+    per branch (the inconsistent one is never re-observed, so it is pruned).
 
     ``info`` holds ``landmarks`` (confirmed VA positions of the best particle),
     ``n_confirmed`` and ``n_detections_used``.
@@ -96,19 +100,20 @@ def run_fastslam(detections, ap_positions, velocity, timestep_s, rng,
         assoc = np.full((P, dets.shape[0]), -1)
         logw = np.zeros(P)
         taken = np.zeros((P, M), bool)             # one detection per landmark per frame
-        for j, (rho_in, phi, api) in enumerate(dets):
+        aphi = np.zeros((P, dets.shape[0]))      # azimuth branch used by each association
+        for j, (rho_in, phi0, api) in enumerate(dets):
             api = int(api)
             rho = (_horizontal_length(rho_in, pose, aps[api], rx_height) if excess_delay
                    else np.full(P, rho_in))
+            branches = [phi0, float(_wrap(np.pi - phi0))] if ambiguous_azimuth else [phi0]
             cand = act & (lap == api) & ~taken
             cols = np.where(cand.any(0))[0]
             hit = np.zeros(P, bool)
-            k = np.zeros(P, int)
             if cols.size:
                 Lc, Sc = L[:, cols], S[:, cols]
                 d = Lc - pose[:, None, :]
                 r2 = np.maximum(np.sum(d ** 2, -1), 1e-6); r = np.sqrt(r2)
-                nu = np.stack([rho[:, None] - r, _wrap(phi - np.arctan2(d[..., 1], d[..., 0]))], -1)
+                bearing = np.arctan2(d[..., 1], d[..., 0])
                 H = np.empty(d.shape[:2] + (2, 2))
                 H[..., 0, 0] = d[..., 0] / r; H[..., 0, 1] = d[..., 1] / r
                 H[..., 1, 0] = -d[..., 1] / r2; H[..., 1, 1] = d[..., 0] / r2
@@ -117,45 +122,53 @@ def run_fastslam(detections, ap_positions, velocity, timestep_s, rng,
                 Si = np.empty_like(Sm)
                 Si[..., 0, 0] = Sm[..., 1, 1] / det; Si[..., 1, 1] = Sm[..., 0, 0] / det
                 Si[..., 0, 1] = -Sm[..., 0, 1] / det; Si[..., 1, 0] = -Sm[..., 1, 0] / det
-                md = np.einsum('pmi,pmij,pmj->pm', nu, Si, nu)
-                md = np.where(cand[:, cols], md, np.inf)
-                kc = np.argmin(md, axis=1)
-                hit = md[ar, kc] < params.gate_chi2
-                k = cols[kc]
+                best = np.full(P, np.inf); kc = np.zeros(P, int)
+                nu_sel = np.zeros((P, 2)); phi_sel = np.full(P, phi0)
+                for phb in branches:
+                    nu = np.stack([rho[:, None] - r, _wrap(phb - bearing)], -1)
+                    md = np.einsum('pmi,pmij,pmj->pm', nu, Si, nu)
+                    md = np.where(cand[:, cols], md, np.inf)
+                    kb = np.argmin(md, axis=1); mb = md[ar, kb]
+                    better = mb < best
+                    best[better] = mb[better]; kc[better] = kb[better]
+                    nu_sel[better] = nu[ar[better], kb[better]]; phi_sel[better] = phb
+                hit = best < params.gate_chi2
             # EKF update for associated particles
             if hit.any():
                 p_, kc_ = ar[hit], kc[hit]
-                k_ = k[hit]
-                Hk, Sik, nuk = H[p_, kc_], Si[p_, kc_], nu[p_, kc_]
+                k_ = cols[kc_]
+                Hk, Sik, nuk = H[p_, kc_], Si[p_, kc_], nu_sel[p_]
                 Sigk = S[p_, k_]
                 K = Sigk @ np.swapaxes(Hk, -1, -2) @ Sik
                 L[p_, k_] += np.einsum('pij,pj->pi', K, nuk)
                 S[p_, k_] = (np.eye(2) - K @ Hk) @ Sigk
                 cnt[p_, k_] += 1; last[p_, k_] = f
                 taken[p_, k_] = True
-                logw[p_] += -0.5 * md[p_, kc_] - np.log(2 * np.pi * np.sqrt(det[p_, kc_]))
-                assoc[p_, j] = k_
-            # initialize a new tentative VA for the rest
+                logw[p_] += -0.5 * best[p_] - np.log(2 * np.pi * np.sqrt(det[p_, kc_]))
+                assoc[p_, j] = k_; aphi[p_, j] = phi_sel[p_]
+            # initialize a new tentative VA (one per azimuth branch) for the rest
             miss = ~hit
             if miss.any():
                 p_ = ar[miss]
                 logw[p_] += np.log(params.new_landmark_lik)
-                free = ~act[p_]
-                slot = np.where(free.any(1), np.argmax(free, 1),
-                                np.argmin(np.where(act[p_], cnt[p_], 1 << 30), 1))
-                u = np.array([np.cos(phi), np.sin(phi)])
                 rp = rho[p_]
-                G = np.zeros((len(p_), 2, 2))
-                G[:, 0, 0] = u[0]; G[:, 0, 1] = -rp * u[1]
-                G[:, 1, 0] = u[1]; G[:, 1, 1] = rp * u[0]
-                L[p_, slot] = pose[p_] + rp[:, None] * u
-                S[p_, slot] = G @ R @ np.swapaxes(G, -1, -2)
-                act[p_, slot] = True; cnt[p_, slot] = 1; last[p_, slot] = f
-                lap[p_, slot] = api
-                ids = next_id + np.arange(len(p_)); next_id += len(p_)
-                lid[p_, slot] = ids
-                assoc[p_, j] = slot
-                taken[p_, slot] = True
+                for bi, phb in enumerate(branches):
+                    free = ~act[p_]
+                    slot = np.where(free.any(1), np.argmax(free, 1),
+                                    np.argmin(np.where(act[p_], cnt[p_], 1 << 30), 1))
+                    u = np.array([np.cos(phb), np.sin(phb)])
+                    G = np.zeros((len(p_), 2, 2))
+                    G[:, 0, 0] = u[0]; G[:, 0, 1] = -rp * u[1]
+                    G[:, 1, 0] = u[1]; G[:, 1, 1] = rp * u[0]
+                    L[p_, slot] = pose[p_] + rp[:, None] * u
+                    S[p_, slot] = G @ R @ np.swapaxes(G, -1, -2)
+                    act[p_, slot] = True; cnt[p_, slot] = 1; last[p_, slot] = f
+                    lap[p_, slot] = api
+                    ids = next_id + np.arange(len(p_)); next_id += len(p_)
+                    lid[p_, slot] = ids
+                    taken[p_, slot] = True
+                    if bi == 0:
+                        assoc[p_, j] = slot; aphi[p_, j] = phb
         # prune stale tentative landmarks
         stale = act & (cnt < params.promote_min_obs) & (f - last > params.prune_after)
         act &= ~stale
@@ -169,9 +182,10 @@ def run_fastslam(detections, ap_positions, velocity, timestep_s, rng,
         # record reflection points from the posterior mean pose, tagged by the best
         # particle's landmark id (resolved to confirmed/unconfirmed at the end)
         b = int(np.argmax(w))
-        for j, (rho_in, phi, api) in enumerate(dets):
+        for j, (rho_in, _phi_raw, api) in enumerate(dets):
             if assoc[b, j] < 0:
                 continue
+            phi = aphi[b, j]
             rho = (float(_horizontal_length(rho_in, mean, aps[int(api)], rx_height))
                    if excess_delay else rho_in)
             pt = _triangulate_bistatic(mean, aps[int(api)][:2], rho, phi)
