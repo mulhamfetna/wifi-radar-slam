@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import numpy as np
 from ..config import RunConfig
-from ..geometry import straight_trajectory, footprint_points, RX_HEIGHT_M
+from ..geometry import straight_trajectory, scurve_trajectory, footprint_points, RX_HEIGHT_M
 
 
 @dataclass
@@ -138,8 +138,12 @@ def build_scene(cfg: RunConfig) -> BuiltScene:
     scene.add(rt.Receiver(name="veh", position=[0.0, 0.0, RX_HEIGHT_M]))
 
     # trajectory centered so the vehicle drives through the middle of the scene
-    traj = straight_trajectory(cfg.trajectory.length_m, cfg.trajectory.speed_mps,
-                               cfg.trajectory.timestep_s)
+    if cfg.trajectory.shape == "scurve":
+        traj = scurve_trajectory(cfg.trajectory.length_m, cfg.trajectory.speed_mps,
+                                 cfg.trajectory.timestep_s)
+    else:
+        traj = straight_trajectory(cfg.trajectory.length_m, cfg.trajectory.speed_mps,
+                                   cfg.trajectory.timestep_s)
     traj[:, 0] -= cfg.trajectory.length_m / 2.0
 
     # ground-truth map: xy footprint (facade outline) of each static scatterer's

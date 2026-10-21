@@ -51,3 +51,14 @@ def test_pointmap_covers_boxes():
     assert pts.shape[1] == 3
     assert pts.shape[0] > 0
     assert np.all(np.abs(pts[:, 0]) <= 0.2)            # within box x-extent
+
+
+def test_scurve_trajectory_lane_change():
+    from wifi_radar_slam.geometry import scurve_trajectory
+    t = scurve_trajectory(60.0, 5.0, 0.05, amplitude_m=2.5)
+    assert t.shape == (240, 3)
+    assert np.isclose(np.max(np.abs(t[:, 1])), 2.5, atol=0.05)
+    assert np.isclose(t[0, 1], 0.0) and abs(t[-1, 1]) < 0.1     # starts/ends on the lane centre
+    step = np.linalg.norm(np.diff(t[:, :2], axis=0), axis=1)
+    assert np.allclose(step, 0.25, rtol=0.05)                    # ~constant speed
+    assert np.ptp(t[:, 2]) > 0.2                                  # heading actually changes

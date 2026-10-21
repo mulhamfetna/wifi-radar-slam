@@ -12,6 +12,26 @@ def straight_trajectory(length_m: float, speed_mps: float, timestep_s: float) ->
     return poses
 
 
+def scurve_trajectory(length_m: float, speed_mps: float, timestep_s: float,
+                      amplitude_m: float = 2.5) -> np.ndarray:
+    """One full lateral sine period (a lane change out and back) at ~constant speed.
+
+    y = A sin(2 pi x / L); x is reparameterized by arc length so the speed is constant.
+    Yaw follows the tangent. Starts at x=0 like ``straight_trajectory``.
+    """
+    n = int(round((length_m / speed_mps) / timestep_s))
+    xs = np.linspace(0.0, length_m, 4000)
+    ys = amplitude_m * np.sin(2 * np.pi * xs / length_m)
+    arc = np.concatenate([[0.0], np.cumsum(np.hypot(np.diff(xs), np.diff(ys)))])
+    s = np.arange(n) * speed_mps * timestep_s * arc[-1] / length_m
+    x = np.interp(s, arc, xs)
+    poses = np.zeros((n, 3))
+    poses[:, 0] = x
+    poses[:, 1] = amplitude_m * np.sin(2 * np.pi * x / length_m)
+    poses[:, 2] = np.arctan(amplitude_m * 2 * np.pi / length_m * np.cos(2 * np.pi * x / length_m))
+    return poses
+
+
 def velocity_from_poses(poses: np.ndarray, timestep_s: float) -> np.ndarray:
     vel = np.zeros((poses.shape[0], 2))
     if poses.shape[0] > 1:
