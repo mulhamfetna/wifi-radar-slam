@@ -27,7 +27,8 @@ plt.rcParams.update({"font.family": "serif", "font.size": 8, "axes.edgecolor": M
                      "axes.labelcolor": INK, "xtick.color": MUTED, "ytick.color": MUTED,
                      "text.color": INK, "axes.spines.top": False, "axes.spines.right": False,
                      "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.6,
-                     "axes.axisbelow": True, "legend.frameon": False})
+                     "axes.axisbelow": True, "legend.frameon": False,
+                     "pdf.fonttype": 42, "ps.fonttype": 42})
 
 
 def fig_localization(S, L):
