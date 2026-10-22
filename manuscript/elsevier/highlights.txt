@@ -1,0 +1,5 @@
+Exact WiFi multipath parameters cut vehicle odometry drift by 66-79 %.
+A 4-element MUSIC front-end returns only ~15 % facade reflections.
+Persistent false anchors make realistic WiFi SLAM worse than dead reckoning.
+Ambient-WiFi aiding needs access-point positions known to sub-metre accuracy.
+Reading first-arrival-referenced CSI delays as absolute creates a false range bias.

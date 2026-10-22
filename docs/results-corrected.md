@@ -134,3 +134,48 @@ accuracy.
 
 The phantom rate is flat in bandwidth: the limit is the 4-element aperture and model mismatch,
 not range resolution.
+
+### R5. Robustness (corrected; 5 seeds; `results/robustness_corrected.json`)
+
+Dead reckoning for these seeds: 0.158 m (controlled), 0.370 m (street).
+
+| AP error std (m) | 0 | 0.5 | 1 | 2 | 4 | 8 |
+|---|---|---|---|---|---|---|
+| Controlled, oracle | 0.057 | 0.242 | 0.308 | 0.393 | 0.456 | 0.508 |
+| Street, oracle | 0.083 | 0.339 | 0.479 | 0.668 | 0.987 | 1.204 |
+
+| Blackout (frames) | 0 | 10 | 20 | 40 | 80 |
+|---|---|---|---|---|---|
+| Controlled, oracle | 0.057 | 0.053 | 0.058 | 0.074 | 0.130 |
+| Street, oracle | 0.083 | 0.095 | 0.092 | 0.106 | 0.164 |
+| Street, MUSIC | 1.277 | 1.205 | 1.320 | 1.078 | 0.796 |
+
+The published "ATE flat to 32 m of AP error" was D1+D2. With the excess-delay model every range
+inherits the AP error, and the oracle loses its advantage over odometry at about 0.5 m (controlled)
+to 1 m (street) of AP error. Blackouts are tolerated; for MUSIC, fewer measurements is better.
+
+### R6. Radar ablation (Table IV of the IEEE Access draft)
+
+Cells A–D read absolute delays (`paths.tau`) and are not affected by D3; cell M was, and its
+corrected counterpart is R3's GT-pose MUSIC map. The ablation code was merged from
+`paper3-sub3-ablation` and now emits both M and M*, but a local re-run is impractical on a CPU
+(≈4 h per seed for the controlled scene at 77 GHz; the street scene ≈6.6× more), and the original
+raw output was never committed. The revised manuscript therefore does not rely on Table IV.
+To regenerate on a capable host:
+
+```sh
+WRS_FRAME_STRIDE=2 nice -n 19 .venv/bin/python experiments/run_ablation.py controlled_wall
+WRS_FRAME_STRIDE=4 nice -n 19 .venv/bin/python experiments/run_ablation.py street_canyon
+```
+
+## Withdrawn claims (earlier unpublished drafts and the IEEE Access consolidation)
+
+- WiFi localization "ties LiDAR" (0.098 vs 0.102 m): D1+D2.
+- Localization "structurally robust" to AP error (flat to 32 m) and blackouts: D1+D2.
+- Fusion design rule (reinforces at parity, degrades 8× when mismatched): D1+D2.
+- Cost-normalized accuracy (price × ATE): built on the parity claim.
+- Mapping "phantom ceiling" of ≈89 % with a 6.45 m range bias, "not a bandwidth or aperture
+  limit", "not repairable by a learned filter": D3 (corrected values in R2–R4).
+
+Unaffected: oracle mapping of the controlled wall (IoU 0.767, reproduced), the KITTI anchor of the
+LiDAR back-end, and the ESP32 first-light CSI reading.

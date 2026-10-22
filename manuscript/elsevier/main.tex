@@ -30,24 +30,24 @@ Commodity Front-End Limits, and a Delay-Convention Pitfall in Ray-Traced Evaluat
             country={Syria}}
 
 \begin{abstract}
-Ambient WiFi is radiated by existing infrastructure and received by hardware a vehicle already
-carries, which makes it an attractive low-cost aid for vehicular simultaneous localization and
+Ambient WiFi comes from existing infrastructure and reaches hardware a vehicle already
+carries, making it an attractive low-cost aid for vehicular simultaneous localization and
 mapping (SLAM). We ask what commodity channel state information (CSI) can actually contribute,
 using ray-traced channels (Sionna RT) in three outdoor scenarios, wheel-grade odometry as the
 baseline that any aid must beat, and a virtual-anchor FastSLAM back-end in which each wall
 reflection is represented by the access point mirrored in that wall. With exact multipath
 parameters the geometry works: WiFi reduces odometry drift by 66--79\,\% and, beside a single
-reflecting wall, outperforms a simulated spinning LiDAR. With a commodity front-end it does not:
+reflecting wall, outperforms a simulated spinning LiDAR on average. With a commodity front-end it does not:
 joint delay--angle MUSIC on a four-element linear array returns only about 15\,\% facade
 reflections, about a third of detections match no propagation path, and a further 19--34\,\% are
 real paths reported at their front/back mirror angle. These errors persist across frames, are
 confirmed as false anchors, and make WiFi-aided SLAM worse than dead reckoning in every scenario;
-the share of unexplained detections does not fall with bandwidth from 20 to 160\,MHz. We also
+the share of unexplained detections stays at a third or more from 20 to 160\,MHz. We also
 report a delay-convention pitfall in ray-traced CSI studies: channel frequency responses whose
 delays are referenced to the first arrival, as on real hardware, were read as absolute path
 lengths in our earlier analyses. This produced a spurious several-metre range bias and an
-inflated phantom rate, both of which vanish once excess delay is modelled explicitly. Code,
-cached channels, and firmware are released openly.
+inflated phantom rate, which vanish once excess delay is modelled. Code, cached channels, and
+firmware are open.
 \end{abstract}
 
 \begin{keyword}
@@ -234,7 +234,7 @@ WiFi a useful aid; joint MUSIC on a four-element array makes it harmful.}
 Table~\ref{tab:ate} and Fig.~\ref{fig:loc} give the central result. With exact multipath
 parameters, WiFi reduces the odometry error by 66\,\% beside the single wall and by 79\,\% in both
 street runs; the filter confirms exactly the three and seven VAs present. Beside a single wall
-WiFi also outperforms LiDAR, whose scan matching cannot constrain motion along a featureless
+WiFi also outperforms LiDAR on average (the LiDAR spread across seeds is large), whose scan matching cannot constrain motion along a featureless
 plane, whereas the VAs of three APs observe the wall from different directions. In the street
 canyon LiDAR is four times better again.
 
@@ -316,7 +316,9 @@ Bandwidth & Unexplained (\%) & IoU & Unexplained (\%) & IoU \\ \midrule
 \end{tabular}
 \end{table}
 
-Eightfold more bandwidth does not reduce the unexplained share (Table~\ref{tab:bw}). The limit is
+Bandwidth barely changes the composition (Table~\ref{tab:bw}): the unexplained share falls from
+44 to 37\,\% between 20 and 40\,MHz beside the wall and is flat beyond, and in the canyon it stays
+between 33 and 43\,\% with no trend. The limit is
 set by the four-element aperture and by model mismatch in a coherent, single-snapshot multipath
 channel, not by range resolution.
 
@@ -345,11 +347,6 @@ dead reckoning. Five seeds.}
 \label{fig:robust}
 \end{figure}
 
-\subsection{Geometry, carrier, and bandwidth: the radar ablation}\label{sec:ablation}
-
-\pending{Re-run of the CFAR ablation (cells A--D) and of the MUSIC row with the excess-delay
-correction (M$^\ast$) from results/ablation\_*.json.}
-
 %% ===========================================================================
 \section{The excess-delay pitfall}\label{sec:pitfall}
 
@@ -374,11 +371,14 @@ both for any study that synthesizes CSI from a ray tracer.
 \section{Hardware: what commodity CSI provides}\label{sec:hw}
 
 Two ESP32-S3 boards \cite{espressif_esp32,hernandez2020esp32}, one transmitting HT40 frames and one
-logging CSI, were used to confirm the measurement convention on real silicon. From a static
+logging CSI, were used to exercise the CSI reading on real silicon. From a static
 capture we parse valid 40\,MHz high-throughput records whose long training field carries 128
-subcarriers with 114 non-null, matching the physical active mask. The delay profile obtained by
-coherent averaging places the LOS tap at zero delay with no absolute reference, which is the
-excess-delay convention of \eqref{eq:excess}. This bench validates the CSI reading and the
+subcarriers with 114 non-null, matching the physical active mask. As in any commodity-CSI
+chain, there is no absolute time reference: our processing aligns the delay profile on the LOS tap
+(coherent averaging places it at 0\,m), so every later tap is an excess delay in the sense of
+\eqref{eq:excess}. For reflector measurements the method removes the receiver's own frequency
+response by background subtraction (captures with and without the reflector); the first-light
+capture had no reflector and shows the expected single LOS tap. This bench validates the CSI reading and the
 convention, not a SLAM system; measuring detection composition against surveyed reflectors on
 this hardware requires a large surveyed space and is left as future work. The firmware and the
 offline chain are released so that the measurement can be reproduced for the cost of two
@@ -394,6 +394,11 @@ property of the single linear array and would be removed by a second array axis 
 heading changes; the unexplained detections call for front-ends with explicit model-order
 selection or sparse estimation, and for VA promotion rules that test geometric consistency rather
 than mere persistence.
+
+\textbf{Other sensors.} Our earlier analysis compared the WiFi front-end with a simulated 77\,GHz
+radar under ground-truth poses and found a CFAR detector in a monostatic geometry far cleaner than
+the bistatic one. That radar chain read absolute delays and is unaffected by the pitfall of
+Section~\ref{sec:pitfall}, but it was not re-run for this paper and we do not rely on it here.
 
 \textbf{Limitations.} All channels are simulated; the hardware result confirms the measurement
 convention, not the detection statistics. The scenes use perfectly conducting facades, which
