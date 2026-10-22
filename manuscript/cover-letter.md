@@ -1,8 +1,8 @@
 # Cover letter
 
-**To:** The Editor, *Pervasive and Mobile Computing*
+**To:** The Editor, *Pervasive and Mobile Computing*\
 **Article:** *Can Ambient WiFi Support Vehicular Multipath SLAM? Virtual-Anchor Localization,
-Commodity Front-End Limits, and a Delay-Convention Pitfall in Ray-Traced Evaluation*
+Commodity Front-End Limits, and a Delay-Convention Pitfall in Ray-Traced Evaluation*\
 **Author:** Mulham Fetna, Department of Mechatronics Engineering, University of Aleppo,
 Aleppo, Syria · ORCID 0009-0006-4432-798X · contact@mulhamfetna.com
 

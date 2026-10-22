@@ -45,7 +45,7 @@ pending.
 | Path | What it is |
 |---|---|
 | `PROJECT.md` | This file |
-| `manuscript/` | The paper: `main.tex`, `main.pdf`, `refs.bib`, `figures/`, `highlights.txt`, `cover-letter.md`, Elsevier class |
+| `manuscript/` | The paper: `main.tex`, `main.pdf`, `refs.bib`, `figures/`, `highlights.txt`, `cover-letter.md`, Elsevier class; `SUBMISSION-GUIDE.md` (step-by-step submission) and `make-submission.sh` (upload package) |
 | `src/wifi_radar_slam/` | Library: scenes, channel simulation, MUSIC front-end, FastSLAM, LiDAR baseline, ESP32 CSI parsing |
 | `experiments/` | Entry points (section 5) |
 | `configs/` | Scene and RF configurations |

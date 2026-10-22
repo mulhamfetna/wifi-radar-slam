@@ -82,3 +82,4 @@ manuscript/*.blg
 manuscript/*.bbl
 manuscript/*.out
 manuscript/*.spl
+manuscript/submission/
