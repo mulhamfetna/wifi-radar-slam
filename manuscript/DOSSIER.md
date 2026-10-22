@@ -1,5 +1,13 @@
 # Consolidated Journal Paper — Dossier
 
+> **SUPERSEDED (2026-10-22).** IEEE Access rejected this draft without review. Re-verification
+> then found three pipeline defects (ground-truth odometry, a measurement update without position
+> information, and first-arrival-referenced CSI delays read as absolute path lengths) that
+> invalidate its localization-parity, robustness, fusion, cost and phantom-ceiling claims. The
+> corrected study is `elsevier/` (manuscript) and `../docs/results-corrected.md` (results). This
+> dossier is kept as the record of the Access submission.
+
+
 **Working title:** *Ambient WiFi as a Cheap Radar for SLAM: From Physics Feasibility to $30
 Hardware — Why Localization Works, Mapping Hits a Phantom Ceiling, and What That Ceiling Is*
 **Author:** Mulham Fetna (ORCID 0009-0006-4432-798X)
