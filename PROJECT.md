@@ -35,7 +35,7 @@ pending.
 | CRediT statement; funding sentence | present |
 | Generative-AI declaration, section before references, journal wording | present; **author must confirm** |
 | Competing interests via the journal's declarations tool (Word file uploaded at submission) | at submission |
-| Research data (Option C): deposit in a repository and cite with a persistent identifier | **needs the Zenodo release DOI before submission** |
+| Research data (Option C): deposit in a repository and cite with a persistent identifier | Zenodo v1.0.0, 10.5281/zenodo.23560036, cited in the data statement and references |
 | Figures supplied as separate files | `manuscript/figures/*.pdf` (vector, fonts embedded) |
 | Single-anonymized review | author names stay on the manuscript |
 | Free SSRN preprint option at submission | author's choice |
@@ -182,6 +182,7 @@ detection composition (F2) on real silicon. Blocked on access to such a space.
 | 2026-10-21 | Re-verification found D1–D3; plan: fix, re-run everything, retarget Elsevier |
 | 2026-10-22 | Corrected study written; target Pervasive and Mobile Computing; radar ablation dropped (CPU re-run impractical, raw output never committed) |
 | 2026-10-22 | Repository reset to one manuscript and this file; old papers and drafts removed (see section 9) |
+| 2026-10-22 | Release v1.0.0 archived on Zenodo (10.5281/zenodo.23560036) and cited in the manuscript |
 | 2026-10-22 | Language/accuracy pass; "as published" relabelled "earlier reading" (the earlier work was never published); CRediT and generative-AI declarations added |
 
 ## 8. Open tasks
@@ -191,9 +192,7 @@ detection composition (F2) on real silicon. Blocked on access to such a space.
 2. Author confirms the journal's limits on its guide-for-authors page; consider a supervisor
    co-author if one contributes.
 3. Check the journal's preprint policy; choose the subscription route (no APC).
-4. **Before submission:** cut a Zenodo release of the corrected state, then cite it in the
-   manuscript as a `[dataset]`/software reference with its DOI and in the data-availability
-   statement (journal research-data Option C).
+4. ~~Zenodo release~~ done: v1.0.0, DOI 10.5281/zenodo.23560036 (concept 10.5281/zenodo.21247288), cited in the manuscript.
 5. Optional: corridor reflector measurement (section 6).
 6. Optional: re-run the radar ablation on a capable host (retrieve `run_ablation.py` from the
    `archive/ieee-access-submission` tag).

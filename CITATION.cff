@@ -30,6 +30,12 @@ identifiers:
     value: 10.5281/zenodo.21247288
     description: Concept DOI (resolves to the latest version)
   - type: doi
+    value: 10.5281/zenodo.23560036
+    description: Version DOI for v1.0.0 (corrected study)
+  - type: doi
+    value: 10.5281/zenodo.21265865
+    description: Version DOI for v0.7.1 (earlier study; claims withdrawn)
+  - type: doi
     value: 10.5281/zenodo.21263556
     description: Version DOI for v0.4.0 (v0.5.0+ DOIs on the Zenodo record)
   - type: doi

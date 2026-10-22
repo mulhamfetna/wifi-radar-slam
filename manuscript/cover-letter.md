@@ -40,7 +40,8 @@ A consolidated version of the earlier work was submitted to *IEEE Access* and re
 review; the present article is a substantially different, corrected study.
 
 **Reproducibility.** All code, configurations, regenerable ray-traced channel caches, result files
-and ESP32 firmware are released under AGPL-3.0 at https://github.com/mulhamfetna/wifi-radar-slam.
+and ESP32 firmware are archived on Zenodo (release v1.0.0, https://doi.org/10.5281/zenodo.23560036)
+under AGPL-3.0, with development at https://github.com/mulhamfetna/wifi-radar-slam.
 Every number in the article is produced by the scripts listed in the repository's
 `PROJECT.md`.
 
