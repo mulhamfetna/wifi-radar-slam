@@ -23,11 +23,22 @@ preprint pages); language and accuracy pass done; CRediT statement and Elsevier'
 declaration added; highlights and cover letter written. **Not yet submitted.** Author review
 pending.
 
-**Compliance against Elsevier's standard requirements:** abstract 246 words (limit 250, as
-reported by a third-party template site; confirm), 6 keywords (1-7, same caveat), 5 highlights
-of at most 85 characters, numbered references (`elsarticle-num`), declarations of competing
-interest, funding, data availability, CRediT and generative-AI use present. The journal's own
-guide page could not be read automatically (CAPTCHA), so its specific limits are unconfirmed.
+**Compliance, checked against the journal's guide for authors (read 2026-10-22):**
+
+| Requirement | State |
+|---|---|
+| Abstract at most 250 words, non-standard abbreviations defined | 249 words; SLAM, CSI, MUSIC defined |
+| 1 to 7 keywords | 6 |
+| Highlights: separate file named with "highlights", 3-5 bullets of at most 85 characters | `manuscript/highlights.txt`, 5 bullets, max 83 |
+| Numbered references in order of appearance; DOIs where available | `elsarticle-num`; DOIs added from Crossref (exact title/year match only) |
+| Software cited as software with version and identifier | Sionna RT v2.0.1 cited as software plus its paper |
+| CRediT statement; funding sentence | present |
+| Generative-AI declaration, section before references, journal wording | present; **author must confirm** |
+| Competing interests via the journal's declarations tool (Word file uploaded at submission) | at submission |
+| Research data (Option C): deposit in a repository and cite with a persistent identifier | **needs the Zenodo release DOI before submission** |
+| Figures supplied as separate files | `manuscript/figures/*.pdf` (vector, fonts embedded) |
+| Single-anonymized review | author names stay on the manuscript |
+| Free SSRN preprint option at submission | author's choice |
 
 ## 2. Repository layout
 
@@ -180,7 +191,9 @@ detection composition (F2) on real silicon. Blocked on access to such a space.
 2. Author confirms the journal's limits on its guide-for-authors page; consider a supervisor
    co-author if one contributes.
 3. Check the journal's preprint policy; choose the subscription route (no APC).
-4. Cut a Zenodo release of the corrected state and add its DOI to the manuscript.
+4. **Before submission:** cut a Zenodo release of the corrected state, then cite it in the
+   manuscript as a `[dataset]`/software reference with its DOI and in the data-availability
+   statement (journal research-data Option C).
 5. Optional: corridor reflector measurement (section 6).
 6. Optional: re-run the radar ablation on a capable host (retrieve `run_ablation.py` from the
    `archive/ieee-access-submission` tag).

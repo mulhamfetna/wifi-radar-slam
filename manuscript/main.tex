@@ -36,7 +36,7 @@ baseline that any aid must beat, and a virtual-anchor FastSLAM back-end in which
 reflection is represented by the access point mirrored in that wall. With exact multipath
 parameters the geometry works: WiFi reduces odometry drift by 66--79\,\% and, beside a single
 reflecting wall, outperforms a simulated spinning LiDAR on average. With a commodity front-end it does not:
-joint delay--angle MUSIC on a four-element linear array returns only about 15\,\% facade
+joint delay--angle multiple signal classification (MUSIC) on a four-element linear array returns only about 15\,\% facade
 reflections, about a third of detections match no propagation path, and a further 19--34\,\% are
 real paths reported at their front/back mirror angle. These errors persist across frames, are
 confirmed as false anchors, and make WiFi-aided SLAM worse than dead reckoning in every scenario;
@@ -179,7 +179,7 @@ branch; an optional \emph{two-branch} model scores each detection against both $
 $\pi-\phi$ and seeds a tentative VA for each.
 
 \subsection{Channels, scenes, and front-ends}
-Channels are ray traced with Sionna RT 2.0 \cite{hoydis2023sionnart} at 5.2\,GHz (maximum depth
+Channels are ray traced with Sionna RT 2.0.1 \cite{hoydis2023sionnart,sionnart2026software} at 5.2\,GHz (maximum depth
 three) and stored once per scene, including the noise-free channel frequency response at 20, 40,
 80, and 160\,MHz and the full table of propagation paths. Seeds vary the receiver noise (20\,dB
 SNR) and the odometry. The receiver is a four-element half-wavelength ULA with 128 subcarriers.
@@ -434,11 +434,11 @@ firmware are available under AGPL-3.0 at \url{https://github.com/mulhamfetna/wif
 Investigation, Data curation, Writing -- original draft, Writing -- review \& editing,
 Visualization.
 
-\section*{Declaration of generative AI and AI-assisted technologies in the writing process}
-During the preparation of this work the author used Claude (Anthropic) to assist with code,
-analysis scripts, figure generation, and drafting and editing of the text. After using this tool,
-the author reviewed and edited the content as needed and takes full responsibility for the content
-of the publication.
+\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
+During the preparation of this work the author used Claude (Anthropic) to assist with writing
+code and analysis scripts, generating data plots from the computed results, and drafting and
+editing the text. After using this tool/service, the author reviewed and edited the content as
+needed and takes full responsibility for the content of the published article.
 
 \section*{Declaration of competing interest}
 The author declares no competing interests.
