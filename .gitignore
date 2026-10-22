@@ -74,3 +74,11 @@ Preparing Your Article.md
 
 # assembled submission bundle (derived from manuscript sources; rebuild with the zip step in DOSSIER)
 manuscript/ACCESS-submission-source.zip
+
+# Elsevier manuscript LaTeX intermediates (main.pdf IS committed)
+manuscript/elsevier/*.aux
+manuscript/elsevier/*.log
+manuscript/elsevier/*.blg
+manuscript/elsevier/*.bbl
+manuscript/elsevier/*.out
+manuscript/elsevier/*.spl
