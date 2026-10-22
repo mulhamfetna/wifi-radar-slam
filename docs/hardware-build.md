@@ -2,8 +2,8 @@
 
 **Date:** 2026-07-15
 **Branch:** `paper4-hardware-testbed`
-**Companion to:** `docs/paper4-restart-static-bench.md` (the design) and
-`docs/results-paper4-rung0.md` (the offline pipeline, already built and tested).
+**Companion to:** the static-bench design (archived design document; `git show archive/ieee-access-submission:docs/paper4-restart-static-bench.md`).
+Current status of the hardware work: `PROJECT.md`, section 6.
 
 > **The whole rig is: two ESP32-S3 boards, a baking tray, a tape measure, and a long
 > corridor. ~$31.** Everything else on your bench is a laptop you already own.

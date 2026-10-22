@@ -42,7 +42,7 @@ review; the present article is a substantially different, corrected study.
 **Reproducibility.** All code, configurations, regenerable ray-traced channel caches, result files
 and ESP32 firmware are released under AGPL-3.0 at https://github.com/mulhamfetna/wifi-radar-slam.
 Every number in the article is produced by the scripts listed in the repository's
-`docs/results-corrected.md`.
+`PROJECT.md`.
 
 **Originality and exclusivity.** The work is original, has not been published, and is not under
 consideration at any other journal. There are no competing interests and no funding to declare.

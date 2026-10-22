@@ -1,7 +1,7 @@
 """Paper 4 — the ESP32 CSI hardware sensor (the static bench).
 
 Pure NumPy/SciPy, fully testable on **synthetic CSI** — no hardware required to develop
-or CI. This is rung 0 of the ladder in ``docs/paper4-restart-static-bench.md``: prove the
+or CI. This is rung 0 of the ladder in the static-bench design (tag ``archive/ieee-access-submission``, ``the archived static-bench design (tag archive/ieee-access-submission)``): prove the
 delay-domain pipeline recovers a tap we injected ourselves, before a single ESP32 is bought.
 
 Modules

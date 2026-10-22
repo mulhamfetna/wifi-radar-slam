@@ -1,6 +1,6 @@
 """ESP32 HT40 CSI physical constants — every number verified, every derivation shown.
 
-Sources (see ``docs/paper4-restart-static-bench.md`` Part 4 and Part 7 for the [V] tags):
+Sources (see the static-bench design (tag ``archive/ieee-access-submission``, ``the archived static-bench design (tag archive/ieee-access-submission)``) Part 4 and Part 7 for the [V] tags):
   - HT40 reports 128 HT-LTF subcarriers on a uniform 312.5 kHz grid (ESP-IDF wifi.rst).
   - 114 non-null of 128; the DC notch is 3 subcarriers wide (ESPARGOS HT40_GAP_SUBCARRIERS=3).
   - 11 edge guard bins (|k| >= 59) set the sidelobe skirt — window before the IFFT.

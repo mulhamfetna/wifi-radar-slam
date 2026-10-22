@@ -1,6 +1,6 @@
 """Rung 0 — the pipeline recovers a tap we injected, through every documented corruption.
 
-These tests ARE the rung-0 acceptance criteria from docs/paper4-restart-static-bench.md
+These tests ARE the rung-0 acceptance criteria from the archived static-bench design (tag archive/ieee-access-submission)
 Part 9. If they pass, the Python side is sound and the failure mode of the real experiment
 is physics, not our code. No hardware is involved.
 
