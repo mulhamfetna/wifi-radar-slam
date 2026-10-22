@@ -19,8 +19,8 @@ authors:
     given-names: Mulham
     orcid: "https://orcid.org/0009-0006-4432-798X"
     email: contact@mulhamfetna.com
-version: 0.7.1
-date-released: "2026-07-08"
+version: 1.0.0
+date-released: "2026-10-22"
 license: AGPL-3.0-or-later
 doi: 10.5281/zenodo.21247288
 repository-code: "https://github.com/mulhamfetna/wifi-radar-slam"
@@ -43,12 +43,10 @@ identifiers:
     description: Version DOI for v0.1.0
 keywords:
   - WiFi sensing
-  - passive WiFi radar
   - channel state information
-  - SLAM
-  - integrated sensing and communication
-  - automotive radar
+  - multipath-assisted SLAM
+  - virtual anchors
+  - vehicular localization
+  - ray tracing
   - Sionna RT
-  - multipath-based SLAM
   - ESP32
-  - low-cost hardware testbed

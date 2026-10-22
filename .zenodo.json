@@ -1,6 +1,7 @@
 {
-  "title": "WiFi-Radar-for-SLAM: Ambient WiFi as a Radar Replacement for Automotive SLAM",
-  "description": "A physics-based (Sionna RT ray-traced) feasibility study and system for using ambient sub-7 GHz WiFi signals received on a moving vehicle to build a 3D scan of the surroundings usable in place of radar in SLAM pipelines. Vehicle localization is centimetre-level and, with joint 2-D (delay-angle) MUSIC, reaches oracle quality from realistic commodity CSI in sparse-multipath scenes. Mapping is two-tier: ~25-30 cm with clean single-bounce (oracle) sensing and ~4-5 m with realistic CSI. A 60 GHz (1.76 GHz bandwidth) and a 16-antenna test show this mapping floor is removed by neither wider bandwidth nor larger aperture: it is a path-discrimination limit of commodity CSI, not a resolution limit, identifying the key open problem for WiFi mapping while localization stays practical. A CSIKit-backed adapter runs the same sensing front-end on real commodity CSI (Intel 5300, nexmon) as a proof-of-concept. This release adds WiFiSLAM-Sim (a ray-traced outdoor/vehicular WiFi-CSI dataset with per-path labels) and a learned path discriminator that predicts mapping-useful reflections from estimable features (F1 ~0.9 at realistic noise) - a first concrete step on the path-discrimination open problem.",
+  "title": "WiFi-Radar-for-SLAM: ambient WiFi for vehicular multipath SLAM (Sionna RT simulation + ESP32 hardware)",
+  "version": "1.0.0",
+  "description": "Code, configurations, result files and ESP32-S3 firmware for the study \"Can Ambient WiFi Support Vehicular Multipath SLAM? Virtual-Anchor Localization, Commodity Front-End Limits, and a Delay-Convention Pitfall in Ray-Traced Evaluation\". Ray-traced channels (Sionna RT 2.0.1) in three outdoor scenarios are evaluated against wheel-grade odometry with a virtual-anchor FastSLAM back-end and a LiDAR baseline. With exact multipath parameters, ambient WiFi reduces odometry drift by 66-79 %; a commodity four-element joint-MUSIC front-end returns only about 15 % facade reflections, about a third unexplained detections and 19-34 % front/back-folded paths, making WiFi-aided SLAM worse than dead reckoning. Access-point positions must be known to sub-metre accuracy. This version corrects earlier releases (v0.1.0-v0.7.1): those drove the estimator with ground-truth odometry, used a measurement update without position information, and read first-arrival-referenced CSI delays as absolute path lengths; their localization-parity, robustness, fusion, cost, phantom-ceiling and learned-discriminator results are withdrawn. PROJECT.md in the archive is the authoritative record and lists the exact commands that regenerate every number.",
   "upload_type": "software",
   "access_right": "open",
   "license": "AGPL-3.0-or-later",
@@ -12,13 +13,12 @@
   ],
   "keywords": [
     "WiFi sensing",
-    "passive WiFi radar",
     "channel state information",
-    "SLAM",
-    "integrated sensing and communication",
-    "automotive radar",
+    "multipath-assisted SLAM",
+    "virtual anchors",
+    "vehicular localization",
+    "ray tracing",
     "Sionna RT",
-    "multipath-based SLAM",
-    "dataset"
+    "ESP32"
   ]
 }
