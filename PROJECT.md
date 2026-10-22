@@ -19,9 +19,12 @@ Publish **one** corrected journal paper:
 > — Mulham Fetna (sole author), target **Pervasive and Mobile Computing** (Elsevier).
 
 **Status: SUBMITTED 2026-10-22 17:57** to *Pervasive and Mobile Computing* through Elsevier's new
-submission service; article type *Research Paper*; sole and corresponding author. Awaiting the
-confirmation email, which carries the manuscript number; the author must then sign in to the
-journal account (or set a password) to track the submission and handle revisions.
+submission service; article type *Research Paper*; sole and corresponding author.
+**Manuscript number: PMC-D-26-02160.** Tracked in Editorial Manager
+(https://www.editorialmanager.com/PMC/, folder "Submissions Being Processed"). As of 2026-10-22
+the submission sits with the automated ingest account ("NSE INGEST Transfer-Ingest Admin"); no
+handling editor assigned yet. The journal uses Elsevier's Article Transfer Service, so a transfer
+offer to another Elsevier title is possible.
 
 **Compliance, checked against the journal's guide for authors (read 2026-10-22):**
 
@@ -182,14 +185,14 @@ detection composition (F2) on real silicon. Blocked on access to such a space.
 | 2026-10-21 | Re-verification found D1–D3; plan: fix, re-run everything, retarget Elsevier |
 | 2026-10-22 | Corrected study written; target Pervasive and Mobile Computing; radar ablation dropped (CPU re-run impractical, raw output never committed) |
 | 2026-10-22 | Repository reset to one manuscript and this file; old papers and drafts removed (see section 9) |
-| 2026-10-22 | **Submitted** to Pervasive and Mobile Computing (Research Paper, 17:57); manuscript number pending |
+| 2026-10-22 | **Submitted** to Pervasive and Mobile Computing (Research Paper, 17:57); confirmed 18:09 as **PMC-D-26-02160** |
 | 2026-10-22 | Release v1.0.0 archived on Zenodo (10.5281/zenodo.23560036) and cited in the manuscript |
 | 2026-10-22 | Language/accuracy pass; "as published" relabelled "earlier reading" (the earlier work was never published); CRediT and generative-AI declarations added |
 
 ## 8. Open tasks
 
-1. When the confirmation email arrives: sign in to the journal account, then record the manuscript
-   number here (status and decision log).
+1. ~~Record the manuscript number~~ done: PMC-D-26-02160. Author: sign in to Editorial Manager
+   (https://www.editorialmanager.com/PMC/; set a password if prompted) to track status.
 2. ~~Tag the submitted state~~ done: tag `pmc-submitted` (pushed). Revisions happen on `main`.
 3. Wait for the editor's assessment; on a decision follow `manuscript/SUBMISSION-GUIDE.md`, Step 5.
 4. Optional, useful for a revision: corridor reflector measurement (section 6).
