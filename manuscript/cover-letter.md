@@ -1,54 +1,51 @@
-# Cover letter — IEEE Access submission
+# Cover letter
 
-**To:** The Editors, *IEEE Access*
-**Article:** *Ambient WiFi as a Cheap Radar for Automotive SLAM: Centimetre Localization, a
-Phantom Ceiling on Mapping, and What That Ceiling Is — in Simulation and on $30 of Silicon*
+**To:** The Editor, *Pervasive and Mobile Computing*
+**Article:** *Can Ambient WiFi Support Vehicular Multipath SLAM? Virtual-Anchor Localization,
+Commodity Front-End Limits, and a Delay-Convention Pitfall in Ray-Traced Evaluation*
 **Author:** Mulham Fetna, Department of Mechatronics Engineering, University of Aleppo,
 Aleppo, Syria · ORCID 0009-0006-4432-798X · contact@mulhamfetna.com
 
 ---
 
-Dear Editors,
+Dear Editor,
 
-I am pleased to submit the above article for consideration in *IEEE Access*.
+I submit the above research article for consideration in *Pervasive and Mobile Computing*.
 
-**What the article asks and answers.** It asks whether ambient sub-7 GHz WiFi, received on a
-moving vehicle and processed with commodity channel state information (CSI), can replace radar or
-LiDAR as a front-end for simultaneous localization and mapping. The answer is a boundary rather
-than a yes or no, and that boundary is the contribution: WiFi localizes to centimetre level — at
-parity with a mid-range LiDAR for roughly one percent of its cost — while WiFi *mapping* hits a
-hard ceiling. The article locates that ceiling precisely: approximately 89 % of realistic-CSI
-detections correspond to no real propagation path, accompanied by a several-metre range bias. It
-is a front-end and geometry limit, not a path-discrimination limit, not a resolution limit, and
-not repairable by a learned filter.
+**What the article answers.** Commodity WiFi receivers are cheap and ambient access points are
+everywhere, so WiFi is an attractive aid for vehicle localization. The article separates two
+questions that are usually mixed: whether the multipath geometry in WiFi channels is informative
+for a moving vehicle, and whether a commodity front-end can extract it. Using ray-traced channels
+in three outdoor scenarios, wheel-grade odometry as the baseline, paired LiDAR runs, and a
+virtual-anchor FastSLAM back-end, it shows that exact multipath parameters reduce odometry drift
+by 66–79 %, while joint MUSIC on a four-element array returns too few facade reflections and too
+many persistent false detections, making WiFi-aided SLAM worse than odometry alone. It quantifies
+why (composition of the detections, front/back folding, bandwidth independence), shows that
+access-point positions must be known to sub-metre accuracy, and identifies a delay-convention
+pitfall that affects any study synthesizing CSI from a ray tracer.
 
-**Why it should interest a broad readership.** Running the same substrate against real LiDAR
-(KITTI) and a simulated 77 GHz FMCW radar shows the ceiling is neither carrier-specific nor
-WiFi-specific: the carrier does not matter, geometry does — a monostatic, on-vehicle transmitter
-reduces the phantom rate from 18.2 % to 0.1 % — and wider bandwidth makes phantoms worse. The
-article also reports a cost analysis (the WiFi package is 84–600× cheaper than the simulated LiDAR
-class), a symmetric fusion study yielding a design rule (fusion reinforces at sensor parity and
-degrades the stronger sensor eightfold when mismatched), a robustness characterization, and a
-hardware demonstration on two $30 ESP32-S3 boards.
+**Why it fits the journal.** The article is about what commodity wireless sensing can and cannot
+deliver for localization on a mobile platform, and it gives practitioners concrete requirements:
+array geometry that resolves front/back ambiguity, front-ends with model-order control, anchor
+promotion based on geometric consistency, and surveyed access points.
 
-**Reproducibility.** All code, configurations, result data, and the ESP32 firmware are released
-openly under AGPL-3.0 at https://github.com/mulhamfetna/wifi-radar-slam and archived with
-persistent DOIs. Every reported number is regenerable from that artifact.
+**Relationship to the author's earlier work, and corrections.** This article supersedes two of my
+earlier **unpublished** manuscripts on the same simulation framework. They are publicly readable in
+the open repository below, so a similarity check may match against them. On re-verification I
+found that those analyses drove the estimator with ground-truth odometry, used a measurement update
+that carried no position information, and read first-arrival-referenced CSI delays as absolute path
+lengths. Their localization-parity, robustness, fusion and cost results are withdrawn, and the
+article documents the delay-convention error and its effect openly (Section 5 and the Discussion).
+A consolidated version of the earlier work was submitted to *IEEE Access* and rejected before
+review; the present article is a substantially different, corrected study.
 
-**Disclosure of similarity to my own prior work.** This article consolidates and substantially
-extends earlier **unpublished** manuscripts of my own — a physics-based feasibility study and a
-WiFi-versus-LiDAR comparison. Those drafts are cited in the article and are publicly readable in
-the open-source repository above, so an automated similarity check may match text against them. To
-be explicit: they are my own unpublished work, not prior publications, and this submission is a
-consolidated and considerably extended treatment that adds the radar comparison, the robustness
-experiments, the hardware validation, and a corrected analysis. I note also that a numerical result
-reported in the earlier feasibility draft did not reproduce on re-verification; the corrected value
-(absolute trajectory error 0.098 ± 0.028 m) is the one used throughout this article.
+**Reproducibility.** All code, configurations, regenerable ray-traced channel caches, result files
+and ESP32 firmware are released under AGPL-3.0 at https://github.com/mulhamfetna/wifi-radar-slam.
+Every number in the article is produced by the scripts listed in the repository's
+`PROJECT.md`.
 
-**Originality and exclusivity.** The work is original, is not under consideration for peer review
-at any other journal, and has not been published elsewhere.
-
-Thank you for considering this submission. I would be glad to provide any further information.
+**Originality and exclusivity.** The work is original, has not been published, and is not under
+consideration at any other journal. There are no competing interests and no funding to declare.
 
 Sincerely,
 **Mulham Fetna**

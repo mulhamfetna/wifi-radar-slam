@@ -2,7 +2,7 @@
 """Figures for the revised manuscript, read from the corrected-evaluation JSON (no recompute,
 except Fig. 3, which re-triangulates one seed's cached detections at ground-truth poses).
 
-    .venv/bin/python experiments/make_corrected_figures.py   -> manuscript/elsevier/figures/
+    .venv/bin/python experiments/make_corrected_figures.py   -> manuscript/figures/
 """
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(__file__))
-OUT = "manuscript/elsevier/figures"
+OUT = "manuscript/figures"
 # reference categorical palette, slots 1-5 in fixed order (validated: dataviz validator)
 SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"]
 INK, MUTED, GRID = "#2b2b29", "#6b6a63", "#e4e3dc"

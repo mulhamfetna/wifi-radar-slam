@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Stage 2 of the corrected evaluation -- every number the revised manuscript reports.
 
-Fixes relative to the published pipeline (both documented in docs/results-corrected.md):
+Fixes relative to the published pipeline (both documented in PROJECT.md):
   1. Odometry is NOISY (wheel-grade, ``odometry.OdometryNoise`` defaults) and dead reckoning
      is always reported; the published runs fed the filter the ground-truth velocity.
   2. CSI delays are EXCESS over the first arrival (Sionna ``normalize_delays``), converted

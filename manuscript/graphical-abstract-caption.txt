@@ -1,5 +1,0 @@
-Ambient WiFi on a moving vehicle localizes to 0.098 m — a statistical tie
-with LiDAR at 84–600× lower sensor cost — yet its map scores zero: ≈89 % of
-realistic-CSI detections are phantoms (controlled scene). Ablation isolates
-the cause as geometry, not carrier, and wider bandwidth worsens it.
-Reproduced on two $30 ESP32-S3 boards.

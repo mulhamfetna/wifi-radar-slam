@@ -76,9 +76,9 @@ Preparing Your Article.md
 manuscript/ACCESS-submission-source.zip
 
 # Elsevier manuscript LaTeX intermediates (main.pdf IS committed)
-manuscript/elsevier/*.aux
-manuscript/elsevier/*.log
-manuscript/elsevier/*.blg
-manuscript/elsevier/*.bbl
-manuscript/elsevier/*.out
-manuscript/elsevier/*.spl
+manuscript/*.aux
+manuscript/*.log
+manuscript/*.blg
+manuscript/*.bbl
+manuscript/*.out
+manuscript/*.spl
