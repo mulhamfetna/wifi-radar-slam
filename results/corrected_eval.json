@@ -1,0 +1,5784 @@
+{
+ "summary": {
+  "controlled_wall/bw160": {
+   "phantoms_corrected/matched_facade": {
+    "mean": 0.15685185185185185,
+    "std": 0.004267303193260338,
+    "n": 10
+   },
+   "phantoms_corrected/matched_other": {
+    "mean": 0.2918518518518519,
+    "std": 0.0038356139217051786,
+    "n": 10
+   },
+   "phantoms_corrected/folded_facade": {
+    "mean": 0.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "phantoms_corrected/folded_other": {
+    "mean": 0.19342592592592595,
+    "std": 0.0034508602136267058,
+    "n": 10
+   },
+   "phantoms_corrected/unexplained": {
+    "mean": 0.3578703703703704,
+    "std": 0.00606110290705672,
+    "n": 10
+   },
+   "phantoms_corrected/n_detections": {
+    "mean": 1080.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "phantoms_corrected/phantom_rate_manuscript_def": {
+    "mean": 0.5512962962962963,
+    "std": 0.004206598774666874,
+    "n": 10
+   },
+   "phantoms_corrected/median_signed_range_err_facade_m": {
+    "mean": 0.03235196273806693,
+    "std": 0.007044245187942452,
+    "n": 10
+   },
+   "phantoms_corrected/median_abs_range_err_facade_m": {
+    "mean": 0.07279323219644045,
+    "std": 0.0022376442325638185,
+    "n": 10
+   },
+   "gt_map_music_corrected/chamfer": {
+    "mean": 2.6015322202603164,
+    "std": 0.03738275058393612,
+    "n": 10
+   },
+   "gt_map_music_corrected/map_accuracy": {
+    "mean": 4.371290605401653,
+    "std": 0.07436192942206192,
+    "n": 10
+   },
+   "gt_map_music_corrected/map_completeness": {
+    "mean": 0.8317738351189794,
+    "std": 0.016753831454237835,
+    "n": 10
+   },
+   "gt_map_music_corrected/iou": {
+    "mean": 0.3493857458778772,
+    "std": 0.017122882055505217,
+    "n": 10
+   },
+   "gt_map_music_corrected/n_map": {
+    "mean": 143.2,
+    "std": 5.325410782277739,
+    "n": 10
+   },
+   "slam_music/ate_dead_reckoning": {
+    "mean": 0.21109600856062372,
+    "std": 0.10931165990776943,
+    "n": 10
+   },
+   "slam_music/ate": {
+    "mean": 0.3404704666776867,
+    "std": 0.12317961228667378,
+    "n": 10
+   },
+   "slam_music/rpe": {
+    "mean": 0.028971368673081865,
+    "std": 0.005342806799043846,
+    "n": 10
+   },
+   "slam_music/n_confirmed": {
+    "mean": 27.6,
+    "std": 1.6248076809271923,
+    "n": 10
+   },
+   "slam_music/chamfer": {
+    "mean": 2.8335137910886994,
+    "std": 0.17089772148899002,
+    "n": 10
+   },
+   "slam_music/map_accuracy": {
+    "mean": 3.996949733044223,
+    "std": 0.11900912995586119,
+    "n": 10
+   },
+   "slam_music/map_completeness": {
+    "mean": 1.6700778491331758,
+    "std": 0.356901547218489,
+    "n": 10
+   },
+   "slam_music/iou": {
+    "mean": 0.24929051156188411,
+    "std": 0.03759671778522249,
+    "n": 10
+   },
+   "slam_music/n_map": {
+    "mean": 93.8,
+    "std": 28.57551399362748,
+    "n": 10
+   },
+   "phantoms_as_published/matched_facade": {
+    "mean": 0.08870370370370369,
+    "std": 0.0039020939825380515,
+    "n": 10
+   },
+   "phantoms_as_published/matched_other": {
+    "mean": 0.02287037037037037,
+    "std": 0.0017592592592592592,
+    "n": 10
+   },
+   "phantoms_as_published/folded_facade": {
+    "mean": 0.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "phantoms_as_published/folded_other": {
+    "mean": 0.1222222222222222,
+    "std": 0.0016563466499998436,
+    "n": 10
+   },
+   "phantoms_as_published/unexplained": {
+    "mean": 0.7662037037037036,
+    "std": 0.0035920675446797857,
+    "n": 10
+   },
+   "phantoms_as_published/n_detections": {
+    "mean": 1080.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "phantoms_as_published/phantom_rate_manuscript_def": {
+    "mean": 0.888425925925926,
+    "std": 0.004689428615592838,
+    "n": 10
+   },
+   "phantoms_as_published/median_signed_range_err_facade_m": {
+    "mean": -6.35325685935314,
+    "std": 0.2206616732358245,
+    "n": 10
+   },
+   "phantoms_as_published/median_abs_range_err_facade_m": {
+    "mean": 6.35325685935314,
+    "std": 0.2206616732358245,
+    "n": 10
+   },
+   "gt_map_music_as_published/chamfer": {
+    "mean": 5.878885427523561,
+    "std": 0.25138318868985776,
+    "n": 10
+   },
+   "gt_map_music_as_published/map_accuracy": {
+    "mean": 2.556171159105234,
+    "std": 0.3994082245853906,
+    "n": 10
+   },
+   "gt_map_music_as_published/map_completeness": {
+    "mean": 9.201599695941887,
+    "std": 0.7557793274598591,
+    "n": 10
+   },
+   "gt_map_music_as_published/iou": {
+    "mean": 0.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "gt_map_music_as_published/n_map": {
+    "mean": 5.3,
+    "std": 1.1,
+    "n": 10
+   },
+   "gt_map_oracle/chamfer": {
+    "mean": 0.5003080998594438,
+    "std": 0.0,
+    "n": 10
+   },
+   "gt_map_oracle/map_accuracy": {
+    "mean": 0.24582667113843634,
+    "std": 0.0,
+    "n": 10
+   },
+   "gt_map_oracle/map_completeness": {
+    "mean": 0.7547895285804512,
+    "std": 0.0,
+    "n": 10
+   },
+   "gt_map_oracle/iou": {
+    "mean": 0.7674418604651162,
+    "std": 1.1102230246251565e-16,
+    "n": 10
+   },
+   "gt_map_oracle/n_map": {
+    "mean": 60.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "slam_oracle/ate_dead_reckoning": {
+    "mean": 0.21109600856062372,
+    "std": 0.10931165990776943,
+    "n": 10
+   },
+   "slam_oracle/ate": {
+    "mean": 0.07194888844202739,
+    "std": 0.026157222870718807,
+    "n": 10
+   },
+   "slam_oracle/rpe": {
+    "mean": 0.004784351424765319,
+    "std": 0.00035809251901337634,
+    "n": 10
+   },
+   "slam_oracle/n_confirmed": {
+    "mean": 3.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "slam_oracle/chamfer": {
+    "mean": 1.7112813353498375,
+    "std": 0.6200397728694348,
+    "n": 10
+   },
+   "slam_oracle/map_accuracy": {
+    "mean": 0.2570634685002906,
+    "std": 0.038220087469593315,
+    "n": 10
+   },
+   "slam_oracle/map_completeness": {
+    "mean": 3.165499202199384,
+    "std": 1.257596892144155,
+    "n": 10
+   },
+   "slam_oracle/iou": {
+    "mean": 0.23657505285412256,
+    "std": 0.0692559248312098,
+    "n": 10
+   },
+   "slam_oracle/n_map": {
+    "mean": 14.4,
+    "std": 5.571355310873648,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/ate": {
+    "mean": 0.12173137802433617,
+    "std": 0.044731107883637565,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/chamfer": {
+    "mean": 5.934716872637689,
+    "std": 0.24447956027488682,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/map_accuracy": {
+    "mean": 2.320860291811033,
+    "std": 0.32234256213532625,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/map_completeness": {
+    "mean": 9.548573453464346,
+    "std": 0.799529832962538,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/iou": {
+    "mean": 0.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/n_map": {
+    "mean": 5.1,
+    "std": 1.0440306508910548,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/ate": {
+    "mean": 0.23412796291340104,
+    "std": 0.08577260736252551,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/chamfer": {
+    "mean": 5.9209152424548215,
+    "std": 0.22678558643620098,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/map_accuracy": {
+    "mean": 2.33186256614926,
+    "std": 0.46923508977419975,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/map_completeness": {
+    "mean": 9.509967918760385,
+    "std": 0.8163202366519623,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/iou": {
+    "mean": 0.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/n_map": {
+    "mean": 5.2,
+    "std": 1.077032961426901,
+    "n": 10
+   },
+   "slam_music_two_branch/ate_dead_reckoning": {
+    "mean": 0.21109600856062372,
+    "std": 0.10931165990776943,
+    "n": 10
+   },
+   "slam_music_two_branch/ate": {
+    "mean": 0.3903338142359435,
+    "std": 0.1100401123400833,
+    "n": 10
+   },
+   "slam_music_two_branch/rpe": {
+    "mean": 0.029137527494107064,
+    "std": 0.0042032948216716,
+    "n": 10
+   },
+   "slam_music_two_branch/n_confirmed": {
+    "mean": 29.1,
+    "std": 1.8138357147217052,
+    "n": 10
+   },
+   "slam_music_two_branch/chamfer": {
+    "mean": 5.166326729683603,
+    "std": 0.6530732786522688,
+    "n": 10
+   },
+   "slam_music_two_branch/map_accuracy": {
+    "mean": 8.275495650804329,
+    "std": 0.7905693155554805,
+    "n": 10
+   },
+   "slam_music_two_branch/map_completeness": {
+    "mean": 2.057157808562876,
+    "std": 0.6473305201408849,
+    "n": 10
+   },
+   "slam_music_two_branch/iou": {
+    "mean": 0.12798915532381624,
+    "std": 0.08302674564507635,
+    "n": 10
+   },
+   "slam_music_two_branch/n_map": {
+    "mean": 142.1,
+    "std": 35.03269901106679,
+    "n": 10
+   }
+  },
+  "controlled_wall/bw20": {
+   "phantoms_corrected/matched_facade": {
+    "mean": 0.20981481481481482,
+    "std": 0.0035428011980942575,
+    "n": 5
+   },
+   "phantoms_corrected/matched_other": {
+    "mean": 0.26296296296296295,
+    "std": 0.008861841565929935,
+    "n": 5
+   },
+   "phantoms_corrected/folded_facade": {
+    "mean": 0.0,
+    "std": 0.0,
+    "n": 5
+   },
+   "phantoms_corrected/folded_other": {
+    "mean": 0.08314814814814815,
+    "std": 0.004475202212442435,
+    "n": 5
+   },
+   "phantoms_corrected/unexplained": {
+    "mean": 0.4440740740740742,
+    "std": 0.00959752482951847,
+    "n": 5
+   },
+   "phantoms_corrected/n_detections": {
+    "mean": 1080.0,
+    "std": 0.0,
+    "n": 5
+   },
+   "phantoms_corrected/phantom_rate_manuscript_def": {
+    "mean": 0.5272222222222223,
+    "std": 0.006844340226880109,
+    "n": 5
+   },
+   "phantoms_corrected/median_signed_range_err_facade_m": {
+    "mean": -0.31726238246719307,
+    "std": 0.015823294380951942,
+    "n": 5
+   },
+   "phantoms_corrected/median_abs_range_err_facade_m": {
+    "mean": 0.31726238246719307,
+    "std": 0.015823294380951942,
+    "n": 5
+   },
+   "gt_map_music_corrected/chamfer": {
+    "mean": 1.8434008929259562,
+    "std": 0.2946675065054985,
+    "n": 5
+   },
+   "gt_map_music_corrected/map_accuracy": {
+    "mean": 2.752606664239435,
+    "std": 0.5551227834695505,
+    "n": 5
+   },
+   "gt_map_music_corrected/map_completeness": {
+    "mean": 0.9341951216124775,
+    "std": 0.03495219932257119,
+    "n": 5
+   },
+   "gt_map_music_corrected/iou": {
+    "mean": 0.47350579839429086,
+    "std": 0.044702073606915374,
+    "n": 5
+   },
+   "gt_map_music_corrected/n_map": {
+    "mean": 70.0,
+    "std": 3.3466401061363023,
+    "n": 5
+   },
+   "slam_music/ate_dead_reckoning": {
+    "mean": 0.1581972132126058,
+    "std": 0.11133742256516195,
+    "n": 5
+   },
+   "slam_music/ate": {
+    "mean": 0.24547642146127796,
+    "std": 0.13480652352062142,
+    "n": 5
+   },
+   "slam_music/rpe": {
+    "mean": 0.02211767380347484,
+    "std": 0.00307802214892189,
+    "n": 5
+   },
+   "slam_music/n_confirmed": {
+    "mean": 31.8,
+    "std": 2.6381811916545836,
+    "n": 5
+   },
+   "slam_music/chamfer": {
+    "mean": 9.48021168044875,
+    "std": 0.6957623987503182,
+    "n": 5
+   },
+   "slam_music/map_accuracy": {
+    "mean": 16.179336943368288,
+    "std": 1.4071840271165041,
+    "n": 5
+   },
+   "slam_music/map_completeness": {
+    "mean": 2.7810864175292167,
+    "std": 0.658487781055534,
+    "n": 5
+   },
+   "slam_music/iou": {
+    "mean": 0.070660168858066,
+    "std": 0.02601711127076283,
+    "n": 5
+   },
+   "slam_music/n_map": {
+    "mean": 87.2,
+    "std": 37.1451208101414,
+    "n": 5
+   }
+  },
+  "controlled_wall/bw40": {
+   "phantoms_corrected/matched_facade": {
+    "mean": 0.18425925925925926,
+    "std": 0.0030429030972509204,
+    "n": 5
+   },
+   "phantoms_corrected/matched_other": {
+    "mean": 0.3172222222222222,
+    "std": 0.007444352311941397,
+    "n": 5
+   },
+   "phantoms_corrected/folded_facade": {
+    "mean": 0.0,
+    "std": 0.0,
+    "n": 5
+   },
+   "phantoms_corrected/folded_other": {
+    "mean": 0.12925925925925927,
+    "std": 0.0025255892031455294,
+    "n": 5
+   },
+   "phantoms_corrected/unexplained": {
+    "mean": 0.36925925925925923,
+    "std": 0.009285148990164206,
+    "n": 5
+   },
+   "phantoms_corrected/n_detections": {
+    "mean": 1080.0,
+    "std": 0.0,
+    "n": 5
+   },
+   "phantoms_corrected/phantom_rate_manuscript_def": {
+    "mean": 0.4985185185185186,
+    "std": 0.007138642691628295,
+    "n": 5
+   },
+   "phantoms_corrected/median_signed_range_err_facade_m": {
+    "mean": -0.07359977422194,
+    "std": 0.010542880737532886,
+    "n": 5
+   },
+   "phantoms_corrected/median_abs_range_err_facade_m": {
+    "mean": 0.1375441422153873,
+    "std": 0.0054978867547781874,
+    "n": 5
+   },
+   "gt_map_music_corrected/chamfer": {
+    "mean": 3.426156917894356,
+    "std": 0.17168263314474266,
+    "n": 5
+   },
+   "gt_map_music_corrected/map_accuracy": {
+    "mean": 5.996963005550104,
+    "std": 0.33235617399921685,
+    "n": 5
+   },
+   "gt_map_music_corrected/map_completeness": {
+    "mean": 0.8553508302386079,
+    "std": 0.03230609050814826,
+    "n": 5
+   },
+   "gt_map_music_corrected/iou": {
+    "mean": 0.34084101888449714,
+    "std": 0.011281299240150696,
+    "n": 5
+   },
+   "gt_map_music_corrected/n_map": {
+    "mean": 123.4,
+    "std": 3.261901286060018,
+    "n": 5
+   },
+   "slam_music/ate_dead_reckoning": {
+    "mean": 0.1581972132126058,
+    "std": 0.11133742256516195,
+    "n": 5
+   },
+   "slam_music/ate": {
+    "mean": 0.15994263113720025,
+    "std": 0.08541716127305742,
+    "n": 5
+   },
+   "slam_music/rpe": {
+    "mean": 0.022482787285754167,
+    "std": 0.006639814062823711,
+    "n": 5
+   },
+   "slam_music/n_confirmed": {
+    "mean": 25.2,
+    "std": 2.315167380558045,
+    "n": 5
+   },
+   "slam_music/chamfer": {
+    "mean": 6.103250624566774,
+    "std": 1.100356006672415,
+    "n": 4
+   },
+   "slam_music/map_accuracy": {
+    "mean": 9.808997601100119,
+    "std": 1.4008816786291725,
+    "n": 4
+   },
+   "slam_music/map_completeness": {
+    "mean": 2.397503648033431,
+    "std": 0.9399405260174959,
+    "n": 4
+   },
+   "slam_music/iou": {
+    "mean": 0.10704343878165493,
+    "std": 0.0642789268208423,
+    "n": 5
+   },
+   "slam_music/n_map": {
+    "mean": 66.2,
+    "std": 52.296845029121975,
+    "n": 5
+   }
+  },
+  "controlled_wall/bw80": {
+   "phantoms_corrected/matched_facade": {
+    "mean": 0.1585185185185185,
+    "std": 0.0031752644813856095,
+    "n": 5
+   },
+   "phantoms_corrected/matched_other": {
+    "mean": 0.3088888888888889,
+    "std": 0.009362388636862626,
+    "n": 5
+   },
+   "phantoms_corrected/folded_facade": {
+    "mean": 0.0,
+    "std": 0.0,
+    "n": 5
+   },
+   "phantoms_corrected/folded_other": {
+    "mean": 0.1737037037037037,
+    "std": 0.0043666022676117,
+    "n": 5
+   },
+   "phantoms_corrected/unexplained": {
+    "mean": 0.3588888888888889,
+    "std": 0.009417171951919347,
+    "n": 5
+   },
+   "phantoms_corrected/n_detections": {
+    "mean": 1080.0,
+    "std": 0.0,
+    "n": 5
+   },
+   "phantoms_corrected/phantom_rate_manuscript_def": {
+    "mean": 0.5325925925925926,
+    "std": 0.008310668767524761,
+    "n": 5
+   },
+   "phantoms_corrected/median_signed_range_err_facade_m": {
+    "mean": 0.011411205763325327,
+    "std": 0.005110916298110718,
+    "n": 5
+   },
+   "phantoms_corrected/median_abs_range_err_facade_m": {
+    "mean": 0.07962563929785205,
+    "std": 0.0020310424555003348,
+    "n": 5
+   },
+   "gt_map_music_corrected/chamfer": {
+    "mean": 2.930746941320752,
+    "std": 0.07367155570366309,
+    "n": 5
+   },
+   "gt_map_music_corrected/map_accuracy": {
+    "mean": 5.022898320303125,
+    "std": 0.13286479238472523,
+    "n": 5
+   },
+   "gt_map_music_corrected/map_completeness": {
+    "mean": 0.8385955623383792,
+    "std": 0.01833380033620075,
+    "n": 5
+   },
+   "gt_map_music_corrected/iou": {
+    "mean": 0.3306020699931537,
+    "std": 0.013746326772981337,
+    "n": 5
+   },
+   "gt_map_music_corrected/n_map": {
+    "mean": 139.0,
+    "std": 2.5298221281347035,
+    "n": 5
+   },
+   "slam_music/ate_dead_reckoning": {
+    "mean": 0.1581972132126058,
+    "std": 0.11133742256516195,
+    "n": 5
+   },
+   "slam_music/ate": {
+    "mean": 0.22618394081035892,
+    "std": 0.07124857629026722,
+    "n": 5
+   },
+   "slam_music/rpe": {
+    "mean": 0.02377648106436046,
+    "std": 0.007051554785162282,
+    "n": 5
+   },
+   "slam_music/n_confirmed": {
+    "mean": 23.6,
+    "std": 1.2,
+    "n": 5
+   },
+   "slam_music/chamfer": {
+    "mean": 4.023233709411798,
+    "std": 0.3029053914585198,
+    "n": 5
+   },
+   "slam_music/map_accuracy": {
+    "mean": 5.947983109901285,
+    "std": 0.46650385832383123,
+    "n": 5
+   },
+   "slam_music/map_completeness": {
+    "mean": 2.0984843089223104,
+    "std": 0.4445788474522564,
+    "n": 5
+   },
+   "slam_music/iou": {
+    "mean": 0.16062605465294377,
+    "std": 0.024199715169211766,
+    "n": 5
+   },
+   "slam_music/n_map": {
+    "mean": 65.8,
+    "std": 24.798387044322055,
+    "n": 5
+   }
+  },
+  "street_canyon/bw160": {
+   "phantoms_corrected/matched_facade": {
+    "mean": 0.15472222222222226,
+    "std": 0.0018144368465060573,
+    "n": 10
+   },
+   "phantoms_corrected/matched_other": {
+    "mean": 0.19027777777777777,
+    "std": 0.0017198310760191404,
+    "n": 10
+   },
+   "phantoms_corrected/folded_facade": {
+    "mean": 0.11041666666666668,
+    "std": 0.0015389601980180232,
+    "n": 10
+   },
+   "phantoms_corrected/folded_other": {
+    "mean": 0.19833333333333333,
+    "std": 0.0017223217812720615,
+    "n": 10
+   },
+   "phantoms_corrected/unexplained": {
+    "mean": 0.34625000000000006,
+    "std": 0.0024624233605504086,
+    "n": 10
+   },
+   "phantoms_corrected/n_detections": {
+    "mean": 2160.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "phantoms_corrected/phantom_rate_manuscript_def": {
+    "mean": 0.655,
+    "std": 0.0014163943093313278,
+    "n": 10
+   },
+   "phantoms_corrected/median_signed_range_err_facade_m": {
+    "mean": -0.06059278730677242,
+    "std": 0.005331984548690722,
+    "n": 10
+   },
+   "phantoms_corrected/median_abs_range_err_facade_m": {
+    "mean": 0.14321974710886415,
+    "std": 0.0016002640854168768,
+    "n": 10
+   },
+   "gt_map_music_corrected/chamfer": {
+    "mean": 10.512489025676777,
+    "std": 0.17225750512034824,
+    "n": 10
+   },
+   "gt_map_music_corrected/map_accuracy": {
+    "mean": 3.1135894429025055,
+    "std": 0.06981590556677095,
+    "n": 10
+   },
+   "gt_map_music_corrected/map_completeness": {
+    "mean": 17.91138860845105,
+    "std": 0.3197597715463012,
+    "n": 10
+   },
+   "gt_map_music_corrected/iou": {
+    "mean": 0.030779705232405502,
+    "std": 0.0019568786314529524,
+    "n": 10
+   },
+   "gt_map_music_corrected/n_map": {
+    "mean": 220.2,
+    "std": 6.881860213634102,
+    "n": 10
+   },
+   "slam_music/ate_dead_reckoning": {
+    "mean": 0.46957557710169856,
+    "std": 0.2595668542195005,
+    "n": 10
+   },
+   "slam_music/ate": {
+    "mean": 1.202313373711721,
+    "std": 0.24105486155571207,
+    "n": 10
+   },
+   "slam_music/rpe": {
+    "mean": 0.04406731580607047,
+    "std": 0.005237271040209814,
+    "n": 10
+   },
+   "slam_music/n_confirmed": {
+    "mean": 101.1,
+    "std": 2.3853720883753127,
+    "n": 10
+   },
+   "slam_music/chamfer": {
+    "mean": 10.031183121419746,
+    "std": 0.6465551414985354,
+    "n": 10
+   },
+   "slam_music/map_accuracy": {
+    "mean": 2.8232241515264525,
+    "std": 0.09066674399780168,
+    "n": 10
+   },
+   "slam_music/map_completeness": {
+    "mean": 17.239142091313038,
+    "std": 1.297271680157922,
+    "n": 10
+   },
+   "slam_music/iou": {
+    "mean": 0.04378451331781837,
+    "std": 0.005785089757219175,
+    "n": 10
+   },
+   "slam_music/n_map": {
+    "mean": 349.8,
+    "std": 31.485869846647084,
+    "n": 10
+   },
+   "phantoms_as_published/matched_facade": {
+    "mean": 0.019722222222222224,
+    "std": 0.000752225778207034,
+    "n": 10
+   },
+   "phantoms_as_published/matched_other": {
+    "mean": 0.08342592592592593,
+    "std": 0.00196200186114973,
+    "n": 10
+   },
+   "phantoms_as_published/folded_facade": {
+    "mean": 0.00638888888888889,
+    "std": 0.0007407407407407405,
+    "n": 10
+   },
+   "phantoms_as_published/folded_other": {
+    "mean": 0.07379629629629629,
+    "std": 0.002344257203920769,
+    "n": 10
+   },
+   "phantoms_as_published/unexplained": {
+    "mean": 0.8166666666666667,
+    "std": 0.003267088660069862,
+    "n": 10
+   },
+   "phantoms_as_published/n_detections": {
+    "mean": 2160.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "phantoms_as_published/phantom_rate_manuscript_def": {
+    "mean": 0.8968518518518518,
+    "std": 0.0018379104853036168,
+    "n": 10
+   },
+   "phantoms_as_published/median_signed_range_err_facade_m": {
+    "mean": -2.1887081740022176,
+    "std": 0.16613428092972993,
+    "n": 10
+   },
+   "phantoms_as_published/median_abs_range_err_facade_m": {
+    "mean": 2.1887081740022176,
+    "std": 0.16613428092972993,
+    "n": 10
+   },
+   "gt_map_music_as_published/chamfer": {
+    "mean": 18.725558233455338,
+    "std": 1.7859788589479404,
+    "n": 10
+   },
+   "gt_map_music_as_published/map_accuracy": {
+    "mean": 3.760319149464716,
+    "std": 1.8311649427797152,
+    "n": 10
+   },
+   "gt_map_music_as_published/map_completeness": {
+    "mean": 33.69079731744596,
+    "std": 3.1490076801589577,
+    "n": 10
+   },
+   "gt_map_music_as_published/iou": {
+    "mean": 0.0002328291863175584,
+    "std": 0.00046565876705692685,
+    "n": 10
+   },
+   "gt_map_music_as_published/n_map": {
+    "mean": 2.8,
+    "std": 1.1661903789690602,
+    "n": 10
+   },
+   "gt_map_oracle/chamfer": {
+    "mean": 12.53200892372266,
+    "std": 0.0,
+    "n": 10
+   },
+   "gt_map_oracle/map_accuracy": {
+    "mean": 0.25799245907278745,
+    "std": 5.551115123125783e-17,
+    "n": 10
+   },
+   "gt_map_oracle/map_completeness": {
+    "mean": 24.80602538837253,
+    "std": 3.552713678800501e-15,
+    "n": 10
+   },
+   "gt_map_oracle/iou": {
+    "mean": 0.07476635514018691,
+    "std": 0.0,
+    "n": 10
+   },
+   "gt_map_oracle/n_map": {
+    "mean": 100.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "slam_oracle/ate_dead_reckoning": {
+    "mean": 0.46957557710169856,
+    "std": 0.2595668542195005,
+    "n": 10
+   },
+   "slam_oracle/ate": {
+    "mean": 0.10117296195858239,
+    "std": 0.044900120382759354,
+    "n": 10
+   },
+   "slam_oracle/rpe": {
+    "mean": 0.005001852248698655,
+    "std": 0.0004505630198788907,
+    "n": 10
+   },
+   "slam_oracle/n_confirmed": {
+    "mean": 7.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "slam_oracle/chamfer": {
+    "mean": 13.495331155019025,
+    "std": 0.6956195870124792,
+    "n": 10
+   },
+   "slam_oracle/map_accuracy": {
+    "mean": 0.2758307252395092,
+    "std": 0.013826760610340362,
+    "n": 10
+   },
+   "slam_oracle/map_completeness": {
+    "mean": 26.71483158479855,
+    "std": 1.3838067751500895,
+    "n": 10
+   },
+   "slam_oracle/iou": {
+    "mean": 0.027070195751226343,
+    "std": 0.012454472896981303,
+    "n": 10
+   },
+   "slam_oracle/n_map": {
+    "mean": 39.1,
+    "std": 20.964016790682074,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/ate": {
+    "mean": 0.3210260847127829,
+    "std": 0.07615915007355688,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/chamfer": {
+    "mean": 17.907537762048552,
+    "std": 1.6733715309423463,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/map_accuracy": {
+    "mean": 3.9983349144509335,
+    "std": 1.2041350153466341,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/map_completeness": {
+    "mean": 31.816740609646168,
+    "std": 2.87028301036902,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/iou": {
+    "mean": 0.0008135492792327732,
+    "std": 0.0009073224687693728,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/n_map": {
+    "mean": 4.7,
+    "std": 1.6155494421403513,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/ate": {
+    "mean": 0.6030634442918593,
+    "std": 0.28879231695594904,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/chamfer": {
+    "mean": 18.431295647397548,
+    "std": 1.5639268590802808,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/map_accuracy": {
+    "mean": 3.7496809973167387,
+    "std": 1.8046478432113295,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/map_completeness": {
+    "mean": 33.11291029747836,
+    "std": 3.120201008374862,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/iou": {
+    "mean": 0.00046593037045396056,
+    "std": 0.0005706472878972929,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/n_map": {
+    "mean": 3.4,
+    "std": 1.2000000000000002,
+    "n": 10
+   },
+   "slam_music_two_branch/ate_dead_reckoning": {
+    "mean": 0.46957557710169856,
+    "std": 0.2595668542195005,
+    "n": 10
+   },
+   "slam_music_two_branch/ate": {
+    "mean": 0.527352518108383,
+    "std": 0.16721741820463795,
+    "n": 10
+   },
+   "slam_music_two_branch/rpe": {
+    "mean": 0.03890133029733019,
+    "std": 0.007351177671551462,
+    "n": 10
+   },
+   "slam_music_two_branch/n_confirmed": {
+    "mean": 63.3,
+    "std": 2.685144316419511,
+    "n": 10
+   },
+   "slam_music_two_branch/chamfer": {
+    "mean": 8.668278853493224,
+    "std": 0.17958824612529956,
+    "n": 10
+   },
+   "slam_music_two_branch/map_accuracy": {
+    "mean": 2.3319105287701247,
+    "std": 0.21130025278380796,
+    "n": 10
+   },
+   "slam_music_two_branch/map_completeness": {
+    "mean": 15.004647178216326,
+    "std": 0.35406889534539576,
+    "n": 10
+   },
+   "slam_music_two_branch/iou": {
+    "mean": 0.05173248523505124,
+    "std": 0.007961944174220718,
+    "n": 10
+   },
+   "slam_music_two_branch/n_map": {
+    "mean": 295.5,
+    "std": 44.10045351240733,
+    "n": 10
+   }
+  },
+  "street_canyon/bw20": {
+   "phantoms_corrected/matched_facade": {
+    "mean": 0.09018518518518517,
+    "std": 0.001221380181321566,
+    "n": 5
+   },
+   "phantoms_corrected/matched_other": {
+    "mean": 0.2512037037037037,
+    "std": 0.005339952168628232,
+    "n": 5
+   },
+   "phantoms_corrected/folded_facade": {
+    "mean": 0.07268518518518519,
+    "std": 0.00087841046115788,
+    "n": 5
+   },
+   "phantoms_corrected/folded_other": {
+    "mean": 0.2088888888888889,
+    "std": 0.0020992192682878974,
+    "n": 5
+   },
+   "phantoms_corrected/unexplained": {
+    "mean": 0.37703703703703706,
+    "std": 0.004551187306460922,
+    "n": 5
+   },
+   "phantoms_corrected/n_detections": {
+    "mean": 2160.0,
+    "std": 0.0,
+    "n": 5
+   },
+   "phantoms_corrected/phantom_rate_manuscript_def": {
+    "mean": 0.6586111111111111,
+    "std": 0.005529258750679125,
+    "n": 5
+   },
+   "phantoms_corrected/median_signed_range_err_facade_m": {
+    "mean": 0.014435011556552978,
+    "std": 0.02665493160824635,
+    "n": 5
+   },
+   "phantoms_corrected/median_abs_range_err_facade_m": {
+    "mean": 0.45602119164303295,
+    "std": 0.05304776500477583,
+    "n": 5
+   },
+   "gt_map_music_corrected/chamfer": {
+    "mean": 10.484214448110464,
+    "std": 1.0064643547724867,
+    "n": 5
+   },
+   "gt_map_music_corrected/map_accuracy": {
+    "mean": 3.1071647076854063,
+    "std": 0.3298124589630763,
+    "n": 5
+   },
+   "gt_map_music_corrected/map_completeness": {
+    "mean": 17.861264188535525,
+    "std": 1.8497398495540913,
+    "n": 5
+   },
+   "gt_map_music_corrected/iou": {
+    "mean": 0.01221813312092701,
+    "std": 0.002035179345649,
+    "n": 5
+   },
+   "gt_map_music_corrected/n_map": {
+    "mean": 75.0,
+    "std": 4.560701700396552,
+    "n": 5
+   },
+   "slam_music/ate_dead_reckoning": {
+    "mean": 0.36971689201971036,
+    "std": 0.27274218374393566,
+    "n": 5
+   },
+   "slam_music/ate": {
+    "mean": 0.7040936426917722,
+    "std": 0.2521159371225181,
+    "n": 5
+   },
+   "slam_music/rpe": {
+    "mean": 0.037782203367006016,
+    "std": 0.009284992829622675,
+    "n": 5
+   },
+   "slam_music/n_confirmed": {
+    "mean": 86.2,
+    "std": 3.919183588453085,
+    "n": 5
+   },
+   "slam_music/chamfer": {
+    "mean": 10.136291633851439,
+    "std": 1.3889281259859325,
+    "n": 5
+   },
+   "slam_music/map_accuracy": {
+    "mean": 6.965757245649961,
+    "std": 0.9068338619136517,
+    "n": 5
+   },
+   "slam_music/map_completeness": {
+    "mean": 13.306826022052917,
+    "std": 2.318005257491679,
+    "n": 5
+   },
+   "slam_music/iou": {
+    "mean": 0.024206356664662858,
+    "std": 0.008095492121536164,
+    "n": 5
+   },
+   "slam_music/n_map": {
+    "mean": 339.6,
+    "std": 77.69066868035054,
+    "n": 5
+   }
+  },
+  "street_canyon/bw40": {
+   "phantoms_corrected/matched_facade": {
+    "mean": 0.10490740740740741,
+    "std": 0.0006279935169560406,
+    "n": 5
+   },
+   "phantoms_corrected/matched_other": {
+    "mean": 0.1973148148148148,
+    "std": 0.0028145711395501254,
+    "n": 5
+   },
+   "phantoms_corrected/folded_facade": {
+    "mean": 0.0750925925925926,
+    "std": 0.0019510469912690275,
+    "n": 5
+   },
+   "phantoms_corrected/folded_other": {
+    "mean": 0.1899074074074074,
+    "std": 0.002689970193765543,
+    "n": 5
+   },
+   "phantoms_corrected/unexplained": {
+    "mean": 0.43277777777777776,
+    "std": 0.002705859110407857,
+    "n": 5
+   },
+   "phantoms_corrected/n_detections": {
+    "mean": 2160.0,
+    "std": 0.0,
+    "n": 5
+   },
+   "phantoms_corrected/phantom_rate_manuscript_def": {
+    "mean": 0.6977777777777778,
+    "std": 0.002673986866332177,
+    "n": 5
+   },
+   "phantoms_corrected/median_signed_range_err_facade_m": {
+    "mean": -0.05588492180686373,
+    "std": 0.018261407637289832,
+    "n": 5
+   },
+   "phantoms_corrected/median_abs_range_err_facade_m": {
+    "mean": 0.2592541583917704,
+    "std": 0.01453038200561959,
+    "n": 5
+   },
+   "gt_map_music_corrected/chamfer": {
+    "mean": 9.939558594896337,
+    "std": 0.20131125686828777,
+    "n": 5
+   },
+   "gt_map_music_corrected/map_accuracy": {
+    "mean": 3.4158224254339595,
+    "std": 0.15955320151223518,
+    "n": 5
+   },
+   "gt_map_music_corrected/map_completeness": {
+    "mean": 16.46329476435872,
+    "std": 0.37435155007172527,
+    "n": 5
+   },
+   "gt_map_music_corrected/iou": {
+    "mean": 0.020124809938641915,
+    "std": 0.002091038969909735,
+    "n": 5
+   },
+   "gt_map_music_corrected/n_map": {
+    "mean": 115.0,
+    "std": 2.280350850198276,
+    "n": 5
+   },
+   "slam_music/ate_dead_reckoning": {
+    "mean": 0.36971689201971036,
+    "std": 0.27274218374393566,
+    "n": 5
+   },
+   "slam_music/ate": {
+    "mean": 0.9074416062210748,
+    "std": 0.3238788256752125,
+    "n": 5
+   },
+   "slam_music/rpe": {
+    "mean": 0.03732694676712804,
+    "std": 0.011892021416878944,
+    "n": 5
+   },
+   "slam_music/n_confirmed": {
+    "mean": 73.8,
+    "std": 2.4819347291981715,
+    "n": 5
+   },
+   "slam_music/chamfer": {
+    "mean": 9.541131627160942,
+    "std": 1.1900848175627199,
+    "n": 5
+   },
+   "slam_music/map_accuracy": {
+    "mean": 4.340796993029902,
+    "std": 0.2879279738208046,
+    "n": 5
+   },
+   "slam_music/map_completeness": {
+    "mean": 14.741466261291981,
+    "std": 2.1358306540235956,
+    "n": 5
+   },
+   "slam_music/iou": {
+    "mean": 0.032560865188307836,
+    "std": 0.007055230080551273,
+    "n": 5
+   },
+   "slam_music/n_map": {
+    "mean": 347.0,
+    "std": 96.8854994310294,
+    "n": 5
+   }
+  },
+  "street_canyon/bw80": {
+   "phantoms_corrected/matched_facade": {
+    "mean": 0.11574074074074074,
+    "std": 0.0005071505162084853,
+    "n": 5
+   },
+   "phantoms_corrected/matched_other": {
+    "mean": 0.24064814814814817,
+    "std": 0.0029192375500804568,
+    "n": 5
+   },
+   "phantoms_corrected/folded_facade": {
+    "mean": 0.08157407407407408,
+    "std": 0.0013224867460264497,
+    "n": 5
+   },
+   "phantoms_corrected/folded_other": {
+    "mean": 0.2287962962962963,
+    "std": 0.002037037037037033,
+    "n": 5
+   },
+   "phantoms_corrected/unexplained": {
+    "mean": 0.3332407407407407,
+    "std": 0.004530418452861145,
+    "n": 5
+   },
+   "phantoms_corrected/n_detections": {
+    "mean": 2160.0,
+    "std": 0.0,
+    "n": 5
+   },
+   "phantoms_corrected/phantom_rate_manuscript_def": {
+    "mean": 0.6436111111111111,
+    "std": 0.002783943773772762,
+    "n": 5
+   },
+   "phantoms_corrected/median_signed_range_err_facade_m": {
+    "mean": -0.03859729247619441,
+    "std": 0.007248388920129928,
+    "n": 5
+   },
+   "phantoms_corrected/median_abs_range_err_facade_m": {
+    "mean": 0.18828889155895007,
+    "std": 0.0063377430432073785,
+    "n": 5
+   },
+   "gt_map_music_corrected/chamfer": {
+    "mean": 9.850900588745917,
+    "std": 0.1435305181002978,
+    "n": 5
+   },
+   "gt_map_music_corrected/map_accuracy": {
+    "mean": 2.909158894825162,
+    "std": 0.11992549323110155,
+    "n": 5
+   },
+   "gt_map_music_corrected/map_completeness": {
+    "mean": 16.79264228266667,
+    "std": 0.3140317900423613,
+    "n": 5
+   },
+   "gt_map_music_corrected/iou": {
+    "mean": 0.027196368175232234,
+    "std": 0.0006252042048468648,
+    "n": 5
+   },
+   "gt_map_music_corrected/n_map": {
+    "mean": 188.4,
+    "std": 8.593020423576334,
+    "n": 5
+   },
+   "slam_music/ate_dead_reckoning": {
+    "mean": 0.36971689201971036,
+    "std": 0.27274218374393566,
+    "n": 5
+   },
+   "slam_music/ate": {
+    "mean": 0.9729751206697262,
+    "std": 0.19643604821691907,
+    "n": 5
+   },
+   "slam_music/rpe": {
+    "mean": 0.03861268579639103,
+    "std": 0.004843555401661367,
+    "n": 5
+   },
+   "slam_music/n_confirmed": {
+    "mean": 86.4,
+    "std": 3.0066592756745814,
+    "n": 5
+   },
+   "slam_music/chamfer": {
+    "mean": 9.785558045068598,
+    "std": 0.6610265838652792,
+    "n": 5
+   },
+   "slam_music/map_accuracy": {
+    "mean": 2.9986998411068697,
+    "std": 0.09006813151436047,
+    "n": 5
+   },
+   "slam_music/map_completeness": {
+    "mean": 16.572416249030322,
+    "std": 1.3221162962734412,
+    "n": 5
+   },
+   "slam_music/iou": {
+    "mean": 0.03993247198253606,
+    "std": 0.0051148316721483875,
+    "n": 5
+   },
+   "slam_music/n_map": {
+    "mean": 325.0,
+    "std": 46.238512086787566,
+    "n": 5
+   }
+  },
+  "street_canyon_scurve/bw160": {
+   "phantoms_corrected/matched_facade": {
+    "mean": 0.15180555555555553,
+    "std": 0.0013803751403588535,
+    "n": 10
+   },
+   "phantoms_corrected/matched_other": {
+    "mean": 0.18236111111111114,
+    "std": 0.0015277777777777755,
+    "n": 10
+   },
+   "phantoms_corrected/folded_facade": {
+    "mean": 0.10324074074074074,
+    "std": 0.001793047845466396,
+    "n": 10
+   },
+   "phantoms_corrected/folded_other": {
+    "mean": 0.2383796296296296,
+    "std": 0.002758031668260456,
+    "n": 10
+   },
+   "phantoms_corrected/unexplained": {
+    "mean": 0.324212962962963,
+    "std": 0.0030149518805860955,
+    "n": 10
+   },
+   "phantoms_corrected/n_detections": {
+    "mean": 2160.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "phantoms_corrected/phantom_rate_manuscript_def": {
+    "mean": 0.6658333333333333,
+    "std": 0.0016794775136312096,
+    "n": 10
+   },
+   "phantoms_corrected/median_signed_range_err_facade_m": {
+    "mean": -0.059732017750425116,
+    "std": 0.00655795992015646,
+    "n": 10
+   },
+   "phantoms_corrected/median_abs_range_err_facade_m": {
+    "mean": 0.15002984017577886,
+    "std": 0.0013116800533882745,
+    "n": 10
+   },
+   "gt_map_music_corrected/chamfer": {
+    "mean": 10.370513297581434,
+    "std": 0.10130239209915705,
+    "n": 10
+   },
+   "gt_map_music_corrected/map_accuracy": {
+    "mean": 3.08225029597872,
+    "std": 0.06376019489413427,
+    "n": 10
+   },
+   "gt_map_music_corrected/map_completeness": {
+    "mean": 17.658776299184147,
+    "std": 0.20543229105152788,
+    "n": 10
+   },
+   "gt_map_music_corrected/iou": {
+    "mean": 0.02791733524531701,
+    "std": 0.0032714343564044833,
+    "n": 10
+   },
+   "gt_map_music_corrected/n_map": {
+    "mean": 186.7,
+    "std": 6.132699242584786,
+    "n": 10
+   },
+   "slam_music/ate_dead_reckoning": {
+    "mean": 0.47185430285461516,
+    "std": 0.25902256083723013,
+    "n": 10
+   },
+   "slam_music/ate": {
+    "mean": 1.0654798357265007,
+    "std": 0.19899017702279126,
+    "n": 10
+   },
+   "slam_music/rpe": {
+    "mean": 0.04669849418113005,
+    "std": 0.007123052478388706,
+    "n": 10
+   },
+   "slam_music/n_confirmed": {
+    "mean": 115.9,
+    "std": 1.445683229480096,
+    "n": 10
+   },
+   "slam_music/chamfer": {
+    "mean": 9.688168572992263,
+    "std": 0.40287670039245804,
+    "n": 10
+   },
+   "slam_music/map_accuracy": {
+    "mean": 2.8658760818560753,
+    "std": 0.12705807020610654,
+    "n": 10
+   },
+   "slam_music/map_completeness": {
+    "mean": 16.510461064128446,
+    "std": 0.8453309258464085,
+    "n": 10
+   },
+   "slam_music/iou": {
+    "mean": 0.04315822168160942,
+    "std": 0.006386037109980489,
+    "n": 10
+   },
+   "slam_music/n_map": {
+    "mean": 349.7,
+    "std": 50.332991168814914,
+    "n": 10
+   },
+   "phantoms_as_published/matched_facade": {
+    "mean": 0.01912037037037037,
+    "std": 0.0006563632814239735,
+    "n": 10
+   },
+   "phantoms_as_published/matched_other": {
+    "mean": 0.09587962962962962,
+    "std": 0.003624441208527746,
+    "n": 10
+   },
+   "phantoms_as_published/folded_facade": {
+    "mean": 0.005277777777777778,
+    "std": 0.0007522257782070333,
+    "n": 10
+   },
+   "phantoms_as_published/folded_other": {
+    "mean": 0.0575925925925926,
+    "std": 0.0023715274953454994,
+    "n": 10
+   },
+   "phantoms_as_published/unexplained": {
+    "mean": 0.8221296296296294,
+    "std": 0.004463692886368139,
+    "n": 10
+   },
+   "phantoms_as_published/n_detections": {
+    "mean": 2160.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "phantoms_as_published/phantom_rate_manuscript_def": {
+    "mean": 0.8850000000000001,
+    "std": 0.0034346735168502567,
+    "n": 10
+   },
+   "phantoms_as_published/median_signed_range_err_facade_m": {
+    "mean": -6.623033431108299,
+    "std": 0.17506486440404687,
+    "n": 10
+   },
+   "phantoms_as_published/median_abs_range_err_facade_m": {
+    "mean": 6.623033431108299,
+    "std": 0.17506486440404687,
+    "n": 10
+   },
+   "gt_map_music_as_published/chamfer": {
+    "mean": 17.327688704818165,
+    "std": 1.6163137617360863,
+    "n": 10
+   },
+   "gt_map_music_as_published/map_accuracy": {
+    "mean": 3.5041691906919326,
+    "std": 0.5142881545919107,
+    "n": 10
+   },
+   "gt_map_music_as_published/map_completeness": {
+    "mean": 31.1512082189444,
+    "std": 3.0867924546585743,
+    "n": 10
+   },
+   "gt_map_music_as_published/iou": {
+    "mean": 0.0008103208543783758,
+    "std": 0.0011629552442414329,
+    "n": 10
+   },
+   "gt_map_music_as_published/n_map": {
+    "mean": 9.2,
+    "std": 2.6381811916545836,
+    "n": 10
+   },
+   "gt_map_oracle/chamfer": {
+    "mean": 12.518304125792499,
+    "std": 0.0,
+    "n": 10
+   },
+   "gt_map_oracle/map_accuracy": {
+    "mean": 0.2545868633597613,
+    "std": 0.0,
+    "n": 10
+   },
+   "gt_map_oracle/map_completeness": {
+    "mean": 24.78202138822524,
+    "std": 3.552713678800501e-15,
+    "n": 10
+   },
+   "gt_map_oracle/iou": {
+    "mean": 0.07476635514018691,
+    "std": 0.0,
+    "n": 10
+   },
+   "gt_map_oracle/n_map": {
+    "mean": 108.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "slam_oracle/ate_dead_reckoning": {
+    "mean": 0.47185430285461516,
+    "std": 0.25902256083723013,
+    "n": 10
+   },
+   "slam_oracle/ate": {
+    "mean": 0.100132320226528,
+    "std": 0.047095794982799546,
+    "n": 10
+   },
+   "slam_oracle/rpe": {
+    "mean": 0.005181275431167387,
+    "std": 0.0005454667974072188,
+    "n": 10
+   },
+   "slam_oracle/n_confirmed": {
+    "mean": 7.0,
+    "std": 0.0,
+    "n": 10
+   },
+   "slam_oracle/chamfer": {
+    "mean": 13.535121669226374,
+    "std": 1.0363397015362978,
+    "n": 10
+   },
+   "slam_oracle/map_accuracy": {
+    "mean": 0.27897899536960447,
+    "std": 0.044491967820994544,
+    "n": 10
+   },
+   "slam_oracle/map_completeness": {
+    "mean": 26.791264343083146,
+    "std": 2.0345374679416306,
+    "n": 10
+   },
+   "slam_oracle/iou": {
+    "mean": 0.03250325983478579,
+    "std": 0.016133850976922423,
+    "n": 10
+   },
+   "slam_oracle/n_map": {
+    "mean": 45.4,
+    "std": 23.66516427156169,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/ate": {
+    "mean": 0.2213765014044084,
+    "std": 0.05440521351138689,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/chamfer": {
+    "mean": 16.45833876312262,
+    "std": 1.0363612930257724,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/map_accuracy": {
+    "mean": 3.163918868690159,
+    "std": 0.5170151284371449,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/map_completeness": {
+    "mean": 29.75275865755508,
+    "std": 1.892008685371725,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/iou": {
+    "mean": 0.002428822595166669,
+    "std": 0.0012058594326110896,
+    "n": 10
+   },
+   "legacy_music/gt_odometry/n_map": {
+    "mean": 12.1,
+    "std": 1.9723082923316022,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/ate": {
+    "mean": 0.5350702467853541,
+    "std": 0.18293582758973123,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/chamfer": {
+    "mean": 16.49446471012576,
+    "std": 1.177790333374831,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/map_accuracy": {
+    "mean": 3.270501410046536,
+    "std": 0.5162295179986421,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/map_completeness": {
+    "mean": 29.71842801020498,
+    "std": 2.087627480448251,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/iou": {
+    "mean": 0.0015038326761373873,
+    "std": 0.0007393988266144806,
+    "n": 10
+   },
+   "legacy_music/noisy_odometry/n_map": {
+    "mean": 11.9,
+    "std": 2.7367864366808017,
+    "n": 10
+   },
+   "slam_music_two_branch/ate_dead_reckoning": {
+    "mean": 0.47185430285461516,
+    "std": 0.25902256083723013,
+    "n": 10
+   },
+   "slam_music_two_branch/ate": {
+    "mean": 0.4877090313935149,
+    "std": 0.2664613438282792,
+    "n": 10
+   },
+   "slam_music_two_branch/rpe": {
+    "mean": 0.045703658342555985,
+    "std": 0.010463991715649693,
+    "n": 10
+   },
+   "slam_music_two_branch/n_confirmed": {
+    "mean": 67.3,
+    "std": 1.8466185312619385,
+    "n": 10
+   },
+   "slam_music_two_branch/chamfer": {
+    "mean": 8.631909015916179,
+    "std": 0.23933738274679045,
+    "n": 10
+   },
+   "slam_music_two_branch/map_accuracy": {
+    "mean": 2.521942568205815,
+    "std": 0.17939217850567343,
+    "n": 10
+   },
+   "slam_music_two_branch/map_completeness": {
+    "mean": 14.741875463626538,
+    "std": 0.47730772020100815,
+    "n": 10
+   },
+   "slam_music_two_branch/iou": {
+    "mean": 0.0500155353984739,
+    "std": 0.006453316657632374,
+    "n": 10
+   },
+   "slam_music_two_branch/n_map": {
+    "mean": 296.8,
+    "std": 49.573783394048114,
+    "n": 10
+   }
+  }
+ },
+ "runs": [
+  {
+   "scene": "controlled_wall",
+   "bw": 160,
+   "seed": 3,
+   "phantoms_corrected": {
+    "matched_facade": 0.1537037037037037,
+    "matched_other": 0.2972222222222222,
+    "folded_facade": 0.0,
+    "folded_other": 0.19814814814814816,
+    "unexplained": 0.3509259259259259,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.549074074074074,
+    "median_signed_range_err_facade_m": 0.03565137471414204,
+    "median_abs_range_err_facade_m": 0.06949908732420162
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.6786865183156343,
+    "map_accuracy": 4.531327857002164,
+    "map_completeness": 0.826045179629105,
+    "iou": 0.3595505617977528,
+    "n_map": 145
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.20562977528247456,
+    "ate": 0.4932602355730919,
+    "rpe": 0.027911826565109855,
+    "n_confirmed": 27,
+    "chamfer": 2.991523931215208,
+    "map_accuracy": 3.9933661255633885,
+    "map_completeness": 1.9896817368670277,
+    "iou": 0.22727272727272727,
+    "n_map": 93
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.0824074074074074,
+    "matched_other": 0.023148148148148147,
+    "folded_facade": 0.0,
+    "folded_other": 0.12314814814814815,
+    "unexplained": 0.7712962962962963,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.8944444444444445,
+    "median_signed_range_err_facade_m": -6.273128009743907,
+    "median_abs_range_err_facade_m": 6.273128009743907
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 5.723002763679078,
+    "map_accuracy": 2.8609266936452338,
+    "map_completeness": 8.585078833712924,
+    "iou": 0.0,
+    "n_map": 7
+   },
+   "gt_map_oracle": {
+    "chamfer": 0.5003080998594438,
+    "map_accuracy": 0.24582667113843634,
+    "map_completeness": 0.7547895285804512,
+    "iou": 0.7674418604651163,
+    "n_map": 60
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.20562977528247456,
+    "ate": 0.08671643205690159,
+    "rpe": 0.0045335402176861425,
+    "n_confirmed": 3,
+    "chamfer": 1.1003021138840356,
+    "map_accuracy": 0.22546620322476618,
+    "map_completeness": 1.975138024543305,
+    "iou": 0.3023255813953488,
+    "n_map": 16
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.13992805801150027,
+     "chamfer": 6.001079134217934,
+     "map_accuracy": 2.157232543194338,
+     "map_completeness": 9.84492572524153,
+     "iou": 0.0,
+     "n_map": 6
+    },
+    "noisy_odometry": {
+     "ate": 0.21751924994759358,
+     "chamfer": 5.589883965263792,
+     "map_accuracy": 2.54849283243383,
+     "map_completeness": 8.631275098093754,
+     "iou": 0.0,
+     "n_map": 7
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.20562977528247456,
+    "ate": 0.43757556188641467,
+    "rpe": 0.02582742773997201,
+    "n_confirmed": 29,
+    "chamfer": 5.568274560471321,
+    "map_accuracy": 8.624217539297797,
+    "map_completeness": 2.5123315816448435,
+    "iou": 0.183206106870229,
+    "n_map": 169
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 160,
+   "seed": 9,
+   "phantoms_corrected": {
+    "matched_facade": 0.16111111111111112,
+    "matched_other": 0.29074074074074074,
+    "folded_facade": 0.0,
+    "folded_other": 0.19907407407407407,
+    "unexplained": 0.3490740740740741,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5481481481481482,
+    "median_signed_range_err_facade_m": 0.025474009728071678,
+    "median_abs_range_err_facade_m": 0.0733250150361826
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.575010537107921,
+    "map_accuracy": 4.356723397564718,
+    "map_completeness": 0.793297676651124,
+    "iou": 0.3404255319148936,
+    "n_map": 151
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.2332208999771592,
+    "ate": 0.13826042939004166,
+    "rpe": 0.04046684930224087,
+    "n_confirmed": 25,
+    "chamfer": 2.9985702573043804,
+    "map_accuracy": 4.09555381425327,
+    "map_completeness": 1.9015867003554905,
+    "iou": 0.24390243902439024,
+    "n_map": 91
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.09166666666666666,
+    "matched_other": 0.021296296296296296,
+    "folded_facade": 0.0,
+    "folded_other": 0.12129629629629629,
+    "unexplained": 0.7657407407407407,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.8870370370370371,
+    "median_signed_range_err_facade_m": -6.089307475718428,
+    "median_abs_range_err_facade_m": 6.089307475718428
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 5.791086450755009,
+    "map_accuracy": 2.5988764912273843,
+    "map_completeness": 8.983296410282634,
+    "iou": 0.0,
+    "n_map": 5
+   },
+   "gt_map_oracle": {
+    "chamfer": 0.5003080998594438,
+    "map_accuracy": 0.24582667113843634,
+    "map_completeness": 0.7547895285804512,
+    "iou": 0.7674418604651163,
+    "n_map": 60
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.2332208999771592,
+    "ate": 0.09871385578026133,
+    "rpe": 0.004705714414047143,
+    "n_confirmed": 3,
+    "chamfer": 2.646306363312031,
+    "map_accuracy": 0.22281243808182133,
+    "map_completeness": 5.069800288542241,
+    "iou": 0.16279069767441862,
+    "n_map": 9
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.08989879490066104,
+     "chamfer": 5.787054086359119,
+     "map_accuracy": 2.612837475310627,
+     "map_completeness": 8.961270697407612,
+     "iou": 0.0,
+     "n_map": 5
+    },
+    "noisy_odometry": {
+     "ate": 0.3101333856882431,
+     "chamfer": 6.033815138855656,
+     "map_accuracy": 3.2731993500826846,
+     "map_completeness": 8.794430927628627,
+     "iou": 0.0,
+     "n_map": 5
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.2332208999771592,
+    "ate": 0.31168615172118785,
+    "rpe": 0.028606816297826916,
+    "n_confirmed": 30,
+    "chamfer": 4.4011325046519305,
+    "map_accuracy": 7.535878224320167,
+    "map_completeness": 1.2663867849836936,
+    "iou": 0.07432432432432433,
+    "n_map": 160
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 160,
+   "seed": 5,
+   "phantoms_corrected": {
+    "matched_facade": 0.15092592592592594,
+    "matched_other": 0.2972222222222222,
+    "folded_facade": 0.0,
+    "folded_other": 0.19537037037037036,
+    "unexplained": 0.35648148148148145,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5518518518518518,
+    "median_signed_range_err_facade_m": 0.03565137471414204,
+    "median_abs_range_err_facade_m": 0.07086952114107703
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.5717324842620033,
+    "map_accuracy": 4.2961375671113196,
+    "map_completeness": 0.8473274014126874,
+    "iou": 0.3516483516483517,
+    "n_map": 144
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.15246875269100826,
+    "ate": 0.39357569001717985,
+    "rpe": 0.025802977244873182,
+    "n_confirmed": 28,
+    "chamfer": 2.7393358237219636,
+    "map_accuracy": 4.039831523025512,
+    "map_completeness": 1.4388401244184152,
+    "iou": 0.24390243902439024,
+    "n_map": 88
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.08611111111111111,
+    "matched_other": 0.021296296296296296,
+    "folded_facade": 0.0,
+    "folded_other": 0.1259259259259259,
+    "unexplained": 0.7666666666666667,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.8925925925925926,
+    "median_signed_range_err_facade_m": -6.1796163998129785,
+    "median_abs_range_err_facade_m": 6.1796163998129785
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 5.881004891908145,
+    "map_accuracy": 2.9741630203329907,
+    "map_completeness": 8.787846763483298,
+    "iou": 0.0,
+    "n_map": 6
+   },
+   "gt_map_oracle": {
+    "chamfer": 0.5003080998594438,
+    "map_accuracy": 0.24582667113843634,
+    "map_completeness": 0.7547895285804512,
+    "iou": 0.7674418604651163,
+    "n_map": 60
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.15246875269100826,
+    "ate": 0.05928657682372588,
+    "rpe": 0.004536680668708698,
+    "n_confirmed": 3,
+    "chamfer": 2.2236084212038434,
+    "map_accuracy": 0.3017945118537776,
+    "map_completeness": 4.1454223305539095,
+    "iou": 0.20930232558139536,
+    "n_map": 17
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.11882795389758279,
+     "chamfer": 5.652230549789488,
+     "map_accuracy": 2.5446249771569738,
+     "map_completeness": 8.759836122422001,
+     "iou": 0.0,
+     "n_map": 6
+    },
+    "noisy_odometry": {
+     "ate": 0.2375558322438048,
+     "chamfer": 6.052363479835097,
+     "map_accuracy": 2.056394829403466,
+     "map_completeness": 10.048332130266727,
+     "iou": 0.0,
+     "n_map": 5
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.15246875269100826,
+    "ate": 0.2591283558783981,
+    "rpe": 0.024451080673643277,
+    "n_confirmed": 30,
+    "chamfer": 6.201015828346149,
+    "map_accuracy": 9.167760961224188,
+    "map_completeness": 3.234270695468111,
+    "iou": 0.17708333333333334,
+    "n_map": 97
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 160,
+   "seed": 2,
+   "phantoms_corrected": {
+    "matched_facade": 0.16296296296296298,
+    "matched_other": 0.28425925925925927,
+    "folded_facade": 0.0,
+    "folded_other": 0.1935185185185185,
+    "unexplained": 0.3592592592592593,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5527777777777778,
+    "median_signed_range_err_facade_m": 0.025475074804838016,
+    "median_abs_range_err_facade_m": 0.07772947498149563
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.595611559989286,
+    "map_accuracy": 4.354498086050703,
+    "map_completeness": 0.836725033927869,
+    "iou": 0.3229166666666667,
+    "n_map": 150
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.3421356271192468,
+    "ate": 0.513442008677981,
+    "rpe": 0.030260037117081813,
+    "n_confirmed": 26,
+    "chamfer": 2.680379069993138,
+    "map_accuracy": 4.11736195180167,
+    "map_completeness": 1.2433961881846054,
+    "iou": 0.2727272727272727,
+    "n_map": 156
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.09166666666666666,
+    "matched_other": 0.022222222222222223,
+    "folded_facade": 0.0,
+    "folded_other": 0.12222222222222222,
+    "unexplained": 0.7638888888888888,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.8861111111111111,
+    "median_signed_range_err_facade_m": -6.273128009743907,
+    "median_abs_range_err_facade_m": 6.273128009743907
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 6.095123856046722,
+    "map_accuracy": 2.1127899723761185,
+    "map_completeness": 10.077457739717325,
+    "iou": 0.0,
+    "n_map": 5
+   },
+   "gt_map_oracle": {
+    "chamfer": 0.5003080998594438,
+    "map_accuracy": 0.24582667113843634,
+    "map_completeness": 0.7547895285804512,
+    "iou": 0.7674418604651163,
+    "n_map": 60
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.3421356271192468,
+    "ate": 0.08505181065611778,
+    "rpe": 0.005260094577481022,
+    "n_confirmed": 3,
+    "chamfer": 0.9531223699048723,
+    "map_accuracy": 0.3007299671264918,
+    "map_completeness": 1.6055147726832528,
+    "iou": 0.3023255813953488,
+    "n_map": 17
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.12853976881048618,
+     "chamfer": 6.108352335089663,
+     "map_accuracy": 2.140954729056117,
+     "map_completeness": 10.075749941123208,
+     "iou": 0.0,
+     "n_map": 5
+    },
+    "noisy_odometry": {
+     "ate": 0.3567754502441668,
+     "chamfer": 5.976033244095054,
+     "map_accuracy": 1.962736114847536,
+     "map_completeness": 9.989330373342572,
+     "iou": 0.0,
+     "n_map": 5
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.3421356271192468,
+    "ate": 0.49883792591676135,
+    "rpe": 0.02400514730303102,
+    "n_confirmed": 26,
+    "chamfer": 5.461694920631341,
+    "map_accuracy": 8.715283704940408,
+    "map_completeness": 2.2081061363222743,
+    "iou": 0.03676470588235294,
+    "n_map": 137
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 160,
+   "seed": 0,
+   "phantoms_corrected": {
+    "matched_facade": 0.15555555555555556,
+    "matched_other": 0.29259259259259257,
+    "folded_facade": 0.0,
+    "folded_other": 0.19537037037037036,
+    "unexplained": 0.35648148148148145,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5518518518518518,
+    "median_signed_range_err_facade_m": 0.039801504198131,
+    "median_abs_range_err_facade_m": 0.07507484245045859
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.597120889272442,
+    "map_accuracy": 4.377513469387093,
+    "map_completeness": 0.8167283091577899,
+    "iou": 0.3333333333333333,
+    "n_map": 142
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.04853439689462517,
+    "ate": 0.2714483635082486,
+    "rpe": 0.027363112117560998,
+    "n_confirmed": 26,
+    "chamfer": 2.6083003029809477,
+    "map_accuracy": 3.903419008315272,
+    "map_completeness": 1.313181597646623,
+    "iou": 0.275,
+    "n_map": 73
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.08518518518518518,
+    "matched_other": 0.020370370370370372,
+    "folded_facade": 0.0,
+    "folded_other": 0.12407407407407407,
+    "unexplained": 0.7703703703703704,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.8944444444444445,
+    "median_signed_range_err_facade_m": -6.636994383520213,
+    "median_abs_range_err_facade_m": 6.636994383520213
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 6.0768244682011145,
+    "map_accuracy": 2.082624104250847,
+    "map_completeness": 10.071024832151382,
+    "iou": 0.0,
+    "n_map": 4
+   },
+   "gt_map_oracle": {
+    "chamfer": 0.5003080998594438,
+    "map_accuracy": 0.24582667113843634,
+    "map_completeness": 0.7547895285804512,
+    "iou": 0.7674418604651163,
+    "n_map": 60
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.04853439689462517,
+    "ate": 0.03188779569260935,
+    "rpe": 0.004293381798487046,
+    "n_confirmed": 3,
+    "chamfer": 1.9308250978212242,
+    "map_accuracy": 0.2780733030173126,
+    "map_completeness": 3.583576892625136,
+    "iou": 0.20930232558139536,
+    "n_map": 15
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.21754406060737197,
+     "chamfer": 6.128175207021855,
+     "map_accuracy": 2.1444990946120623,
+     "map_completeness": 10.111851319431649,
+     "iou": 0.0,
+     "n_map": 4
+    },
+    "noisy_odometry": {
+     "ate": 0.19308354204512,
+     "chamfer": 6.129787668103526,
+     "map_accuracy": 2.1570018674125655,
+     "map_completeness": 10.102573468794485,
+     "iou": 0.0,
+     "n_map": 4
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.04853439689462517,
+    "ate": 0.5276064006480141,
+    "rpe": 0.025434976798878253,
+    "n_confirmed": 27,
+    "chamfer": 5.5835356345411284,
+    "map_accuracy": 8.860038012415517,
+    "map_completeness": 2.307033256666741,
+    "iou": 0.005405405405405406,
+    "n_map": 204
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 160,
+   "seed": 6,
+   "phantoms_corrected": {
+    "matched_facade": 0.15833333333333333,
+    "matched_other": 0.2935185185185185,
+    "folded_facade": 0.0,
+    "folded_other": 0.18796296296296297,
+    "unexplained": 0.36018518518518516,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5481481481481482,
+    "median_signed_range_err_facade_m": 0.03262448497590853,
+    "median_abs_range_err_facade_m": 0.0733250150361826
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.546944745840384,
+    "map_accuracy": 4.267817724729631,
+    "map_completeness": 0.8260717669511375,
+    "iou": 0.38095238095238093,
+    "n_map": 131
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.34932268463051797,
+    "ate": 0.38828086221778035,
+    "rpe": 0.01893912408583661,
+    "n_confirmed": 30,
+    "chamfer": 3.1231527939043486,
+    "map_accuracy": 3.9083049472709015,
+    "map_completeness": 2.3380006405377953,
+    "iou": 0.18032786885245902,
+    "n_map": 39
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.08981481481481482,
+    "matched_other": 0.025,
+    "folded_facade": 0.0,
+    "folded_other": 0.12037037037037036,
+    "unexplained": 0.7648148148148148,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.8851851851851852,
+    "median_signed_range_err_facade_m": -6.089305345564895,
+    "median_abs_range_err_facade_m": 6.089305345564895
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 6.013126791440997,
+    "map_accuracy": 3.1016289606075795,
+    "map_completeness": 8.924624622274415,
+    "iou": 0.0,
+    "n_map": 5
+   },
+   "gt_map_oracle": {
+    "chamfer": 0.5003080998594438,
+    "map_accuracy": 0.24582667113843634,
+    "map_completeness": 0.7547895285804512,
+    "iou": 0.7674418604651163,
+    "n_map": 60
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.34932268463051797,
+    "ate": 0.07984075039112537,
+    "rpe": 0.005446721070450833,
+    "n_confirmed": 3,
+    "chamfer": 0.8646665625811462,
+    "map_accuracy": 0.27701435177404,
+    "map_completeness": 1.4523187733882523,
+    "iou": 0.37209302325581395,
+    "n_map": 26
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.17214186149332186,
+     "chamfer": 6.211253352628502,
+     "map_accuracy": 2.1521105757467085,
+     "map_completeness": 10.270396129510296,
+     "iou": 0.0,
+     "n_map": 4
+    },
+    "noisy_odometry": {
+     "ate": 0.2670461863831409,
+     "chamfer": 6.085917856820154,
+     "map_accuracy": 1.9932278339295912,
+     "map_completeness": 10.178607879710716,
+     "iou": 0.0,
+     "n_map": 4
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.34932268463051797,
+    "ate": 0.4946688276185923,
+    "rpe": 0.027873049751957965,
+    "n_confirmed": 31,
+    "chamfer": 5.349387935964961,
+    "map_accuracy": 8.680927283674006,
+    "map_completeness": 2.0178485882559154,
+    "iou": 0.1232876712328767,
+    "n_map": 170
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 160,
+   "seed": 8,
+   "phantoms_corrected": {
+    "matched_facade": 0.15925925925925927,
+    "matched_other": 0.29444444444444445,
+    "folded_facade": 0.0,
+    "folded_other": 0.1925925925925926,
+    "unexplained": 0.3537037037037037,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5462962962962963,
+    "median_signed_range_err_facade_m": 0.01767501910236291,
+    "median_abs_range_err_facade_m": 0.07195741490877339
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.6039880499644315,
+    "map_accuracy": 4.370401709831247,
+    "map_completeness": 0.8375743900976157,
+    "iou": 0.35555555555555557,
+    "n_map": 142
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.35264148849160065,
+    "ate": 0.4385518046465745,
+    "rpe": 0.02668147209320152,
+    "n_confirmed": 28,
+    "chamfer": 3.00476084753433,
+    "map_accuracy": 4.072003569845708,
+    "map_completeness": 1.9375181252229523,
+    "iou": 0.20689655172413793,
+    "n_map": 93
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.08518518518518518,
+    "matched_other": 0.025,
+    "folded_facade": 0.0,
+    "folded_other": 0.12129629629629629,
+    "unexplained": 0.7685185185185185,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.8898148148148148,
+    "median_signed_range_err_facade_m": -6.63430323773626,
+    "median_abs_range_err_facade_m": 6.63430323773626
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 6.086600114734716,
+    "map_accuracy": 2.0889013233267946,
+    "map_completeness": 10.084298906142637,
+    "iou": 0.0,
+    "n_map": 4
+   },
+   "gt_map_oracle": {
+    "chamfer": 0.5003080998594438,
+    "map_accuracy": 0.24582667113843634,
+    "map_completeness": 0.7547895285804512,
+    "iou": 0.7674418604651163,
+    "n_map": 60
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.35264148849160065,
+    "ate": 0.11174540448996748,
+    "rpe": 0.0050441079346012045,
+    "n_confirmed": 3,
+    "chamfer": 2.553664115561315,
+    "map_accuracy": 0.20298723021709217,
+    "map_completeness": 4.904341000905538,
+    "iou": 0.20930232558139536,
+    "n_map": 12
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.06823823360491128,
+     "chamfer": 6.0779064040514665,
+     "map_accuracy": 2.065947028447551,
+     "map_completeness": 10.089865779655382,
+     "iou": 0.0,
+     "n_map": 4
+    },
+    "noisy_odometry": {
+     "ate": 0.35287224457701244,
+     "chamfer": 5.9706720835026035,
+     "map_accuracy": 1.9413294238858296,
+     "map_completeness": 10.000014743119378,
+     "iou": 0.0,
+     "n_map": 5
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.35264148849160065,
+    "ate": 0.41706375086900366,
+    "rpe": 0.03530359203896298,
+    "n_confirmed": 27,
+    "chamfer": 4.19485539633615,
+    "map_accuracy": 6.889836842047696,
+    "map_completeness": 1.4998739506246037,
+    "iou": 0.2553191489361702,
+    "n_map": 101
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 160,
+   "seed": 4,
+   "phantoms_corrected": {
+    "matched_facade": 0.1537037037037037,
+    "matched_other": 0.29074074074074074,
+    "folded_facade": 0.0,
+    "folded_other": 0.18888888888888888,
+    "unexplained": 0.36666666666666664,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5555555555555556,
+    "median_signed_range_err_facade_m": 0.03671421309677214,
+    "median_abs_range_err_facade_m": 0.07195741490877339
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.6410945474093626,
+    "map_accuracy": 4.429093173264408,
+    "map_completeness": 0.8530959215543171,
+    "iou": 0.33695652173913043,
+    "n_map": 145
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.04049003797183227,
+    "ate": 0.25533057817962446,
+    "rpe": 0.03185219290039929,
+    "n_confirmed": 30,
+    "chamfer": 2.6784213843741296,
+    "map_accuracy": 3.7977167889104924,
+    "map_completeness": 1.5591259798377666,
+    "iou": 0.2777777777777778,
+    "n_map": 98
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.08703703703703704,
+    "matched_other": 0.022222222222222223,
+    "folded_facade": 0.0,
+    "folded_other": 0.12222222222222222,
+    "unexplained": 0.7685185185185185,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.8907407407407407,
+    "median_signed_range_err_facade_m": -6.5428660941415755,
+    "median_abs_range_err_facade_m": 6.5428660941415755
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 5.83493208246613,
+    "map_accuracy": 3.0030872004649507,
+    "map_completeness": 8.66677696446731,
+    "iou": 0.0,
+    "n_map": 6
+   },
+   "gt_map_oracle": {
+    "chamfer": 0.5003080998594438,
+    "map_accuracy": 0.24582667113843634,
+    "map_completeness": 0.7547895285804512,
+    "iou": 0.7674418604651163,
+    "n_map": 60
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.04049003797183227,
+    "ate": 0.028024266036830434,
+    "rpe": 0.004827508252336172,
+    "n_confirmed": 3,
+    "chamfer": 1.3411474758310737,
+    "map_accuracy": 0.25318007462437636,
+    "map_completeness": 2.429114877037771,
+    "iou": 0.18604651162790697,
+    "n_map": 8
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.06039002186460845,
+     "chamfer": 5.376297614118432,
+     "map_accuracy": 3.1262845250143996,
+     "map_completeness": 7.626310703222464,
+     "iou": 0.0,
+     "n_map": 7
+    },
+    "noisy_odometry": {
+     "ate": 0.07816477066261829,
+     "chamfer": 5.388427666523401,
+     "map_accuracy": 3.148413281444706,
+     "map_completeness": 7.6284420516020965,
+     "iou": 0.0,
+     "n_map": 7
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.04049003797183227,
+    "ate": 0.22682049308203714,
+    "rpe": 0.03477012707253272,
+    "n_confirmed": 32,
+    "chamfer": 5.436823957973633,
+    "map_accuracy": 9.175094443806652,
+    "map_completeness": 1.6985534721406141,
+    "iou": 0.027210884353741496,
+    "n_map": 148
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 160,
+   "seed": 1,
+   "phantoms_corrected": {
+    "matched_facade": 0.15092592592592594,
+    "matched_other": 0.287962962962963,
+    "folded_facade": 0.0,
+    "folded_other": 0.19166666666666668,
+    "unexplained": 0.36944444444444446,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5611111111111111,
+    "median_signed_range_err_facade_m": 0.04182595691685975,
+    "median_abs_range_err_facade_m": 0.07086952114107703
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.572376732438573,
+    "map_accuracy": 4.296254513232888,
+    "map_completeness": 0.8484989516442578,
+    "iou": 0.37209302325581395,
+    "n_map": 139
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.15419622879485023,
+    "ate": 0.16499854290216268,
+    "rpe": 0.033427732824363565,
+    "n_confirmed": 29,
+    "chamfer": 2.6948550581452846,
+    "map_accuracy": 4.182944345724679,
+    "map_completeness": 1.2067657705658903,
+    "iou": 0.24509803921568626,
+    "n_map": 121
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.09537037037037037,
+    "matched_other": 0.025925925925925925,
+    "folded_facade": 0.0,
+    "folded_other": 0.12037037037037036,
+    "unexplained": 0.7583333333333333,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.8787037037037037,
+    "median_signed_range_err_facade_m": -6.63430323773626,
+    "median_abs_range_err_facade_m": 6.63430323773626
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 5.231178007598134,
+    "map_accuracy": 2.613918096239149,
+    "map_completeness": 7.848437918957117,
+    "iou": 0.0,
+    "n_map": 7
+   },
+   "gt_map_oracle": {
+    "chamfer": 0.5003080998594438,
+    "map_accuracy": 0.24582667113843634,
+    "map_completeness": 0.7547895285804512,
+    "iou": 0.7674418604651163,
+    "n_map": 60
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.15419622879485023,
+    "ate": 0.055342853462015895,
+    "rpe": 0.004829051696313471,
+    "n_confirmed": 3,
+    "chamfer": 2.018976826057143,
+    "map_accuracy": 0.20563428428226194,
+    "map_completeness": 3.8323193678320244,
+    "iou": 0.2727272727272727,
+    "n_map": 18
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.11473718965263346,
+     "chamfer": 5.946966706481001,
+     "map_accuracy": 2.128659413121477,
+     "map_completeness": 9.765273999840524,
+     "iou": 0.0,
+     "n_map": 6
+    },
+    "noisy_odometry": {
+     "ate": 0.19100714251048143,
+     "chamfer": 5.941421659559797,
+     "map_accuracy": 2.1455706605697125,
+     "map_completeness": 9.737272658549882,
+     "iou": 0.0,
+     "n_map": 6
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.15419622879485023,
+    "ate": 0.25268942387043797,
+    "rpe": 0.030457581944448812,
+    "n_confirmed": 29,
+    "chamfer": 4.116601424100578,
+    "map_accuracy": 7.15780316410878,
+    "map_completeness": 1.075399684092376,
+    "iou": 0.21951219512195122,
+    "n_map": 146
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 160,
+   "seed": 7,
+   "phantoms_corrected": {
+    "matched_facade": 0.16203703703703703,
+    "matched_other": 0.2898148148148148,
+    "folded_facade": 0.0,
+    "folded_other": 0.19166666666666668,
+    "unexplained": 0.35648148148148145,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5481481481481482,
+    "median_signed_range_err_facade_m": 0.032626615129441205,
+    "median_abs_range_err_facade_m": 0.0733250150361826
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.6327561380031272,
+    "map_accuracy": 4.433138555842364,
+    "map_completeness": 0.8323737201638904,
+    "iou": 0.3404255319148936,
+    "n_map": 143
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.23232019375292207,
+    "ate": 0.3475561516641821,
+    "rpe": 0.02700836248015092,
+    "n_confirmed": 27,
+    "chamfer": 2.8158384417132654,
+    "map_accuracy": 3.8589952557313394,
+    "map_completeness": 1.7726816276951909,
+    "iou": 0.32,
+    "n_map": 86
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.09259259259259259,
+    "matched_other": 0.022222222222222223,
+    "folded_facade": 0.0,
+    "folded_other": 0.12129629629629629,
+    "unexplained": 0.7638888888888888,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.8851851851851852,
+    "median_signed_range_err_facade_m": -6.1796163998129785,
+    "median_abs_range_err_facade_m": 6.1796163998129785
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 6.0559748484055635,
+    "map_accuracy": 2.124795728581291,
+    "map_completeness": 9.987153968229835,
+    "iou": 0.0,
+    "n_map": 4
+   },
+   "gt_map_oracle": {
+    "chamfer": 0.5003080998594438,
+    "map_accuracy": 0.24582667113843634,
+    "map_completeness": 0.7547895285804512,
+    "iou": 0.7674418604651163,
+    "n_map": 60
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.23232019375292207,
+    "ate": 0.08287913903071878,
+    "rpe": 0.004366713617541459,
+    "n_confirmed": 3,
+    "chamfer": 1.4801940073416882,
+    "map_accuracy": 0.3029423208009663,
+    "map_completeness": 2.65744569388241,
+    "iou": 0.13953488372093023,
+    "n_map": 6
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.10706783740028455,
+     "chamfer": 6.057853336619435,
+     "map_accuracy": 2.1354525564500757,
+     "map_completeness": 9.980254116788794,
+     "iou": 0.0,
+     "n_map": 4
+    },
+    "noisy_odometry": {
+     "ate": 0.1371218248318288,
+     "chamfer": 6.040829661989141,
+     "map_accuracy": 2.092259467482677,
+     "map_completeness": 9.989399856495606,
+     "iou": 0.0,
+     "n_map": 4
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.23232019375292207,
+    "ate": 0.47726125086858745,
+    "rpe": 0.034645475319816654,
+    "n_confirmed": 30,
+    "chamfer": 5.34994513381884,
+    "map_accuracy": 7.948116332208093,
+    "map_completeness": 2.751773935429587,
+    "iou": 0.17777777777777778,
+    "n_map": 89
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 160,
+   "seed": 0,
+   "phantoms_corrected": {
+    "matched_facade": 0.1537037037037037,
+    "matched_other": 0.19074074074074074,
+    "folded_facade": 0.11296296296296296,
+    "folded_other": 0.19722222222222222,
+    "unexplained": 0.3453703703703704,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6555555555555556,
+    "median_signed_range_err_facade_m": -0.06924909470284746,
+    "median_abs_range_err_facade_m": 0.1447115793369136
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.465108921304827,
+    "map_accuracy": 3.1505255772958853,
+    "map_completeness": 17.77969226531377,
+    "iou": 0.027663934426229508,
+    "n_map": 219
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.10649179416829062,
+    "ate": 1.3079798519750583,
+    "rpe": 0.04149012602000925,
+    "n_confirmed": 100,
+    "chamfer": 11.86739830121434,
+    "map_accuracy": 2.7750594446979173,
+    "map_completeness": 20.959737157730764,
+    "iou": 0.03972868217054264,
+    "n_map": 282
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.01898148148148148,
+    "matched_other": 0.08425925925925926,
+    "folded_facade": 0.0060185185185185185,
+    "folded_other": 0.075,
+    "unexplained": 0.8157407407407408,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8967592592592593,
+    "median_signed_range_err_facade_m": -2.1130238951734697,
+    "median_abs_range_err_facade_m": 2.1130238951734697
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 18.738050047432008,
+    "map_accuracy": 5.268712783565746,
+    "map_completeness": 32.20738731129827,
+    "iou": 0.0,
+    "n_map": 2
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.53200892372266,
+    "map_accuracy": 0.2579924590727874,
+    "map_completeness": 24.806025388372532,
+    "iou": 0.07476635514018691,
+    "n_map": 100
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.10649179416829062,
+    "ate": 0.03527533120481146,
+    "rpe": 0.0043594340022439755,
+    "n_confirmed": 7,
+    "chamfer": 14.68468801922345,
+    "map_accuracy": 0.2819130741586275,
+    "map_completeness": 29.087462964288274,
+    "iou": 0.015186915887850467,
+    "n_map": 20
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.29761571092392486,
+     "chamfer": 19.86145663983313,
+     "map_accuracy": 5.765556153117143,
+     "map_completeness": 33.95735712654911,
+     "iou": 0.0,
+     "n_map": 3
+    },
+    "noisy_odometry": {
+     "ate": 0.42743477955399306,
+     "chamfer": 21.179511074714434,
+     "map_accuracy": 5.809058402174944,
+     "map_completeness": 36.54996374725392,
+     "iou": 0.0,
+     "n_map": 2
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.10649179416829062,
+    "ate": 0.716682223923082,
+    "rpe": 0.05533016596495424,
+    "n_confirmed": 62,
+    "chamfer": 8.721120111364709,
+    "map_accuracy": 2.304373673557903,
+    "map_completeness": 15.137866549171516,
+    "iou": 0.050345508390918066,
+    "n_map": 277
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 160,
+   "seed": 3,
+   "phantoms_corrected": {
+    "matched_facade": 0.15324074074074073,
+    "matched_other": 0.19166666666666668,
+    "folded_facade": 0.1087962962962963,
+    "folded_other": 0.19814814814814816,
+    "unexplained": 0.34814814814814815,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6550925925925926,
+    "median_signed_range_err_facade_m": -0.055556937459854794,
+    "median_abs_range_err_facade_m": 0.1414813604692693
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.352815603715971,
+    "map_accuracy": 3.0188326776069974,
+    "map_completeness": 17.686798529824944,
+    "iou": 0.03076923076923077,
+    "n_map": 216
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.47715064921509515,
+    "ate": 1.6627101265266613,
+    "rpe": 0.036094756205694745,
+    "n_confirmed": 102,
+    "chamfer": 10.132841682633819,
+    "map_accuracy": 2.855941578738922,
+    "map_completeness": 17.409741786528716,
+    "iou": 0.045112781954887216,
+    "n_map": 358
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.020370370370370372,
+    "matched_other": 0.0824074074074074,
+    "folded_facade": 0.006481481481481481,
+    "folded_other": 0.0763888888888889,
+    "unexplained": 0.8143518518518519,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8972222222222223,
+    "median_signed_range_err_facade_m": -2.108865835477687,
+    "median_abs_range_err_facade_m": 2.108865835477687
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 17.678837080689156,
+    "map_accuracy": 3.355022857627281,
+    "map_completeness": 32.00265130375103,
+    "iou": 0.0,
+    "n_map": 4
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.53200892372266,
+    "map_accuracy": 0.2579924590727874,
+    "map_completeness": 24.806025388372532,
+    "iou": 0.07476635514018691,
+    "n_map": 100
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.47715064921509515,
+    "ate": 0.1171780478756311,
+    "rpe": 0.0048327135286073755,
+    "n_confirmed": 7,
+    "chamfer": 12.807684069804731,
+    "map_accuracy": 0.26845637453415416,
+    "map_completeness": 25.34691176507531,
+    "iou": 0.05011655011655012,
+    "n_map": 69
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.3296644826302737,
+     "chamfer": 17.662206079497285,
+     "map_accuracy": 3.528419628962369,
+     "map_completeness": 31.795992530032198,
+     "iou": 0.0011614401858304297,
+     "n_map": 7
+    },
+    "noisy_odometry": {
+     "ate": 0.7154765586157119,
+     "chamfer": 17.53133660134367,
+     "map_accuracy": 3.4657173142241424,
+     "map_completeness": 31.5969558884632,
+     "iou": 0.0011627906976744186,
+     "n_map": 5
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.47715064921509515,
+    "ate": 0.8111408004796886,
+    "rpe": 0.03932592133177342,
+    "n_confirmed": 66,
+    "chamfer": 8.364324446353912,
+    "map_accuracy": 2.4015174914546504,
+    "map_completeness": 14.327131401253174,
+    "iou": 0.06261859582542695,
+    "n_map": 343
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 160,
+   "seed": 5,
+   "phantoms_corrected": {
+    "matched_facade": 0.1574074074074074,
+    "matched_other": 0.18981481481481483,
+    "folded_facade": 0.11157407407407408,
+    "folded_other": 0.19907407407407407,
+    "unexplained": 0.3421296296296296,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6527777777777778,
+    "median_signed_range_err_facade_m": -0.06064892027084312,
+    "median_abs_range_err_facade_m": 0.14311338102615778
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.6219447496852,
+    "map_accuracy": 3.152702883808709,
+    "map_completeness": 18.091186615561693,
+    "iou": 0.03067484662576687,
+    "n_map": 223
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.364061090076524,
+    "ate": 1.260340784377268,
+    "rpe": 0.04883974313651446,
+    "n_confirmed": 99,
+    "chamfer": 10.085202741426992,
+    "map_accuracy": 2.88374894518055,
+    "map_completeness": 17.286656537673434,
+    "iou": 0.04498594189315839,
+    "n_map": 378
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.020370370370370372,
+    "matched_other": 0.08657407407407407,
+    "folded_facade": 0.005555555555555556,
+    "folded_other": 0.07731481481481481,
+    "unexplained": 0.8101851851851852,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8930555555555556,
+    "median_signed_range_err_facade_m": -2.0797551573001414,
+    "median_abs_range_err_facade_m": 2.0797551573001414
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 22.706475848394096,
+    "map_accuracy": 5.8779254225693665,
+    "map_completeness": 39.53502627421882,
+    "iou": 0.0,
+    "n_map": 1
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.53200892372266,
+    "map_accuracy": 0.2579924590727874,
+    "map_completeness": 24.806025388372532,
+    "iou": 0.07476635514018691,
+    "n_map": 100
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.364061090076524,
+    "ate": 0.07561422409790736,
+    "rpe": 0.004674874510524326,
+    "n_confirmed": 7,
+    "chamfer": 14.010963240031346,
+    "map_accuracy": 0.28256125507979124,
+    "map_completeness": 27.7393652249829,
+    "iou": 0.018691588785046728,
+    "n_map": 26
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.3080622385284038,
+     "chamfer": 17.924259890482872,
+     "map_accuracy": 3.357954392311509,
+     "map_completeness": 32.49056538865423,
+     "iou": 0.0011627906976744186,
+     "n_map": 5
+    },
+    "noisy_odometry": {
+     "ate": 0.6861325146206829,
+     "chamfer": 19.21758940191255,
+     "map_accuracy": 3.953626174450823,
+     "map_completeness": 34.48155262937428,
+     "iou": 0.0,
+     "n_map": 3
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.364061090076524,
+    "ate": 0.4370414116780976,
+    "rpe": 0.047209868479392146,
+    "n_confirmed": 60,
+    "chamfer": 8.822039264785067,
+    "map_accuracy": 2.1732717449648034,
+    "map_completeness": 15.47080678460533,
+    "iou": 0.054294175715695954,
+    "n_map": 296
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 160,
+   "seed": 4,
+   "phantoms_corrected": {
+    "matched_facade": 0.1527777777777778,
+    "matched_other": 0.19305555555555556,
+    "folded_facade": 0.11064814814814815,
+    "folded_other": 0.19675925925925927,
+    "unexplained": 0.34675925925925927,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6541666666666667,
+    "median_signed_range_err_facade_m": -0.06168689545227224,
+    "median_abs_range_err_facade_m": 0.14554430210220737
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.652836011658595,
+    "map_accuracy": 3.1227331519907833,
+    "map_completeness": 18.182938871326407,
+    "iou": 0.03112033195020747,
+    "n_map": 210
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.09688997588459687,
+    "ate": 1.208046311490104,
+    "rpe": 0.04340393129953773,
+    "n_confirmed": 103,
+    "chamfer": 9.455452027383762,
+    "map_accuracy": 2.669625926313745,
+    "map_completeness": 16.24127812845378,
+    "iou": 0.052930056710775046,
+    "n_map": 364
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.019444444444444445,
+    "matched_other": 0.0824074074074074,
+    "folded_facade": 0.006944444444444444,
+    "folded_other": 0.07314814814814814,
+    "unexplained": 0.8180555555555555,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8981481481481481,
+    "median_signed_range_err_facade_m": -2.4777749746018216,
+    "median_abs_range_err_facade_m": 2.4777749746018216
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 19.018675091822665,
+    "map_accuracy": 5.701495971196422,
+    "map_completeness": 32.33585421244891,
+    "iou": 0.0,
+    "n_map": 3
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.53200892372266,
+    "map_accuracy": 0.2579924590727874,
+    "map_completeness": 24.806025388372532,
+    "iou": 0.07476635514018691,
+    "n_map": 100
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.09688997588459687,
+    "ate": 0.03415613046945007,
+    "rpe": 0.004410652758842136,
+    "n_confirmed": 7,
+    "chamfer": 12.758581519201282,
+    "map_accuracy": 0.24306353035980313,
+    "map_completeness": 25.274099508042763,
+    "iou": 0.037383177570093455,
+    "n_map": 46
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.3209153811915991,
+     "chamfer": 18.949902648792538,
+     "map_accuracy": 5.543182270381945,
+     "map_completeness": 32.35662302720313,
+     "iou": 0.0,
+     "n_map": 4
+    },
+    "noisy_odometry": {
+     "ate": 0.22070403715711193,
+     "chamfer": 18.98041919129585,
+     "map_accuracy": 5.620309657104622,
+     "map_completeness": 32.34052872548708,
+     "iou": 0.0,
+     "n_map": 4
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.09688997588459687,
+    "ate": 0.38523709883348706,
+    "rpe": 0.027606506596448303,
+    "n_confirmed": 59,
+    "chamfer": 8.44077531007382,
+    "map_accuracy": 1.914074896619194,
+    "map_completeness": 14.967475723528446,
+    "iou": 0.05639476334340383,
+    "n_map": 269
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 160,
+   "seed": 8,
+   "phantoms_corrected": {
+    "matched_facade": 0.1550925925925926,
+    "matched_other": 0.1912037037037037,
+    "folded_facade": 0.11018518518518519,
+    "folded_other": 0.19953703703703704,
+    "unexplained": 0.3439814814814815,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6537037037037037,
+    "median_signed_range_err_facade_m": -0.05532997660782257,
+    "median_abs_range_err_facade_m": 0.14062350002440738
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.275005081783316,
+    "map_accuracy": 3.1206932990431464,
+    "map_completeness": 17.429316864523486,
+    "iou": 0.031408308004052685,
+    "n_map": 237
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.7746191087348037,
+    "ate": 1.2176620483054972,
+    "rpe": 0.038432958108029824,
+    "n_confirmed": 102,
+    "chamfer": 9.789799891818374,
+    "map_accuracy": 2.7285032585813513,
+    "map_completeness": 16.851096525055397,
+    "iou": 0.04866412213740458,
+    "n_map": 329
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.01990740740740741,
+    "matched_other": 0.08425925925925926,
+    "folded_facade": 0.006481481481481481,
+    "folded_other": 0.07037037037037037,
+    "unexplained": 0.8189814814814815,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8958333333333334,
+    "median_signed_range_err_facade_m": -2.1130238951734697,
+    "median_abs_range_err_facade_m": 2.1130238951734697
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 20.042154924082677,
+    "map_accuracy": 0.5808295364171293,
+    "map_completeness": 39.50348031174823,
+    "iou": 0.0,
+    "n_map": 1
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.53200892372266,
+    "map_accuracy": 0.2579924590727874,
+    "map_completeness": 24.806025388372532,
+    "iou": 0.07476635514018691,
+    "n_map": 100
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.7746191087348037,
+    "ate": 0.12647492483916792,
+    "rpe": 0.005046613871985973,
+    "n_confirmed": 7,
+    "chamfer": 12.61052983401466,
+    "map_accuracy": 0.2726305627734181,
+    "map_completeness": 24.9484291052559,
+    "iou": 0.04487917146144994,
+    "n_map": 79
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.30921849918606314,
+     "chamfer": 19.47504142177133,
+     "map_accuracy": 2.2055004855159526,
+     "map_completeness": 36.744582358026705,
+     "iou": 0.0,
+     "n_map": 3
+    },
+    "noisy_odometry": {
+     "ate": 0.8426275883912828,
+     "chamfer": 19.9171496516282,
+     "map_accuracy": 0.267428940031735,
+     "map_completeness": 39.566870363224666,
+     "iou": 0.0011682242990654205,
+     "n_map": 1
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.7746191087348037,
+    "ate": 0.4363654887021778,
+    "rpe": 0.03607888083358169,
+    "n_confirmed": 63,
+    "chamfer": 8.581954534140284,
+    "map_accuracy": 2.3278151836744403,
+    "map_completeness": 14.836093884606129,
+    "iou": 0.06196377502383222,
+    "n_map": 350
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 160,
+   "seed": 2,
+   "phantoms_corrected": {
+    "matched_facade": 0.15555555555555556,
+    "matched_other": 0.18888888888888888,
+    "folded_facade": 0.10925925925925926,
+    "folded_other": 0.2,
+    "unexplained": 0.34629629629629627,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6555555555555556,
+    "median_signed_range_err_facade_m": -0.05489981634888608,
+    "median_abs_range_err_facade_m": 0.14220621578953807
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.709806559788102,
+    "map_accuracy": 3.044528434196777,
+    "map_completeness": 18.375084685379427,
+    "iou": 0.028717948717948718,
+    "n_map": 216
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.8338466545189447,
+    "ate": 1.313869645663792,
+    "rpe": 0.04133936313007719,
+    "n_confirmed": 99,
+    "chamfer": 10.108872681811052,
+    "map_accuracy": 2.9150988746599316,
+    "map_completeness": 17.30264648896217,
+    "iou": 0.033364226135310475,
+    "n_map": 356
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.01990740740740741,
+    "matched_other": 0.08425925925925926,
+    "folded_facade": 0.00787037037037037,
+    "folded_other": 0.07037037037037037,
+    "unexplained": 0.8175925925925925,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8958333333333334,
+    "median_signed_range_err_facade_m": -2.108865835477687,
+    "median_abs_range_err_facade_m": 2.108865835477687
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 16.55164854052837,
+    "map_accuracy": 2.784346497963469,
+    "map_completeness": 30.31895058309327,
+    "iou": 0.0011627906976744186,
+    "n_map": 5
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.53200892372266,
+    "map_accuracy": 0.2579924590727874,
+    "map_completeness": 24.806025388372532,
+    "iou": 0.07476635514018691,
+    "n_map": 100
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.8338466545189447,
+    "ate": 0.1454296936149859,
+    "rpe": 0.005770629713358228,
+    "n_confirmed": 7,
+    "chamfer": 12.853495053017626,
+    "map_accuracy": 0.2859309782434425,
+    "map_completeness": 25.42105912779181,
+    "iou": 0.029988465974625143,
+    "n_map": 50
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.2124886611122481,
+     "chamfer": 14.290180242861245,
+     "map_accuracy": 2.93364798784807,
+     "map_completeness": 25.64671249787442,
+     "iou": 0.0023228803716608595,
+     "n_map": 7
+    },
+    "noisy_odometry": {
+     "ate": 0.9665217645242072,
+     "chamfer": 15.799369605004518,
+     "map_accuracy": 4.321393716544942,
+     "map_completeness": 27.277345493464093,
+     "iou": 0.0,
+     "n_map": 4
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.8338466545189447,
+    "ate": 0.4707137561516194,
+    "rpe": 0.03367883834655761,
+    "n_confirmed": 66,
+    "chamfer": 8.839392624070735,
+    "map_accuracy": 2.2052418525455435,
+    "map_completeness": 15.473543395595925,
+    "iou": 0.03903903903903904,
+    "n_map": 227
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 160,
+   "seed": 1,
+   "phantoms_corrected": {
+    "matched_facade": 0.15694444444444444,
+    "matched_other": 0.18981481481481483,
+    "folded_facade": 0.1087962962962963,
+    "folded_other": 0.2013888888888889,
+    "unexplained": 0.34305555555555556,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6532407407407408,
+    "median_signed_range_err_facade_m": -0.07025796261021355,
+    "median_abs_range_err_facade_m": 0.1441343508879811
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.250636664341055,
+    "map_accuracy": 2.9823475989649006,
+    "map_completeness": 17.51892572971721,
+    "iou": 0.035015447991761074,
+    "n_map": 225
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.3342053863116243,
+    "ate": 0.891261385743677,
+    "rpe": 0.046437196722859016,
+    "n_confirmed": 102,
+    "chamfer": 9.686649952663425,
+    "map_accuracy": 2.7831872905576476,
+    "map_completeness": 16.5901126147692,
+    "iou": 0.04666666666666667,
+    "n_map": 357
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.01990740740740741,
+    "matched_other": 0.0837962962962963,
+    "folded_facade": 0.006481481481481481,
+    "folded_other": 0.07361111111111111,
+    "unexplained": 0.8162037037037037,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8962962962962963,
+    "median_signed_range_err_facade_m": -2.108865835477687,
+    "median_abs_range_err_facade_m": 2.108865835477687
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 19.342067021843334,
+    "map_accuracy": 3.5499552574558284,
+    "map_completeness": 35.13417878623084,
+    "iou": 0.0011655011655011655,
+    "n_map": 3
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.53200892372266,
+    "map_accuracy": 0.2579924590727874,
+    "map_completeness": 24.806025388372532,
+    "iou": 0.07476635514018691,
+    "n_map": 100
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.3342053863116243,
+    "ate": 0.08305680112854323,
+    "rpe": 0.005268234060954745,
+    "n_confirmed": 7,
+    "chamfer": 14.087361042570414,
+    "map_accuracy": 0.2895968296986691,
+    "map_completeness": 27.88512525544216,
+    "iou": 0.017523364485981307,
+    "n_map": 15
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.2923078216411752,
+     "chamfer": 18.12452060742569,
+     "map_accuracy": 4.007102675262317,
+     "map_completeness": 32.241938539589064,
+     "iou": 0.0011655011655011655,
+     "n_map": 3
+    },
+    "noisy_odometry": {
+     "ate": 0.1392216021858921,
+     "chamfer": 18.268341561917843,
+     "map_accuracy": 4.310405046835104,
+     "map_completeness": 32.226278077000586,
+     "iou": 0.0011641443538998836,
+     "n_map": 4
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.3342053863116243,
+    "ate": 0.6490337516635915,
+    "rpe": 0.03319203729704668,
+    "n_confirmed": 61,
+    "chamfer": 8.507416811125976,
+    "map_accuracy": 2.331207334484122,
+    "map_completeness": 14.683626287767831,
+    "iou": 0.053588516746411484,
+    "n_map": 333
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 160,
+   "seed": 6,
+   "phantoms_corrected": {
+    "matched_facade": 0.15324074074074073,
+    "matched_other": 0.18935185185185185,
+    "folded_facade": 0.11296296296296296,
+    "folded_other": 0.19490740740740742,
+    "unexplained": 0.34953703703703703,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6574074074074074,
+    "median_signed_range_err_facade_m": -0.061484146503580916,
+    "median_abs_range_err_facade_m": 0.14447477149244037
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.708014079629997,
+    "map_accuracy": 3.1562331066060416,
+    "map_completeness": 18.259795052653953,
+    "iou": 0.029835390946502057,
+    "n_map": 221
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.8489487419736466,
+    "ate": 0.7787228937969041,
+    "rpe": 0.05557895427667246,
+    "n_confirmed": 106,
+    "chamfer": 9.680817072119476,
+    "map_accuracy": 2.9189939408070034,
+    "map_completeness": 16.44264020343195,
+    "iou": 0.03473491773308958,
+    "n_map": 376
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.018055555555555554,
+    "matched_other": 0.08564814814814815,
+    "folded_facade": 0.0060185185185185185,
+    "folded_other": 0.075,
+    "unexplained": 0.8152777777777778,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8962962962962963,
+    "median_signed_range_err_facade_m": -2.108865835477687,
+    "median_abs_range_err_facade_m": 2.108865835477687
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 15.898872441021968,
+    "map_accuracy": 0.8301639179168566,
+    "map_completeness": 30.96758096412708,
+    "iou": 0.0,
+    "n_map": 3
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.53200892372266,
+    "map_accuracy": 0.2579924590727874,
+    "map_completeness": 24.806025388372532,
+    "iou": 0.07476635514018691,
+    "n_map": 100
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.8489487419736466,
+    "ate": 0.18382648914693994,
+    "rpe": 0.005677370524798639,
+    "n_confirmed": 7,
+    "chamfer": 13.162705739073585,
+    "map_accuracy": 0.2704087284217926,
+    "map_completeness": 26.05500274972538,
+    "iou": 0.026558891454965358,
+    "n_map": 42
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.48380847438987673,
+     "chamfer": 15.411785047109724,
+     "map_accuracy": 2.6777363280561866,
+     "map_completeness": 28.14583376616326,
+     "iou": 0.0023228803716608595,
+     "n_map": 7
+    },
+    "noisy_odometry": {
+     "ate": 0.9351401548450076,
+     "chamfer": 16.010454827054915,
+     "map_accuracy": 0.6289859444667941,
+     "map_completeness": 31.391923709643038,
+     "iou": 0.0,
+     "n_map": 3
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.8489487419736466,
+    "ate": 0.21310095457173708,
+    "rpe": 0.03867549464413237,
+    "n_confirmed": 66,
+    "chamfer": 8.884541215497768,
+    "map_accuracy": 2.7560609481199565,
+    "map_completeness": 15.013021482875578,
+    "iou": 0.03811434302908726,
+    "n_map": 228
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 160,
+   "seed": 7,
+   "phantoms_corrected": {
+    "matched_facade": 0.15694444444444444,
+    "matched_other": 0.1865740740740741,
+    "folded_facade": 0.1087962962962963,
+    "folded_other": 0.19814814814814816,
+    "unexplained": 0.34953703703703703,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6564814814814814,
+    "median_signed_range_err_facade_m": -0.061484146503580916,
+    "median_abs_range_err_facade_m": 0.14447477149244037
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.67309930396544,
+    "map_accuracy": 3.2008671193309333,
+    "map_completeness": 18.145331488599947,
+    "iou": 0.029804727646454265,
+    "n_map": 216
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.4480960118955636,
+    "ate": 1.3721533547405174,
+    "rpe": 0.04577783994193249,
+    "n_confirmed": 97,
+    "chamfer": 9.715468514009364,
+    "map_accuracy": 2.955499891923137,
+    "map_completeness": 16.475437136095593,
+    "iou": 0.04537037037037037,
+    "n_map": 388
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.020833333333333332,
+    "matched_other": 0.08009259259259259,
+    "folded_facade": 0.006944444444444444,
+    "folded_other": 0.07546296296296297,
+    "unexplained": 0.8166666666666667,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.899074074074074,
+    "median_signed_range_err_facade_m": -2.108865835477687,
+    "median_abs_range_err_facade_m": 2.108865835477687
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 18.747587946026925,
+    "map_accuracy": 5.487209513665637,
+    "map_completeness": 32.00796637838821,
+    "iou": 0.0,
+    "n_map": 3
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.53200892372266,
+    "map_accuracy": 0.2579924590727874,
+    "map_completeness": 24.806025388372532,
+    "iou": 0.07476635514018691,
+    "n_map": 100
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.4480960118955636,
+    "ate": 0.12301328985413734,
+    "rpe": 0.005065462112518146,
+    "n_confirmed": 7,
+    "chamfer": 13.994369393193047,
+    "map_accuracy": 0.26968175458565946,
+    "map_completeness": 27.719057031800435,
+    "iou": 0.016355140186915886,
+    "n_map": 26
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.4226122518757942,
+     "chamfer": 18.67311303224593,
+     "map_accuracy": 5.389140659263499,
+     "map_completeness": 31.95708540522836,
+     "iou": 0.0,
+     "n_map": 4
+    },
+    "noisy_odometry": {
+     "ate": 0.7901397210781832,
+     "chamfer": 18.653017751606924,
+     "map_accuracy": 5.2254841048696,
+     "map_completeness": 32.08055139834425,
+     "iou": 0.0,
+     "n_map": 3
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.4480960118955636,
+    "ate": 0.6265249306344302,
+    "rpe": 0.040662540405036,
+    "n_confirmed": 67,
+    "chamfer": 8.873550362726649,
+    "map_accuracy": 2.3634924805396436,
+    "map_completeness": 15.383608244913653,
+    "iou": 0.04678362573099415,
+    "n_map": 287
+   }
+  },
+  {
+   "scene": "street_canyon_scurve",
+   "bw": 160,
+   "seed": 0,
+   "phantoms_corrected": {
+    "matched_facade": 0.15231481481481482,
+    "matched_other": 0.18101851851851852,
+    "folded_facade": 0.10601851851851851,
+    "folded_other": 0.23333333333333334,
+    "unexplained": 0.32731481481481484,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6666666666666666,
+    "median_signed_range_err_facade_m": -0.05256605971365502,
+    "median_abs_range_err_facade_m": 0.15121704490714194
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.393345383246857,
+    "map_accuracy": 3.0800795339753395,
+    "map_completeness": 17.706611232518373,
+    "iou": 0.02494802494802495,
+    "n_map": 186
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.10473749535329675,
+    "ate": 0.8111331385592729,
+    "rpe": 0.03750225368637833,
+    "n_confirmed": 115,
+    "chamfer": 9.67891224034721,
+    "map_accuracy": 2.8833991888400514,
+    "map_completeness": 16.474425291854367,
+    "iou": 0.04619826756496631,
+    "n_map": 289
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.01898148148148148,
+    "matched_other": 0.09490740740740741,
+    "folded_facade": 0.005092592592592593,
+    "folded_other": 0.05648148148148148,
+    "unexplained": 0.8245370370370371,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8861111111111111,
+    "median_signed_range_err_facade_m": -6.499682059080126,
+    "median_abs_range_err_facade_m": 6.499682059080126
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 18.681308957015716,
+    "map_accuracy": 3.513196478599598,
+    "map_completeness": 33.849421435431836,
+    "iou": 0.0011614401858304297,
+    "n_map": 6
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.518304125792499,
+    "map_accuracy": 0.2545868633597613,
+    "map_completeness": 24.782021388225235,
+    "iou": 0.07476635514018691,
+    "n_map": 108
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.10473749535329675,
+    "ate": 0.03028732469591958,
+    "rpe": 0.004523369341566655,
+    "n_confirmed": 7,
+    "chamfer": 13.210900421013728,
+    "map_accuracy": 0.24811350552463501,
+    "map_completeness": 26.17368733650282,
+    "iou": 0.02453271028037383,
+    "n_map": 29
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.2280010866948368,
+     "chamfer": 17.722923316351633,
+     "map_accuracy": 3.7483441135075157,
+     "map_completeness": 31.69750251919575,
+     "iou": 0.0011574074074074073,
+     "n_map": 9
+    },
+    "noisy_odometry": {
+     "ate": 0.31708149451473133,
+     "chamfer": 16.094123215325446,
+     "map_accuracy": 3.2009564539219784,
+     "map_completeness": 28.987289976728913,
+     "iou": 0.0023148148148148147,
+     "n_map": 11
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.10473749535329675,
+    "ate": 0.6612993204362643,
+    "rpe": 0.033609805509745586,
+    "n_confirmed": 65,
+    "chamfer": 8.410392918666046,
+    "map_accuracy": 2.6858671883354304,
+    "map_completeness": 14.134918648996663,
+    "iou": 0.0471253534401508,
+    "n_map": 314
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 160,
+   "seed": 9,
+   "phantoms_corrected": {
+    "matched_facade": 0.15231481481481482,
+    "matched_other": 0.19166666666666668,
+    "folded_facade": 0.11018518518518519,
+    "folded_other": 0.19814814814814816,
+    "unexplained": 0.3476851851851852,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6560185185185186,
+    "median_signed_range_err_facade_m": -0.05532997660782257,
+    "median_abs_range_err_facade_m": 0.14143323846728606
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.415623280895263,
+    "map_accuracy": 3.1864305801808794,
+    "map_completeness": 17.644815981609646,
+    "iou": 0.03278688524590164,
+    "n_map": 219
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.4114463582378956,
+    "ate": 1.010387334497732,
+    "rpe": 0.04327828921937747,
+    "n_confirmed": 101,
+    "chamfer": 9.789328349116863,
+    "map_accuracy": 2.746582363804322,
+    "map_completeness": 16.832074334429404,
+    "iou": 0.04628736740597879,
+    "n_map": 310
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.019444444444444445,
+    "matched_other": 0.08055555555555556,
+    "folded_facade": 0.005092592592592593,
+    "folded_other": 0.0712962962962963,
+    "unexplained": 0.8236111111111111,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.9,
+    "median_signed_range_err_facade_m": -2.559174640384839,
+    "median_abs_range_err_facade_m": 2.559174640384839
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 18.531213392712186,
+    "map_accuracy": 4.167529736269429,
+    "map_completeness": 32.89489704915494,
+    "iou": 0.0,
+    "n_map": 3
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.53200892372266,
+    "map_accuracy": 0.2579924590727874,
+    "map_completeness": 24.806025388372532,
+    "iou": 0.07476635514018691,
+    "n_map": 100
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.4114463582378956,
+    "ate": 0.08770468735424959,
+    "rpe": 0.004912537403153003,
+    "n_confirmed": 7,
+    "chamfer": 13.982933640060121,
+    "map_accuracy": 0.2940641645397341,
+    "map_completeness": 27.67180311558051,
+    "iou": 0.014018691588785047,
+    "n_map": 18
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.23356732564847021,
+     "chamfer": 18.702912010465763,
+     "map_accuracy": 4.575108563790344,
+     "map_completeness": 32.83071545714118,
+     "iou": 0.0,
+     "n_map": 4
+    },
+    "noisy_odometry": {
+     "ate": 0.3072357219465217,
+     "chamfer": 18.755766807496567,
+     "map_accuracy": 3.894400672464677,
+     "map_completeness": 33.61713294252846,
+     "iou": 0.0011641443538998836,
+     "n_map": 5
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.4114463582378956,
+    "ate": 0.5276847644459188,
+    "rpe": 0.03725304907437941,
+    "n_confirmed": 63,
+    "chamfer": 8.647673854793325,
+    "map_accuracy": 2.5420496817409917,
+    "map_completeness": 14.753298027845657,
+    "iou": 0.05418250950570342,
+    "n_map": 345
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 20,
+   "seed": 0,
+   "phantoms_corrected": {
+    "matched_facade": 0.21481481481481482,
+    "matched_other": 0.25277777777777777,
+    "folded_facade": 0.0,
+    "folded_other": 0.08611111111111111,
+    "unexplained": 0.4462962962962963,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5324074074074074,
+    "median_signed_range_err_facade_m": -0.3416920377542976,
+    "median_abs_range_err_facade_m": 0.3416920377542976
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 1.8235850478232598,
+    "map_accuracy": 2.7119677738058026,
+    "map_completeness": 0.9352023218407169,
+    "iou": 0.5087719298245614,
+    "n_map": 65
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.04853439689462517,
+    "ate": 0.21693843012560052,
+    "rpe": 0.019978723467189693,
+    "n_confirmed": 28,
+    "chamfer": 9.664432106611482,
+    "map_accuracy": 16.981895888282917,
+    "map_completeness": 2.3469683249400464,
+    "iou": 0.10738255033557047,
+    "n_map": 147
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 20,
+   "seed": 1,
+   "phantoms_corrected": {
+    "matched_facade": 0.2074074074074074,
+    "matched_other": 0.2777777777777778,
+    "folded_facade": 0.0,
+    "folded_other": 0.08796296296296297,
+    "unexplained": 0.42685185185185187,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5148148148148148,
+    "median_signed_range_err_facade_m": -0.3076497256848807,
+    "median_abs_range_err_facade_m": 0.3076497256848807
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 1.5181664126147283,
+    "map_accuracy": 2.138350925713688,
+    "map_completeness": 0.8979818995157686,
+    "iou": 0.5254237288135594,
+    "n_map": 75
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.15419622879485023,
+    "ate": 0.059933719987136036,
+    "rpe": 0.01967976315650731,
+    "n_confirmed": 31,
+    "chamfer": 8.165703686214647,
+    "map_accuracy": 14.063372877086499,
+    "map_completeness": 2.268034495342795,
+    "iou": 0.08064516129032258,
+    "n_map": 108
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 20,
+   "seed": 2,
+   "phantoms_corrected": {
+    "matched_facade": 0.2101851851851852,
+    "matched_other": 0.25555555555555554,
+    "folded_facade": 0.0,
+    "folded_other": 0.0824074074074074,
+    "unexplained": 0.45185185185185184,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5342592592592592,
+    "median_signed_range_err_facade_m": -0.30764972568488247,
+    "median_abs_range_err_facade_m": 0.30764972568488247
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.0397689854362504,
+    "map_accuracy": 3.135588091598786,
+    "map_completeness": 0.9439498792737142,
+    "iou": 0.45,
+    "n_map": 68
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.3421356271192468,
+    "ate": 0.4363858907072454,
+    "rpe": 0.019181149475568614,
+    "n_confirmed": 36,
+    "chamfer": 10.250364208684962,
+    "map_accuracy": 18.216877107070992,
+    "map_completeness": 2.2838513102989304,
+    "iou": 0.08333333333333333,
+    "n_map": 80
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 20,
+   "seed": 3,
+   "phantoms_corrected": {
+    "matched_facade": 0.21203703703703702,
+    "matched_other": 0.262037037037037,
+    "folded_facade": 0.0,
+    "folded_other": 0.08425925925925926,
+    "unexplained": 0.44166666666666665,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5259259259259259,
+    "median_signed_range_err_facade_m": -0.32977189980868715,
+    "median_abs_range_err_facade_m": 0.32977189980868715
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.290810991674381,
+    "map_accuracy": 3.5879207285740233,
+    "map_completeness": 0.9937012547747387,
+    "iou": 0.4,
+    "n_map": 71
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.20562977528247456,
+    "ate": 0.3542952699739677,
+    "rpe": 0.025830036236730972,
+    "n_confirmed": 33,
+    "chamfer": 9.643329199689754,
+    "map_accuracy": 16.244863822614068,
+    "map_completeness": 3.0417945767654393,
+    "iou": 0.043478260869565216,
+    "n_map": 59
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 20,
+   "seed": 4,
+   "phantoms_corrected": {
+    "matched_facade": 0.20462962962962963,
+    "matched_other": 0.26666666666666666,
+    "folded_facade": 0.0,
+    "folded_other": 0.075,
+    "unexplained": 0.4537037037037037,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5287037037037037,
+    "median_signed_range_err_facade_m": -0.29954852340321736,
+    "median_abs_range_err_facade_m": 0.29954852340321736
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 1.5446730270811626,
+    "map_accuracy": 2.1892058015048765,
+    "map_completeness": 0.9001402526574488,
+    "iou": 0.48333333333333334,
+    "n_map": 71
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.04049003797183227,
+    "ate": 0.15982879651244,
+    "rpe": 0.025918696681377598,
+    "n_confirmed": 31,
+    "chamfer": 9.677229201042913,
+    "map_accuracy": 15.389675021786951,
+    "map_completeness": 3.964783380298873,
+    "iou": 0.038461538461538464,
+    "n_map": 42
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 40,
+   "seed": 0,
+   "phantoms_corrected": {
+    "matched_facade": 0.18888888888888888,
+    "matched_other": 0.3148148148148148,
+    "folded_facade": 0.0,
+    "folded_other": 0.13148148148148148,
+    "unexplained": 0.3648148148148148,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.4962962962962963,
+    "median_signed_range_err_facade_m": -0.07997335516448167,
+    "median_abs_range_err_facade_m": 0.13661553926440284
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 3.6706352450541027,
+    "map_accuracy": 6.4660674377441865,
+    "map_completeness": 0.8752030523640191,
+    "iou": 0.33695652173913043,
+    "n_map": 122
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.04853439689462517,
+    "ate": 0.1691697115722639,
+    "rpe": 0.01922622931486389,
+    "n_confirmed": 29,
+    "chamfer": NaN,
+    "map_accuracy": NaN,
+    "map_completeness": NaN,
+    "iou": 0.0,
+    "n_map": 0
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 40,
+   "seed": 1,
+   "phantoms_corrected": {
+    "matched_facade": 0.18055555555555555,
+    "matched_other": 0.31851851851851853,
+    "folded_facade": 0.0,
+    "folded_other": 0.13055555555555556,
+    "unexplained": 0.37037037037037035,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5009259259259259,
+    "median_signed_range_err_facade_m": -0.0784913096375277,
+    "median_abs_range_err_facade_m": 0.13482945394816426
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 3.2972297901816807,
+    "map_accuracy": 5.763578973113862,
+    "map_completeness": 0.8308806072494994,
+    "iou": 0.35555555555555557,
+    "n_map": 129
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.15419622879485023,
+    "ate": 0.08323578685113786,
+    "rpe": 0.0245672104144269,
+    "n_confirmed": 25,
+    "chamfer": 4.870669334974589,
+    "map_accuracy": 7.787105745570591,
+    "map_completeness": 1.9542329243785863,
+    "iou": 0.17525773195876287,
+    "n_map": 91
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 40,
+   "seed": 2,
+   "phantoms_corrected": {
+    "matched_facade": 0.18611111111111112,
+    "matched_other": 0.30648148148148147,
+    "folded_facade": 0.0,
+    "folded_other": 0.125,
+    "unexplained": 0.3824074074074074,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5074074074074074,
+    "median_signed_range_err_facade_m": -0.052545196572037156,
+    "median_abs_range_err_facade_m": 0.1331296981480179
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 3.5396280585182827,
+    "map_accuracy": 6.252234609177157,
+    "map_completeness": 0.8270215078594081,
+    "iou": 0.3333333333333333,
+    "n_map": 119
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.3421356271192468,
+    "ate": 0.31163869579559866,
+    "rpe": 0.03434315331080563,
+    "n_confirmed": 26,
+    "chamfer": 6.3431313690758095,
+    "map_accuracy": 10.297148264023868,
+    "map_completeness": 2.389114474127752,
+    "iou": 0.09876543209876543,
+    "n_map": 51
+   }
+  },
+  {
+   "scene": "street_canyon_scurve",
+   "bw": 160,
+   "seed": 1,
+   "phantoms_corrected": {
+    "matched_facade": 0.15,
+    "matched_other": 0.1814814814814815,
+    "folded_facade": 0.1050925925925926,
+    "folded_other": 0.23796296296296296,
+    "unexplained": 0.32546296296296295,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6685185185185185,
+    "median_signed_range_err_facade_m": -0.057870260409540464,
+    "median_abs_range_err_facade_m": 0.14745323066764726
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.479010233451863,
+    "map_accuracy": 3.0808235657221243,
+    "map_completeness": 17.877196901181602,
+    "iou": 0.027055150884495317,
+    "n_map": 181
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.35058185030479083,
+    "ate": 0.7913882600329928,
+    "rpe": 0.0520538408609811,
+    "n_confirmed": 118,
+    "chamfer": 9.39307900692238,
+    "map_accuracy": 3.0186361256169794,
+    "map_completeness": 15.767521888227778,
+    "iou": 0.054708520179372194,
+    "n_map": 430
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.020370370370370372,
+    "matched_other": 0.09490740740740741,
+    "folded_facade": 0.005092592592592593,
+    "folded_other": 0.05787037037037037,
+    "unexplained": 0.8217592592592593,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8847222222222222,
+    "median_signed_range_err_facade_m": -6.70600788285609,
+    "median_abs_range_err_facade_m": 6.70600788285609
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 19.599712122612576,
+    "map_accuracy": 3.4772437875226694,
+    "map_completeness": 35.722180457702486,
+    "iou": 0.0,
+    "n_map": 7
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.518304125792499,
+    "map_accuracy": 0.2545868633597613,
+    "map_completeness": 24.782021388225235,
+    "iou": 0.07476635514018691,
+    "n_map": 108
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.35058185030479083,
+    "ate": 0.08292510094761678,
+    "rpe": 0.004972151228261669,
+    "n_confirmed": 7,
+    "chamfer": 13.273393404971417,
+    "map_accuracy": 0.2812831747041479,
+    "map_completeness": 26.265503635238687,
+    "iou": 0.028037383177570093,
+    "n_map": 36
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.1786099227932545,
+     "chamfer": 17.411921944120778,
+     "map_accuracy": 3.1626795935278214,
+     "map_completeness": 31.661164294713736,
+     "iou": 0.002320185614849188,
+     "n_map": 11
+    },
+    "noisy_odometry": {
+     "ate": 0.33044748429899407,
+     "chamfer": 19.727798702074068,
+     "map_accuracy": 3.841188127406439,
+     "map_completeness": 35.614409276741696,
+     "iou": 0.001160092807424594,
+     "n_map": 9
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.35058185030479083,
+    "ate": 0.18066636290468951,
+    "rpe": 0.03235670224435761,
+    "n_confirmed": 67,
+    "chamfer": 8.593962137845748,
+    "map_accuracy": 2.518408834842612,
+    "map_completeness": 14.669515440848885,
+    "iou": 0.05304518664047151,
+    "n_map": 283
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 40,
+   "seed": 3,
+   "phantoms_corrected": {
+    "matched_facade": 0.18425925925925926,
+    "matched_other": 0.3296296296296296,
+    "folded_facade": 0.0,
+    "folded_other": 0.13148148148148148,
+    "unexplained": 0.35462962962962963,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.4861111111111111,
+    "median_signed_range_err_facade_m": -0.07849556994459306,
+    "median_abs_range_err_facade_m": 0.13482945394816426
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 3.437902351698418,
+    "map_accuracy": 5.966031553311163,
+    "map_completeness": 0.9097731500856734,
+    "iou": 0.32608695652173914,
+    "n_map": 123
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.20562977528247456,
+    "ate": 0.1622950786397924,
+    "rpe": 0.015176754368072412,
+    "n_confirmed": 22,
+    "chamfer": 7.777227062862389,
+    "map_accuracy": 11.659233127137703,
+    "map_completeness": 3.8952209985870736,
+    "iou": 0.08955223880597014,
+    "n_map": 36
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 40,
+   "seed": 4,
+   "phantoms_corrected": {
+    "matched_facade": 0.1814814814814815,
+    "matched_other": 0.31666666666666665,
+    "folded_facade": 0.0,
+    "folded_other": 0.12777777777777777,
+    "unexplained": 0.37407407407407406,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5018518518518519,
+    "median_signed_range_err_facade_m": -0.07849343979106038,
+    "median_abs_range_err_facade_m": 0.1483165657681873
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 3.1853891440192954,
+    "map_accuracy": 5.536902454404151,
+    "map_completeness": 0.8338758336344394,
+    "iou": 0.3522727272727273,
+    "n_map": 124
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.04049003797183227,
+    "ate": 0.07337388282720851,
+    "rpe": 0.019100589020602014,
+    "n_confirmed": 24,
+    "chamfer": 5.421974731354311,
+    "map_accuracy": 9.492503267668312,
+    "map_completeness": 1.35144619504031,
+    "iou": 0.17164179104477612,
+    "n_map": 153
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 80,
+   "seed": 0,
+   "phantoms_corrected": {
+    "matched_facade": 0.16296296296296298,
+    "matched_other": 0.30277777777777776,
+    "folded_facade": 0.0,
+    "folded_other": 0.1787037037037037,
+    "unexplained": 0.35555555555555557,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5342592592592592,
+    "median_signed_range_err_facade_m": 0.010175791473756135,
+    "median_abs_range_err_facade_m": 0.08145114038437029
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 3.023284878985578,
+    "map_accuracy": 5.1758089548089075,
+    "map_completeness": 0.8707608031622484,
+    "iou": 0.3258426966292135,
+    "n_map": 136
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.04853439689462517,
+    "ate": 0.2139800754137579,
+    "rpe": 0.036416597889280644,
+    "n_confirmed": 25,
+    "chamfer": 3.9891968036800236,
+    "map_accuracy": 5.632258699542392,
+    "map_completeness": 2.3461349078176545,
+    "iou": 0.16049382716049382,
+    "n_map": 66
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 80,
+   "seed": 1,
+   "phantoms_corrected": {
+    "matched_facade": 0.16111111111111112,
+    "matched_other": 0.2972222222222222,
+    "folded_facade": 0.0,
+    "folded_other": 0.17314814814814813,
+    "unexplained": 0.3685185185185185,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5416666666666666,
+    "median_signed_range_err_facade_m": 0.0019574176218117856,
+    "median_abs_range_err_facade_m": 0.0772770724231151
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.973276322086853,
+    "map_accuracy": 5.113181155231684,
+    "map_completeness": 0.8333714889420217,
+    "iou": 0.3225806451612903,
+    "n_map": 140
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.15419622879485023,
+    "ate": 0.14402360100518136,
+    "rpe": 0.026432910124487407,
+    "n_confirmed": 25,
+    "chamfer": 4.336447281732541,
+    "map_accuracy": 5.827950793043948,
+    "map_completeness": 2.8449437704211333,
+    "iou": 0.14864864864864866,
+    "n_map": 54
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 80,
+   "seed": 2,
+   "phantoms_corrected": {
+    "matched_facade": 0.15833333333333333,
+    "matched_other": 0.3212962962962963,
+    "folded_facade": 0.0,
+    "folded_other": 0.1685185185185185,
+    "unexplained": 0.35185185185185186,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5203703703703704,
+    "median_signed_range_err_facade_m": 0.015493987713632862,
+    "median_abs_range_err_facade_m": 0.0825894322288434
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.8400100164691797,
+    "map_accuracy": 4.8655913749271615,
+    "map_completeness": 0.8144286580111976,
+    "iou": 0.34444444444444444,
+    "n_map": 136
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.3421356271192468,
+    "ate": 0.2910935614603988,
+    "rpe": 0.018270190810997768,
+    "n_confirmed": 23,
+    "chamfer": 4.326684854731552,
+    "map_accuracy": 6.750452624544449,
+    "map_completeness": 1.9029170849186563,
+    "iou": 0.14516129032258066,
+    "n_map": 31
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 80,
+   "seed": 3,
+   "phantoms_corrected": {
+    "matched_facade": 0.15555555555555556,
+    "matched_other": 0.31851851851851853,
+    "folded_facade": 0.0,
+    "folded_other": 0.1787037037037037,
+    "unexplained": 0.3472222222222222,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5259259259259259,
+    "median_signed_range_err_facade_m": 0.013934844293792992,
+    "median_abs_range_err_facade_m": 0.07831924181540373
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.8471419730698613,
+    "map_accuracy": 4.861003618016681,
+    "map_completeness": 0.833280328123042,
+    "iou": 0.3118279569892473,
+    "n_map": 142
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.20562977528247456,
+    "ate": 0.3240842371829293,
+    "rpe": 0.020213488887345383,
+    "n_confirmed": 22,
+    "chamfer": 3.952925399353598,
+    "map_accuracy": 6.1271478415071865,
+    "map_completeness": 1.77870295720001,
+    "iou": 0.14150943396226415,
+    "n_map": 107
+   }
+  },
+  {
+   "scene": "controlled_wall",
+   "bw": 80,
+   "seed": 4,
+   "phantoms_corrected": {
+    "matched_facade": 0.15462962962962962,
+    "matched_other": 0.30462962962962964,
+    "folded_facade": 0.0,
+    "folded_other": 0.16944444444444445,
+    "unexplained": 0.3712962962962963,
+    "n_detections": 1080,
+    "phantom_rate_manuscript_def": 0.5407407407407407,
+    "median_signed_range_err_facade_m": 0.015493987713632862,
+    "median_abs_range_err_facade_m": 0.0784913096375277
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 2.970021515992289,
+    "map_accuracy": 5.098906498531191,
+    "map_completeness": 0.8411365334533868,
+    "iou": 0.34831460674157305,
+    "n_map": 141
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.04049003797183227,
+    "ate": 0.15773822898952722,
+    "rpe": 0.017549217609691102,
+    "n_confirmed": 23,
+    "chamfer": 3.510914207561273,
+    "map_accuracy": 5.402105590868448,
+    "map_completeness": 1.619722824254098,
+    "iou": 0.2073170731707317,
+    "n_map": 71
+   }
+  },
+  {
+   "scene": "street_canyon_scurve",
+   "bw": 160,
+   "seed": 4,
+   "phantoms_corrected": {
+    "matched_facade": 0.15416666666666667,
+    "matched_other": 0.18055555555555555,
+    "folded_facade": 0.10324074074074074,
+    "folded_other": 0.23657407407407408,
+    "unexplained": 0.32546296296296295,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6652777777777777,
+    "median_signed_range_err_facade_m": -0.06584390357571124,
+    "median_abs_range_err_facade_m": 0.15121704490714194
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.46162508359479,
+    "map_accuracy": 3.2031985584098503,
+    "map_completeness": 17.720051608779727,
+    "iou": 0.028985507246376812,
+    "n_map": 198
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.09549033131063538,
+    "ate": 1.0955163483284829,
+    "rpe": 0.036277927005128885,
+    "n_confirmed": 116,
+    "chamfer": 9.336848285262048,
+    "map_accuracy": 2.911721331960664,
+    "map_completeness": 15.761975238563434,
+    "iou": 0.044563279857397504,
+    "n_map": 412
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.01898148148148148,
+    "matched_other": 0.09398148148148149,
+    "folded_facade": 0.005555555555555556,
+    "folded_other": 0.05277777777777778,
+    "unexplained": 0.8287037037037037,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8870370370370371,
+    "median_signed_range_err_facade_m": -6.639845508496887,
+    "median_abs_range_err_facade_m": 6.639845508496887
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 16.970015297848448,
+    "map_accuracy": 3.5482036937763586,
+    "map_completeness": 30.391826901920535,
+    "iou": 0.0,
+    "n_map": 7
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.518304125792499,
+    "map_accuracy": 0.2545868633597613,
+    "map_completeness": 24.782021388225235,
+    "iou": 0.07476635514018691,
+    "n_map": 108
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.09549033131063538,
+    "ate": 0.03220404265198407,
+    "rpe": 0.004753364831461985,
+    "n_confirmed": 7,
+    "chamfer": 14.616257282418156,
+    "map_accuracy": 0.27912836755403553,
+    "map_completeness": 28.953386197282274,
+    "iou": 0.010514018691588784,
+    "n_map": 13
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.23134943665966676,
+     "chamfer": 16.103269638865264,
+     "map_accuracy": 2.702594318060116,
+     "map_completeness": 29.503944959670413,
+     "iou": 0.0023121387283236996,
+     "n_map": 12
+    },
+    "noisy_odometry": {
+     "ate": 0.24146981434014092,
+     "chamfer": 16.095556045151763,
+     "map_accuracy": 2.6969481005508844,
+     "map_completeness": 29.494163989752643,
+     "iou": 0.0023148148148148147,
+     "n_map": 12
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.09549033131063538,
+    "ate": 0.40692812270110623,
+    "rpe": 0.043546880045701064,
+    "n_confirmed": 65,
+    "chamfer": 8.076135867031475,
+    "map_accuracy": 2.3642353994149885,
+    "map_completeness": 13.78803633464796,
+    "iou": 0.055765595463137994,
+    "n_map": 359
+   }
+  },
+  {
+   "scene": "street_canyon_scurve",
+   "bw": 160,
+   "seed": 3,
+   "phantoms_corrected": {
+    "matched_facade": 0.15231481481481482,
+    "matched_other": 0.18333333333333332,
+    "folded_facade": 0.10277777777777777,
+    "folded_other": 0.23935185185185184,
+    "unexplained": 0.32222222222222224,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6643518518518519,
+    "median_signed_range_err_facade_m": -0.06584390357571124,
+    "median_abs_range_err_facade_m": 0.15121704490714194
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.378267325346087,
+    "map_accuracy": 3.0526651366622546,
+    "map_completeness": 17.70386951402992,
+    "iou": 0.025853154084798345,
+    "n_map": 185
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.4858718731863649,
+    "ate": 1.2712790862649916,
+    "rpe": 0.05980415872727991,
+    "n_confirmed": 116,
+    "chamfer": 9.829729794128571,
+    "map_accuracy": 2.7485953304283663,
+    "map_completeness": 16.910864257828777,
+    "iou": 0.039122137404580155,
+    "n_map": 297
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.019444444444444445,
+    "matched_other": 0.09259259259259259,
+    "folded_facade": 0.004166666666666667,
+    "folded_other": 0.062037037037037036,
+    "unexplained": 0.8217592592592593,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.887962962962963,
+    "median_signed_range_err_facade_m": -6.68804981786457,
+    "median_abs_range_err_facade_m": 6.68804981786457
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 16.45475993948583,
+    "map_accuracy": 3.1308579403705696,
+    "map_completeness": 29.77866193860109,
+    "iou": 0.0,
+    "n_map": 8
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.518304125792499,
+    "map_accuracy": 0.2545868633597613,
+    "map_completeness": 24.782021388225235,
+    "iou": 0.07476635514018691,
+    "n_map": 108
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.4858718731863649,
+    "ate": 0.10164315071711402,
+    "rpe": 0.00505157577439298,
+    "n_confirmed": 7,
+    "chamfer": 13.134346777580074,
+    "map_accuracy": 0.2457424828882529,
+    "map_completeness": 26.022951072271894,
+    "iou": 0.05023364485981308,
+    "n_map": 68
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.21145554661765142,
+     "chamfer": 15.930644197385687,
+     "map_accuracy": 2.8168353091080225,
+     "map_completeness": 29.044453085663353,
+     "iou": 0.0023121387283236996,
+     "n_map": 11
+    },
+    "noisy_odometry": {
+     "ate": 0.5041890487002035,
+     "chamfer": 16.484268190880925,
+     "map_accuracy": 3.2417201730882006,
+     "map_completeness": 29.726816208673647,
+     "iou": 0.0011574074074074073,
+     "n_map": 10
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.4858718731863649,
+    "ate": 0.47672225295702847,
+    "rpe": 0.04119113454689,
+    "n_confirmed": 70,
+    "chamfer": 8.863784633539503,
+    "map_accuracy": 2.3472133754262443,
+    "map_completeness": 15.38035589165276,
+    "iou": 0.04317269076305221,
+    "n_map": 244
+   }
+  },
+  {
+   "scene": "street_canyon_scurve",
+   "bw": 160,
+   "seed": 2,
+   "phantoms_corrected": {
+    "matched_facade": 0.15,
+    "matched_other": 0.18333333333333332,
+    "folded_facade": 0.10046296296296296,
+    "folded_other": 0.24074074074074073,
+    "unexplained": 0.32546296296296295,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6666666666666666,
+    "median_signed_range_err_facade_m": -0.066790614367779,
+    "median_abs_range_err_facade_m": 0.14904982582840098
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.55280600233391,
+    "map_accuracy": 3.0083378663783717,
+    "map_completeness": 18.097274138289446,
+    "iou": 0.035676810073452254,
+    "n_map": 184
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.8359323474804651,
+    "ate": 1.263861193580248,
+    "rpe": 0.04634036991383417,
+    "n_confirmed": 113,
+    "chamfer": 9.664687768506425,
+    "map_accuracy": 2.6007845073008875,
+    "map_completeness": 16.728591029711964,
+    "iou": 0.031609195402298854,
+    "n_map": 284
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.01898148148148148,
+    "matched_other": 0.1,
+    "folded_facade": 0.006944444444444444,
+    "folded_other": 0.05787037037037037,
+    "unexplained": 0.8162037037037037,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8810185185185185,
+    "median_signed_range_err_facade_m": -6.639845508496887,
+    "median_abs_range_err_facade_m": 6.639845508496887
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 16.82510083789467,
+    "map_accuracy": 3.7195822330176216,
+    "map_completeness": 29.930619442771718,
+    "iou": 0.0011574074074074073,
+    "n_map": 11
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.518304125792499,
+    "map_accuracy": 0.2545868633597613,
+    "map_completeness": 24.782021388225235,
+    "iou": 0.07476635514018691,
+    "n_map": 108
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.8359323474804651,
+    "ate": 0.1837374539201066,
+    "rpe": 0.005549596746865297,
+    "n_confirmed": 7,
+    "chamfer": 12.993827917276759,
+    "map_accuracy": 0.28222178879467763,
+    "map_completeness": 25.70543404575884,
+    "iou": 0.03096330275229358,
+    "n_map": 64
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.1634914673897007,
+     "chamfer": 16.40807079264722,
+     "map_accuracy": 3.4421229119158334,
+     "map_completeness": 29.374018673378604,
+     "iou": 0.0023148148148148147,
+     "n_map": 12
+    },
+    "noisy_odometry": {
+     "ate": 0.7806012855403525,
+     "chamfer": 16.736016825894794,
+     "map_accuracy": 3.4832984857434868,
+     "map_completeness": 29.9887351660461,
+     "iou": 0.001160092807424594,
+     "n_map": 10
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.8359323474804651,
+    "ate": 0.2728724535916362,
+    "rpe": 0.050671960268975136,
+    "n_confirmed": 67,
+    "chamfer": 8.66584351540852,
+    "map_accuracy": 2.698088338943795,
+    "map_completeness": 14.633598691873244,
+    "iou": 0.042759961127308066,
+    "n_map": 270
+   }
+  },
+  {
+   "scene": "street_canyon_scurve",
+   "bw": 160,
+   "seed": 6,
+   "phantoms_corrected": {
+    "matched_facade": 0.15324074074074073,
+    "matched_other": 0.1837962962962963,
+    "folded_facade": 0.10185185185185185,
+    "folded_other": 0.24166666666666667,
+    "unexplained": 0.3194444444444444,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.662962962962963,
+    "median_signed_range_err_facade_m": -0.05957945885528915,
+    "median_abs_range_err_facade_m": 0.14901146814108301
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.336155943497035,
+    "map_accuracy": 3.0688183938053264,
+    "map_completeness": 17.603493493188743,
+    "iou": 0.030927835051546393,
+    "n_map": 195
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.841334702699062,
+    "ate": 0.9617276769641805,
+    "rpe": 0.04566328908466905,
+    "n_confirmed": 115,
+    "chamfer": 9.432168382368943,
+    "map_accuracy": 2.82100924767374,
+    "map_completeness": 16.043327517064146,
+    "iou": 0.034703196347031964,
+    "n_map": 366
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.017592592592592594,
+    "matched_other": 0.10185185185185185,
+    "folded_facade": 0.004629629629629629,
+    "folded_other": 0.056018518518518516,
+    "unexplained": 0.8199074074074074,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8805555555555555,
+    "median_signed_range_err_facade_m": -6.803231285317706,
+    "median_abs_range_err_facade_m": 6.803231285317706
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 15.098517277210952,
+    "map_accuracy": 2.4279691160261034,
+    "map_completeness": 27.769065438395803,
+    "iou": 0.003472222222222222,
+    "n_map": 11
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.518304125792499,
+    "map_accuracy": 0.2545868633597613,
+    "map_completeness": 24.782021388225235,
+    "iou": 0.07476635514018691,
+    "n_map": 108
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.841334702699062,
+    "ate": 0.15662492682166784,
+    "rpe": 0.006345906517983296,
+    "n_confirmed": 7,
+    "chamfer": 12.952379114539115,
+    "map_accuracy": 0.27623623028460176,
+    "map_completeness": 25.628521998793627,
+    "iou": 0.056009334889148193,
+    "n_map": 74
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.2688166096232806,
+     "chamfer": 14.837930446917365,
+     "map_accuracy": 2.2051601936829703,
+     "map_completeness": 27.47070070015176,
+     "iou": 0.004629629629629629,
+     "n_map": 12
+    },
+    "noisy_odometry": {
+     "ate": 0.729674033600962,
+     "chamfer": 15.067130415087695,
+     "map_accuracy": 2.4008300209634608,
+     "map_completeness": 27.733430809211928,
+     "iou": 0.0011560693641618498,
+     "n_map": 12
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.841334702699062,
+    "ate": 0.2317297137469529,
+    "rpe": 0.039501866437069544,
+    "n_confirmed": 67,
+    "chamfer": 8.972547804026767,
+    "map_accuracy": 2.717634899475668,
+    "map_completeness": 15.227460708577865,
+    "iou": 0.04474708171206226,
+    "n_map": 289
+   }
+  },
+  {
+   "scene": "street_canyon_scurve",
+   "bw": 160,
+   "seed": 5,
+   "phantoms_corrected": {
+    "matched_facade": 0.15185185185185185,
+    "matched_other": 0.18287037037037038,
+    "folded_facade": 0.1037037037037037,
+    "folded_other": 0.24074074074074073,
+    "unexplained": 0.32083333333333336,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6652777777777777,
+    "median_signed_range_err_facade_m": -0.04667624212985544,
+    "median_abs_range_err_facade_m": 0.15069956572201448
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.196034105375558,
+    "map_accuracy": 2.9688234464828986,
+    "map_completeness": 17.42324476426822,
+    "iou": 0.029045643153526972,
+    "n_map": 183
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.37275674528731395,
+    "ate": 1.2090293417695674,
+    "rpe": 0.04146784166286577,
+    "n_confirmed": 115,
+    "chamfer": 9.796468596792986,
+    "map_accuracy": 2.787757290016498,
+    "map_completeness": 16.805179903569474,
+    "iou": 0.04725897920604915,
+    "n_map": 320
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.019444444444444445,
+    "matched_other": 0.09861111111111111,
+    "folded_facade": 0.005092592592592593,
+    "folded_other": 0.05740740740740741,
+    "unexplained": 0.8194444444444444,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8819444444444444,
+    "median_signed_range_err_facade_m": -6.153606665393976,
+    "median_abs_range_err_facade_m": 6.153606665393976
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 16.364223246497442,
+    "map_accuracy": 3.4245453487302924,
+    "map_completeness": 29.30390114426459,
+    "iou": 0.0023121387283236996,
+    "n_map": 14
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.518304125792499,
+    "map_accuracy": 0.2545868633597613,
+    "map_completeness": 24.782021388225235,
+    "iou": 0.07476635514018691,
+    "n_map": 108
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.37275674528731395,
+    "ate": 0.07947292313492438,
+    "rpe": 0.0047206424677025665,
+    "n_confirmed": 7,
+    "chamfer": 12.759559222858318,
+    "map_accuracy": 0.25266837711691786,
+    "map_completeness": 25.266450068599717,
+    "iou": 0.04789719626168224,
+    "n_map": 63
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.3476395808561233,
+     "chamfer": 15.655060950173654,
+     "map_accuracy": 3.0273147421606033,
+     "map_completeness": 28.282807158186706,
+     "iou": 0.00461361014994233,
+     "n_map": 17
+    },
+    "noisy_odometry": {
+     "ate": 0.6177987984131471,
+     "chamfer": 15.533050935061448,
+     "map_accuracy": 3.0200843874417025,
+     "map_completeness": 28.046017482681194,
+     "iou": 0.002304147465437788,
+     "n_map": 19
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.37275674528731395,
+    "ate": 0.34962497278081933,
+    "rpe": 0.053181767582546974,
+    "n_confirmed": 71,
+    "chamfer": 8.557295739048218,
+    "map_accuracy": 2.6231827736953304,
+    "map_completeness": 14.491408704401106,
+    "iou": 0.054104477611940295,
+    "n_map": 352
+   }
+  },
+  {
+   "scene": "street_canyon_scurve",
+   "bw": 160,
+   "seed": 7,
+   "phantoms_corrected": {
+    "matched_facade": 0.15138888888888888,
+    "matched_other": 0.18472222222222223,
+    "folded_facade": 0.10092592592592593,
+    "folded_other": 0.24166666666666667,
+    "unexplained": 0.3212962962962963,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6638888888888889,
+    "median_signed_range_err_facade_m": -0.0609955596702072,
+    "median_abs_range_err_facade_m": 0.15018208653688703
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.258493000756454,
+    "map_accuracy": 3.1590244653718007,
+    "map_completeness": 17.357961536141108,
+    "iou": 0.026859504132231406,
+    "n_map": 193
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.44149890277820397,
+    "ate": 1.1915812304483482,
+    "rpe": 0.054280892366721074,
+    "n_confirmed": 118,
+    "chamfer": 9.321975472322736,
+    "map_accuracy": 2.990337929713893,
+    "map_completeness": 15.653613014931578,
+    "iou": 0.047747747747747746,
+    "n_map": 399
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.019444444444444445,
+    "matched_other": 0.09814814814814815,
+    "folded_facade": 0.0060185185185185185,
+    "folded_other": 0.0587962962962963,
+    "unexplained": 0.8175925925925925,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8824074074074074,
+    "median_signed_range_err_facade_m": -6.68804981786457,
+    "median_abs_range_err_facade_m": 6.68804981786457
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 16.66960538973158,
+    "map_accuracy": 3.3108855210503494,
+    "map_completeness": 30.02832525841281,
+    "iou": 0.0,
+    "n_map": 10
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.518304125792499,
+    "map_accuracy": 0.2545868633597613,
+    "map_completeness": 24.782021388225235,
+    "iou": 0.07476635514018691,
+    "n_map": 108
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.44149890277820397,
+    "ate": 0.12859712060971606,
+    "rpe": 0.004699247804564729,
+    "n_confirmed": 7,
+    "chamfer": 13.481432097590337,
+    "map_accuracy": 0.2506539142319864,
+    "map_completeness": 26.71221028094869,
+    "iou": 0.028037383177570093,
+    "n_map": 37
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.2385215571487148,
+     "chamfer": 16.192238909039055,
+     "map_accuracy": 3.0784014605265453,
+     "map_completeness": 29.306076357551568,
+     "iou": 0.002317497103128621,
+     "n_map": 13
+    },
+    "noisy_odometry": {
+     "ate": 0.5663393625575638,
+     "chamfer": 16.239150494113925,
+     "map_accuracy": 2.983311147448633,
+     "map_completeness": 29.49498984077922,
+     "iou": 0.0023121387283236996,
+     "n_map": 14
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.44149890277820397,
+    "ate": 0.7043494959012984,
+    "rpe": 0.06688587398957915,
+    "n_confirmed": 67,
+    "chamfer": 8.690507801685737,
+    "map_accuracy": 2.318004402807211,
+    "map_completeness": 15.063011200564263,
+    "iou": 0.044760935910478125,
+    "n_map": 209
+   }
+  },
+  {
+   "scene": "street_canyon_scurve",
+   "bw": 160,
+   "seed": 9,
+   "phantoms_corrected": {
+    "matched_facade": 0.1527777777777778,
+    "matched_other": 0.17962962962962964,
+    "folded_facade": 0.10277777777777777,
+    "folded_other": 0.2351851851851852,
+    "unexplained": 0.3296296296296296,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6675925925925926,
+    "median_signed_range_err_facade_m": -0.066790614367779,
+    "median_abs_range_err_facade_m": 0.15151302912541986
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.338238425700059,
+    "map_accuracy": 3.106822357601771,
+    "map_completeness": 17.569654493798346,
+    "iou": 0.02383419689119171,
+    "n_map": 184
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.4089233235021498,
+    "ate": 0.7809440229979173,
+    "rpe": 0.05051939161295311,
+    "n_confirmed": 117,
+    "chamfer": 9.653662836968168,
+    "map_accuracy": 3.033360489433901,
+    "map_completeness": 16.273965184502437,
+    "iou": 0.04143126177024482,
+    "n_map": 332
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.01898148148148148,
+    "matched_other": 0.08888888888888889,
+    "folded_facade": 0.004629629629629629,
+    "folded_other": 0.05648148148148148,
+    "unexplained": 0.8310185185185185,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8921296296296296,
+    "median_signed_range_err_facade_m": -6.639845508496887,
+    "median_abs_range_err_facade_m": 6.639845508496887
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 20.513612140083797,
+    "map_accuracy": 3.9635156061339702,
+    "map_completeness": 37.06370867403363,
+    "iou": 0.0,
+    "n_map": 6
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.518304125792499,
+    "map_accuracy": 0.2545868633597613,
+    "map_completeness": 24.782021388225235,
+    "iou": 0.07476635514018691,
+    "n_map": 108
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.4089233235021498,
+    "ate": 0.08105909110529605,
+    "rpe": 0.0055141615838978615,
+    "n_confirmed": 7,
+    "chamfer": 16.235467393571316,
+    "map_accuracy": 0.4058532912039484,
+    "map_completeness": 32.065081495938685,
+    "iou": 0.004672897196261682,
+    "n_map": 4
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.19528666027567962,
+     "chamfer": 18.48289320672989,
+     "map_accuracy": 3.315837809209165,
+     "map_completeness": 33.64994860425062,
+     "iou": 0.0011547344110854503,
+     "n_map": 11
+    },
+    "noisy_odometry": {
+     "ate": 0.5020980055180168,
+     "chamfer": 16.563103576239087,
+     "map_accuracy": 3.587858907551536,
+     "map_completeness": 29.538348244926638,
+     "iou": 0.0011587485515643105,
+     "n_map": 10
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.4089233235021498,
+    "ate": 0.4719180259657899,
+    "rpe": 0.057178011966214505,
+    "n_confirmed": 66,
+    "chamfer": 8.680242763916848,
+    "map_accuracy": 2.2350120723514317,
+    "map_completeness": 15.125473455482263,
+    "iou": 0.06393606393606394,
+    "n_map": 277
+   }
+  },
+  {
+   "scene": "street_canyon_scurve",
+   "bw": 160,
+   "seed": 8,
+   "phantoms_corrected": {
+    "matched_facade": 0.15,
+    "matched_other": 0.18287037037037038,
+    "folded_facade": 0.10555555555555556,
+    "folded_other": 0.23657407407407408,
+    "unexplained": 0.325,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6671296296296296,
+    "median_signed_range_err_facade_m": -0.0543635608387234,
+    "median_abs_range_err_facade_m": 0.14873806101491027
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.31115747251173,
+    "map_accuracy": 3.0939096353774596,
+    "map_completeness": 17.528405309646,
+    "iou": 0.02598752598752599,
+    "n_map": 178
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.7814154566438697,
+    "ate": 1.2783380583190038,
+    "rpe": 0.04307497689048912,
+    "n_confirmed": 116,
+    "chamfer": 10.774153346303155,
+    "map_accuracy": 2.8631593775757755,
+    "map_completeness": 18.685147315030534,
+    "iou": 0.04423963133640553,
+    "n_map": 368
+   },
+   "phantoms_as_published": {
+    "matched_facade": 0.01898148148148148,
+    "matched_other": 0.09490740740740741,
+    "folded_facade": 0.005555555555555556,
+    "folded_other": 0.06018518518518518,
+    "unexplained": 0.8203703703703704,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.8861111111111111,
+    "median_signed_range_err_facade_m": -6.7721702572152935,
+    "median_abs_range_err_facade_m": 6.7721702572152935
+   },
+   "gt_map_music_as_published": {
+    "chamfer": 16.100031839800625,
+    "map_accuracy": 4.5256921816917925,
+    "map_completeness": 27.674371497909455,
+    "iou": 0.0,
+    "n_map": 12
+   },
+   "gt_map_oracle": {
+    "chamfer": 12.518304125792499,
+    "map_accuracy": 0.2545868633597613,
+    "map_completeness": 24.782021388225235,
+    "iou": 0.07476635514018691,
+    "n_map": 108
+   },
+   "slam_oracle": {
+    "ate_dead_reckoning": 0.7814154566438697,
+    "ate": 0.12477206766093472,
+    "rpe": 0.005682738014976836,
+    "n_confirmed": 7,
+    "chamfer": 12.693653060444513,
+    "map_accuracy": 0.26788882139284115,
+    "map_completeness": 25.119417299496185,
+    "iou": 0.04413472706155633,
+    "n_map": 66
+   },
+   "legacy_music": {
+    "gt_odometry": {
+     "ate": 0.15059314598517576,
+     "chamfer": 15.838434228995654,
+     "map_accuracy": 4.139898235203,
+     "map_completeness": 27.53697022278831,
+     "iou": 0.0011560693641618498,
+     "n_map": 13
+    },
+    "noisy_odometry": {
+     "ate": 0.7610031403694296,
+     "chamfer": 16.404448701428436,
+     "map_accuracy": 4.248818296349042,
+     "map_completeness": 28.56007910650783,
+     "iou": 0.0,
+     "n_map": 12
+    }
+   },
+   "slam_music_two_branch": {
+    "ate_dead_reckoning": 0.7814154566438697,
+    "ate": 1.1209795929495636,
+    "rpe": 0.03891258083448023,
+    "n_confirmed": 68,
+    "chamfer": 8.808376977992918,
+    "map_accuracy": 2.7117783967654354,
+    "map_completeness": 14.9049755592204,
+    "iou": 0.0507380073800738,
+    "n_map": 371
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 20,
+   "seed": 0,
+   "phantoms_corrected": {
+    "matched_facade": 0.08981481481481482,
+    "matched_other": 0.2574074074074074,
+    "folded_facade": 0.07268518518518519,
+    "folded_other": 0.21064814814814814,
+    "unexplained": 0.36944444444444446,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6527777777777778,
+    "median_signed_range_err_facade_m": -0.025947296325455227,
+    "median_abs_range_err_facade_m": 0.42846259635451034
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.017569814835717,
+    "map_accuracy": 2.795623379731173,
+    "map_completeness": 17.239516249940262,
+    "iou": 0.013289036544850499,
+    "n_map": 78
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.10649179416829062,
+    "ate": 0.6756146059981705,
+    "rpe": 0.03012536355724602,
+    "n_confirmed": 89,
+    "chamfer": 10.516953316986857,
+    "map_accuracy": 8.49551836852668,
+    "map_completeness": 12.538388265447034,
+    "iou": 0.021238938053097345,
+    "n_map": 328
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 20,
+   "seed": 1,
+   "phantoms_corrected": {
+    "matched_facade": 0.0912037037037037,
+    "matched_other": 0.24259259259259258,
+    "folded_facade": 0.07268518518518519,
+    "folded_other": 0.2111111111111111,
+    "unexplained": 0.3824074074074074,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6662037037037037,
+    "median_signed_range_err_facade_m": 0.0369625945037626,
+    "median_abs_range_err_facade_m": 0.40421350378812093
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.194868832804584,
+    "map_accuracy": 3.5063814794150425,
+    "map_completeness": 16.883356186194124,
+    "iou": 0.011098779134295227,
+    "n_map": 76
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.3342053863116243,
+    "ate": 0.6640381323928776,
+    "rpe": 0.04599525428951483,
+    "n_confirmed": 92,
+    "chamfer": 9.714164350476903,
+    "map_accuracy": 6.486745816244716,
+    "map_completeness": 12.941582884709089,
+    "iou": 0.012059369202226345,
+    "n_map": 265
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 20,
+   "seed": 2,
+   "phantoms_corrected": {
+    "matched_facade": 0.08796296296296297,
+    "matched_other": 0.24768518518518517,
+    "folded_facade": 0.07407407407407407,
+    "folded_other": 0.20972222222222223,
+    "unexplained": 0.38055555555555554,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6643518518518519,
+    "median_signed_range_err_facade_m": 0.047440782214550836,
+    "median_abs_range_err_facade_m": 0.4781786371405907
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 9.792706968629044,
+    "map_accuracy": 3.107634643282524,
+    "map_completeness": 16.477779293975566,
+    "iou": 0.011025358324145534,
+    "n_map": 81
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.8338466545189447,
+    "ate": 0.797820418513604,
+    "rpe": 0.051291299183273874,
+    "n_confirmed": 86,
+    "chamfer": 9.560459587596982,
+    "map_accuracy": 6.183373443509095,
+    "map_completeness": 12.937545731684871,
+    "iou": 0.027149321266968326,
+    "n_map": 317
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 40,
+   "seed": 0,
+   "phantoms_corrected": {
+    "matched_facade": 0.10462962962962963,
+    "matched_other": 0.19444444444444445,
+    "folded_facade": 0.07361111111111111,
+    "folded_other": 0.19074074074074074,
+    "unexplained": 0.43657407407407406,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.700925925925926,
+    "median_signed_range_err_facade_m": -0.024529947247764028,
+    "median_abs_range_err_facade_m": 0.2587431257641697
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 9.921828544591152,
+    "map_accuracy": 3.211047304274175,
+    "map_completeness": 16.63260978490813,
+    "iou": 0.023965141612200435,
+    "n_map": 114
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.10649179416829062,
+    "ate": 0.7473290823905673,
+    "rpe": 0.06073660435470559,
+    "n_confirmed": 72,
+    "chamfer": 8.51111574518458,
+    "map_accuracy": 3.870363539802827,
+    "map_completeness": 13.15186795056633,
+    "iou": 0.03984819734345351,
+    "n_map": 288
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 20,
+   "seed": 4,
+   "phantoms_corrected": {
+    "matched_facade": 0.0912037037037037,
+    "matched_other": 0.25416666666666665,
+    "folded_facade": 0.0712962962962963,
+    "folded_other": 0.20555555555555555,
+    "unexplained": 0.37777777777777777,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6546296296296297,
+    "median_signed_range_err_facade_m": -0.0033885872683470097,
+    "median_abs_range_err_facade_m": 0.5498154724902449
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 12.480277533889794,
+    "map_accuracy": 3.4396316811096925,
+    "map_completeness": 21.520923386669896,
+    "iou": 0.01,
+    "n_map": 72
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.09688997588459687,
+    "ate": 0.30015707763541805,
+    "rpe": 0.02731720677965533,
+    "n_confirmed": 82,
+    "chamfer": 12.54260596877072,
+    "map_accuracy": 7.500148410810454,
+    "map_completeness": 17.585063526730988,
+    "iou": 0.023636363636363636,
+    "n_map": 299
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 40,
+   "seed": 1,
+   "phantoms_corrected": {
+    "matched_facade": 0.10462962962962963,
+    "matched_other": 0.20092592592592592,
+    "folded_facade": 0.07777777777777778,
+    "folded_other": 0.18796296296296297,
+    "unexplained": 0.4287037037037037,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6944444444444444,
+    "median_signed_range_err_facade_m": -0.05858006259540005,
+    "median_abs_range_err_facade_m": 0.24185206629230827
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.046705939592023,
+    "map_accuracy": 3.4266020080035466,
+    "map_completeness": 16.6668098711805,
+    "iou": 0.018338727076591153,
+    "n_map": 115
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.3342053863116243,
+    "ate": 0.4031865899954874,
+    "rpe": 0.034021931926958966,
+    "n_confirmed": 75,
+    "chamfer": 8.089892193827847,
+    "map_accuracy": 4.176152845210406,
+    "map_completeness": 12.003631542445287,
+    "iou": 0.03655352480417755,
+    "n_map": 399
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 40,
+   "seed": 2,
+   "phantoms_corrected": {
+    "matched_facade": 0.10601851851851851,
+    "matched_other": 0.19722222222222222,
+    "folded_facade": 0.07592592592592592,
+    "folded_other": 0.18981481481481483,
+    "unexplained": 0.4310185185185185,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6967592592592593,
+    "median_signed_range_err_facade_m": -0.04945709317212277,
+    "median_abs_range_err_facade_m": 0.2859707093806634
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.049379777701,
+    "map_accuracy": 3.351838184987161,
+    "map_completeness": 16.74692137041484,
+    "iou": 0.020562770562770564,
+    "n_map": 112
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.8338466545189447,
+    "ate": 1.1547282231652423,
+    "rpe": 0.02851951309356093,
+    "n_confirmed": 78,
+    "chamfer": 11.184889817490689,
+    "map_accuracy": 4.6813003885127,
+    "map_completeness": 17.688479246468678,
+    "iou": 0.021256038647342997,
+    "n_map": 229
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 20,
+   "seed": 3,
+   "phantoms_corrected": {
+    "matched_facade": 0.09074074074074075,
+    "matched_other": 0.25416666666666665,
+    "folded_facade": 0.07268518518518519,
+    "folded_other": 0.2074074074074074,
+    "unexplained": 0.375,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6550925925925926,
+    "median_signed_range_err_facade_m": 0.017107564658253693,
+    "median_abs_range_err_facade_m": 0.41943574844169795
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 9.935649090393188,
+    "map_accuracy": 2.6865523548886006,
+    "map_completeness": 17.184745825897775,
+    "iou": 0.015677491601343786,
+    "n_map": 68
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.47715064921509515,
+    "ate": 1.082837978918791,
+    "rpe": 0.03418189302534007,
+    "n_confirmed": 82,
+    "chamfer": 8.347274945425728,
+    "map_accuracy": 6.16300018915886,
+    "map_completeness": 10.531549701692596,
+    "iou": 0.036947791164658635,
+    "n_map": 489
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 40,
+   "seed": 4,
+   "phantoms_corrected": {
+    "matched_facade": 0.1050925925925926,
+    "matched_other": 0.19398148148148148,
+    "folded_facade": 0.07222222222222222,
+    "folded_other": 0.19444444444444445,
+    "unexplained": 0.43425925925925923,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.700925925925926,
+    "median_signed_range_err_facade_m": -0.07025796261021355,
+    "median_abs_range_err_facade_m": 0.2549969939475929
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.121832531952368,
+    "map_accuracy": 3.6995157484891736,
+    "map_completeness": 16.544149315415563,
+    "iou": 0.018318965517241378,
+    "n_map": 115
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.09688997588459687,
+    "ate": 0.8963808293970023,
+    "rpe": 0.033519716865207924,
+    "n_confirmed": 71,
+    "chamfer": 10.61632479871206,
+    "map_accuracy": 4.546255040403279,
+    "map_completeness": 16.68639455702084,
+    "iou": 0.027472527472527472,
+    "n_map": 312
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 40,
+   "seed": 3,
+   "phantoms_corrected": {
+    "matched_facade": 0.10416666666666667,
+    "matched_other": 0.2,
+    "folded_facade": 0.07592592592592592,
+    "folded_other": 0.1865740740740741,
+    "unexplained": 0.43333333333333335,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6958333333333333,
+    "median_signed_range_err_facade_m": -0.07659954340881825,
+    "median_abs_range_err_facade_m": 0.25470789657411785
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 9.558046180645153,
+    "map_accuracy": 3.3901088814157414,
+    "map_completeness": 15.725983479874566,
+    "iou": 0.019438444924406047,
+    "n_map": 119
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.47715064921509515,
+    "ate": 1.3355833061570745,
+    "rpe": 0.02983696759520681,
+    "n_confirmed": 73,
+    "chamfer": 9.303435580589536,
+    "map_accuracy": 4.429913151220298,
+    "map_completeness": 14.176958009958776,
+    "iou": 0.03767403767403767,
+    "n_map": 507
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 80,
+   "seed": 0,
+   "phantoms_corrected": {
+    "matched_facade": 0.11574074074074074,
+    "matched_other": 0.2412037037037037,
+    "folded_facade": 0.08055555555555556,
+    "folded_other": 0.22870370370370371,
+    "unexplained": 0.3337962962962963,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6430555555555556,
+    "median_signed_range_err_facade_m": -0.04124213403230392,
+    "median_abs_range_err_facade_m": 0.1925730392294156
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 9.65931970050568,
+    "map_accuracy": 2.8585060834096203,
+    "map_completeness": 16.46013331760174,
+    "iou": 0.027168234064785787,
+    "n_map": 195
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.10649179416829062,
+    "ate": 1.2101991290359757,
+    "rpe": 0.03182878138136734,
+    "n_confirmed": 82,
+    "chamfer": 10.455802905590824,
+    "map_accuracy": 3.103069825075086,
+    "map_completeness": 17.808535986106563,
+    "iou": 0.038350910834132314,
+    "n_map": 306
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 80,
+   "seed": 1,
+   "phantoms_corrected": {
+    "matched_facade": 0.11574074074074074,
+    "matched_other": 0.2439814814814815,
+    "folded_facade": 0.0824074074074074,
+    "folded_other": 0.2310185185185185,
+    "unexplained": 0.32685185185185184,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6402777777777777,
+    "median_signed_range_err_facade_m": -0.030951007794822516,
+    "median_abs_range_err_facade_m": 0.19529095232630667
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 9.807463917169061,
+    "map_accuracy": 3.057439020921857,
+    "map_completeness": 16.557488813416263,
+    "iou": 0.028008298755186723,
+    "n_map": 199
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.3342053863116243,
+    "ate": 0.672943287562637,
+    "rpe": 0.036264869664189354,
+    "n_confirmed": 85,
+    "chamfer": 9.25824228690502,
+    "map_accuracy": 3.10855149168704,
+    "map_completeness": 15.407933082122998,
+    "iou": 0.03143418467583497,
+    "n_map": 263
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 80,
+   "seed": 2,
+   "phantoms_corrected": {
+    "matched_facade": 0.11666666666666667,
+    "matched_other": 0.2375,
+    "folded_facade": 0.07962962962962963,
+    "folded_other": 0.22962962962962963,
+    "unexplained": 0.3365740740740741,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6458333333333334,
+    "median_signed_range_err_facade_m": -0.04124213403230392,
+    "median_abs_range_err_facade_m": 0.19025449463941335
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 9.893622204683593,
+    "map_accuracy": 2.7071400090935027,
+    "map_completeness": 17.080104400273683,
+    "iou": 0.027225130890052355,
+    "n_map": 186
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.8338466545189447,
+    "ate": 1.1482367203650394,
+    "rpe": 0.042776382179854855,
+    "n_confirmed": 91,
+    "chamfer": 8.95256149576319,
+    "map_accuracy": 2.9570000201849385,
+    "map_completeness": 14.94812297134144,
+    "iou": 0.044626593806921674,
+    "n_map": 385
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 80,
+   "seed": 3,
+   "phantoms_corrected": {
+    "matched_facade": 0.11527777777777778,
+    "matched_other": 0.24351851851851852,
+    "folded_facade": 0.08194444444444444,
+    "folded_other": 0.22962962962962963,
+    "unexplained": 0.3296296296296296,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6412037037037037,
+    "median_signed_range_err_facade_m": -0.04945709317212277,
+    "median_abs_range_err_facade_m": 0.17709224688643133
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 10.095542778535245,
+    "map_accuracy": 2.9379294131309437,
+    "map_completeness": 17.253156143939545,
+    "iou": 0.02748414376321353,
+    "n_map": 174
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.47715064921509515,
+    "ate": 0.9860364720715812,
+    "rpe": 0.03684878395950642,
+    "n_confirmed": 86,
+    "chamfer": 10.643188515115925,
+    "map_accuracy": 2.9345760042253812,
+    "map_completeness": 18.35180102600647,
+    "iou": 0.0394990366088632,
+    "n_map": 299
+   }
+  },
+  {
+   "scene": "street_canyon",
+   "bw": 80,
+   "seed": 4,
+   "phantoms_corrected": {
+    "matched_facade": 0.11527777777777778,
+    "matched_other": 0.23703703703703705,
+    "folded_facade": 0.08333333333333333,
+    "folded_other": 0.225,
+    "unexplained": 0.33935185185185185,
+    "n_detections": 2160,
+    "phantom_rate_manuscript_def": 0.6476851851851851,
+    "median_signed_range_err_facade_m": -0.030094093349418927,
+    "median_abs_range_err_facade_m": 0.18623372471318334
+   },
+   "gt_map_music_corrected": {
+    "chamfer": 9.798554342835997,
+    "map_accuracy": 2.984779947569885,
+    "map_completeness": 16.61232873810211,
+    "iou": 0.026096033402922755,
+    "n_map": 188
+   },
+   "slam_music": {
+    "ate_dead_reckoning": 0.09688997588459687,
+    "ate": 0.8474599943133975,
+    "rpe": 0.04534461179703721,
+    "n_confirmed": 88,
+    "chamfer": 9.617995021968031,
+    "map_accuracy": 2.8903018643619034,
+    "map_completeness": 16.34568817957416,
+    "iou": 0.0457516339869281,
+    "n_map": 372
+   }
+  }
+ ]
+}
