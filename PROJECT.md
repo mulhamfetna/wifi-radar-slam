@@ -190,7 +190,7 @@ detection composition (F2) on real silicon. Blocked on access to such a space.
 
 1. When the confirmation email arrives: sign in to the journal account, then record the manuscript
    number here (status and decision log).
-2. Keep the submitted state fixed: tag the commit as `pmc-submitted` (the paper as sent).
+2. ~~Tag the submitted state~~ done: tag `pmc-submitted` (pushed). Revisions happen on `main`.
 3. Wait for the editor's assessment; on a decision follow `manuscript/SUBMISSION-GUIDE.md`, Step 5.
 4. Optional, useful for a revision: corridor reflector measurement (section 6).
 5. Optional: re-run the radar ablation on a capable host (retrieve `run_ablation.py` from the
