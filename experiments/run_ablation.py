@@ -237,20 +237,29 @@ def run_music_reference(cfg, seed: int) -> dict:
     csi = simulate_csi(built, cfg.rf, cfg.snr_db, rng)
     dets = extract_detections(csi, cfg.rf, n_paths=3, world_aoa=cfg.world_aoa, joint=True)
 
-    pts = []
-    n_det = 0
-    for f in idx:
-        D = np.asarray(dets[f]).reshape(-1, 3)
-        n_det += int(D.shape[0])
-        for (pl, aoa, ap_i) in D:
-            ap_xy = np.asarray(built.ap_positions[int(ap_i)])[:2]
-            R = _triangulate_bistatic(traj[f][:2], ap_xy, float(pl), float(aoa))
-            if R is not None:
-                pts.append(R)
-    est_map = _voxel_map(np.array(pts) if pts else np.empty((0, 2)))
-    return {"cell": "M", "label": "WiFi + joint 2-D MUSIC (papers 1-2 front-end)",
-            "seed": seed, "n_frames": len(idx), "n_detections": n_det,
-            "map": _map_metrics(est_map, gt_xy)}
+    # The CSI carries EXCESS delays (Sionna normalize_delays, as commodity CSI). Row M keeps
+    # the published reading (excess taken as the absolute path length); row M* converts with
+    # the known AP position at the true pose: rho = excess + |AP - p| (docs/results-corrected.md).
+    from wifi_radar_slam.eval.scenes import excess_to_absolute, horizontal
+    aps = np.asarray(built.ap_positions, float)
+    sel = [np.asarray(dets[f]).reshape(-1, 3) for f in idx]
+    corrected = horizontal(excess_to_absolute(sel, traj[idx], aps), aps)
+
+    def _map(dd):
+        pts = []
+        for f, D in zip(idx, dd):
+            for (pl, aoa, ap_i) in D:
+                R = _triangulate_bistatic(traj[f][:2], aps[int(ap_i)][:2], float(pl), float(aoa))
+                if R is not None:
+                    pts.append(R)
+        return _map_metrics(_voxel_map(np.array(pts) if pts else np.empty((0, 2))), gt_xy)
+
+    n_det = int(sum(D.shape[0] for D in sel))
+    base = {"seed": seed, "n_frames": len(idx), "n_detections": n_det}
+    return [{"cell": "M", "label": "WiFi + joint 2-D MUSIC, as published (excess read as absolute)",
+             **base, "map": _map(sel)},
+            {"cell": "M*", "label": "WiFi + joint 2-D MUSIC, excess delay corrected",
+             **base, "map": _map(corrected)}]
 
 
 def main() -> None:
@@ -267,11 +276,11 @@ def main() -> None:
             for r in run_all_cells(cfg, seed):
                 r["scene"] = scene
                 results.append(r)
-            m = run_music_reference(cfg, seed)
-            m["scene"] = scene
-            results.append(m)
-            log.info("  -> MUSIC ref seed %d: n_det=%d  IoU=%.3f  map=%d pts",
-                     seed, m["n_detections"], m["map"]["iou"], m["map"]["n_map_points"])
+            for m in run_music_reference(cfg, seed):
+                m["scene"] = scene
+                results.append(m)
+                log.info("  -> MUSIC %s seed %d: n_det=%d  IoU=%.3f  map=%d pts", m["cell"],
+                         seed, m["n_detections"], m["map"]["iou"], m["map"]["n_map_points"])
 
             os.makedirs("results", exist_ok=True)
             with open(f"results/ablation{suffix}.json", "w") as f:   # checkpoint every seed
