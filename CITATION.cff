@@ -1,20 +1,18 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "WiFi-Radar-for-SLAM: Ambient WiFi as a Cheap Radar for Automotive SLAM (simulation + ESP32 hardware)"
+title: "WiFi-Radar-for-SLAM: ambient WiFi for vehicular multipath SLAM (Sionna RT simulation + ESP32 hardware)"
 abstract: >-
-  A physics-based (Sionna RT ray-traced) study, extended with real ESP32-S3
-  hardware, of using ambient sub-7 GHz WiFi received on a moving vehicle as a
-  radar/LiDAR-replacement front-end for SLAM. Vehicle localization is
-  centimetre-level with a clean bandwidth/SNR operating envelope. Mapping, however,
-  hits a ceiling: with realistic commodity CSI, most detections are phantoms
-  (~89 %) plus a several-metre range bias - a front-end and geometry limit, not a
-  path-discrimination or resolution limit. Comparisons against real LiDAR (KITTI)
-  and a simulated 77 GHz FMCW radar show the ceiling is neither carrier-specific nor
-  WiFi-specific: the radio carrier does not matter, geometry does (a monostatic,
-  on-vehicle transmitter nearly eliminates the phantoms), and wider bandwidth makes
-  them worse. The phantom-rate claim is then reproduced on ~$30 of real ESP32-S3
-  silicon (HT40 CSI captured, parsed, and delay-profiled against a tape measure).
-  Consolidates four component studies into one body of work.
+  A ray-traced (Sionna RT) study, with ESP32-S3 hardware, of whether ambient
+  sub-7 GHz WiFi received on a moving vehicle can aid localization and mapping.
+  Using wheel-grade odometry as the baseline, a virtual-anchor FastSLAM back-end
+  and a LiDAR comparison, exact multipath parameters reduce odometry drift by
+  66-79 %, while a commodity four-element joint-MUSIC front-end returns too few
+  facade reflections and too many persistent false detections, making WiFi-aided
+  SLAM worse than odometry alone. Access-point positions must be known to
+  sub-metre accuracy. The work also documents a delay-convention pitfall in
+  ray-traced CSI (first-arrival-referenced delays read as absolute path lengths)
+  that invalidated earlier versions of this study, whose localization-parity and
+  phantom-ceiling claims are withdrawn.
 type: software
 authors:
   - family-names: Fetna
