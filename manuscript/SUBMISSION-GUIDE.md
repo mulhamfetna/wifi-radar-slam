@@ -3,6 +3,10 @@
 Step-by-step procedure for submitting `manuscript/` to *Pervasive and Mobile Computing* (PMC).
 Status and decisions live in `../PROJECT.md`; this file is only the procedure.
 
+> **Submitted 2026-10-22** through Elsevier's new submission service (it replaced the Editorial
+> Manager form for this journal at the time). Tracking and revisions happen in the journal account
+> linked from the confirmation email. Steps 4.x below describe the older Editorial Manager flow.
+
 ## Links
 
 | What | Link |

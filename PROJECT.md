@@ -18,10 +18,10 @@ Publish **one** corrected journal paper:
 > Front-End Limits, and a Delay-Convention Pitfall in Ray-Traced Evaluation*
 > — Mulham Fetna (sole author), target **Pervasive and Mobile Computing** (Elsevier).
 
-**Status (2026-10-22):** manuscript complete and building cleanly (`manuscript/main.pdf`, 17
-preprint pages); language and accuracy pass done; CRediT statement and Elsevier's generative-AI
-declaration added; highlights and cover letter written. **Not yet submitted.** Author review
-pending.
+**Status: SUBMITTED 2026-10-22 17:57** to *Pervasive and Mobile Computing* through Elsevier's new
+submission service; article type *Research Paper*; sole and corresponding author. Awaiting the
+confirmation email, which carries the manuscript number; the author must then sign in to the
+journal account (or set a password) to track the submission and handle revisions.
 
 **Compliance, checked against the journal's guide for authors (read 2026-10-22):**
 
@@ -182,19 +182,18 @@ detection composition (F2) on real silicon. Blocked on access to such a space.
 | 2026-10-21 | Re-verification found D1–D3; plan: fix, re-run everything, retarget Elsevier |
 | 2026-10-22 | Corrected study written; target Pervasive and Mobile Computing; radar ablation dropped (CPU re-run impractical, raw output never committed) |
 | 2026-10-22 | Repository reset to one manuscript and this file; old papers and drafts removed (see section 9) |
+| 2026-10-22 | **Submitted** to Pervasive and Mobile Computing (Research Paper, 17:57); manuscript number pending |
 | 2026-10-22 | Release v1.0.0 archived on Zenodo (10.5281/zenodo.23560036) and cited in the manuscript |
 | 2026-10-22 | Language/accuracy pass; "as published" relabelled "earlier reading" (the earlier work was never published); CRediT and generative-AI declarations added |
 
 ## 8. Open tasks
 
-1. Author reads the manuscript and approves the withdrawn-claims list (section 4), and confirms
-   the wording of the generative-AI declaration (it is the author's declaration to make).
-2. Author confirms the journal's limits on its guide-for-authors page; consider a supervisor
-   co-author if one contributes.
-3. Check the journal's preprint policy; choose the subscription route (no APC).
-4. ~~Zenodo release~~ done: v1.0.0, DOI 10.5281/zenodo.23560036 (concept 10.5281/zenodo.21247288), cited in the manuscript.
-5. Optional: corridor reflector measurement (section 6).
-6. Optional: re-run the radar ablation on a capable host (retrieve `run_ablation.py` from the
+1. When the confirmation email arrives: sign in to the journal account, then record the manuscript
+   number here (status and decision log).
+2. Keep the submitted state fixed: tag the commit as `pmc-submitted` (the paper as sent).
+3. Wait for the editor's assessment; on a decision follow `manuscript/SUBMISSION-GUIDE.md`, Step 5.
+4. Optional, useful for a revision: corridor reflector measurement (section 6).
+5. Optional: re-run the radar ablation on a capable host (retrieve `run_ablation.py` from the
    `archive/ieee-access-submission` tag).
 
 ## 9. History and archives
