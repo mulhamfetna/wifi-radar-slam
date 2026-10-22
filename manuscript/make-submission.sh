@@ -3,6 +3,8 @@
 #   bash manuscript/make-submission.sh
 set -euo pipefail
 cd "$(dirname "$0")"
+# deterministic PDFs: pin the embedded date to the last commit, so rebuilds do not dirty git
+export SOURCE_DATE_EPOCH="$(git log -1 --format=%ct -- main.tex refs.bib figures elsarticle.cls elsarticle-num.bst)" FORCE_SOURCE_DATE=1
 pdflatex -interaction=nonstopmode main >/dev/null && bibtex main >/dev/null \
   && pdflatex -interaction=nonstopmode main >/dev/null && pdflatex -interaction=nonstopmode main >/dev/null
 grep -qE '^! |undefined' main.log && { echo "LaTeX errors - see main.log"; exit 1; }
