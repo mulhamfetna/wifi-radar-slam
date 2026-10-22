@@ -60,7 +60,7 @@ def fig_frontend(S):
             ("Unexplained", ("unexplained",))]
     rows, labels = [], []
     for sc, name in SCENES:
-        for tag, key in (("as published", "phantoms_as_published"), ("corrected", "phantoms_corrected")):
+        for tag, key in (("earlier reading", "phantoms_as_published"), ("corrected", "phantoms_corrected")):
             g = S[f"{sc}/bw160"]
             rows.append([sum(g[f"{key}/{k}"]["mean"] for k in ks) for _, ks in cats])
             labels.append(f"{name}\n{tag}")
@@ -86,7 +86,7 @@ def fig_maps():
     sc = SceneCache.load(PATHS["controlled_wall"])
     music = load_dets("controlled_wall", 160, 0)
     variants = [("Oracle", excess_to_absolute(excess_oracle_detections(sc), sc.poses, sc.ap_positions)),
-                ("MUSIC, as published", music),
+                ("MUSIC, earlier reading", music),
                 ("MUSIC, corrected", excess_to_absolute(music, sc.poses, sc.ap_positions))]
     fig, axs = plt.subplots(1, 3, figsize=(5.2, 3.0), sharex=True, sharey=True)
     for ax, (name, d3) in zip(axs, variants):

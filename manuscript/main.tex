@@ -7,11 +7,9 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{multirow}
-\usepackage{xcolor}
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 \graphicspath{{figures/}}
-\newcommand{\pending}[1]{\textcolor{red}{[#1]}}
 
 \journal{Pervasive and Mobile Computing}
 
@@ -78,7 +76,7 @@ feed it either exact multipath parameters (an oracle) or the output of joint del
 \cite{schmidt1986music,shan1985smoothing} applied to noisy CSI from a four-element array.
 
 The work also corrects our own earlier analyses \cite{fetna2026wifiradar}, which reported
-centimetre-level WiFi localization at parity with LiDAR and attributed a mapping failure to a
+WiFi localization at the centimetre level, at parity with LiDAR, and attributed a mapping failure to a
 ``phantom ceiling'' with a several-metre range bias. Re-verification found three defects: the
 estimator was driven by ground-truth odometry, its measurement update carried no position
 information, and CSI delays referenced to the first arrival were read as absolute path lengths.
@@ -97,8 +95,9 @@ study that synthesizes CSI from a ray tracer.
         gain from being realized (Sections~\ref{sec:frontend}--\ref{sec:bw}).
   \item A description of the excess-delay pitfall, its quantitative effect, and a measurement
         model that handles it (Section~\ref{sec:pitfall}).
-  \item Hardware evidence from two ESP32-S3 boards that commodity CSI indeed fixes delays only
-        relative to the first arrival (Section~\ref{sec:hw}), and an open artifact.
+  \item An ESP32-S3 CSI chain that reads real 40\,MHz CSI and references delays to the first
+        arrival, released with all code and data for follow-up measurements
+        (Section~\ref{sec:hw}).
 \end{itemize}
 
 %% ===========================================================================
@@ -233,10 +232,11 @@ WiFi a useful aid; joint MUSIC on a four-element array makes it harmful.}
 
 Table~\ref{tab:ate} and Fig.~\ref{fig:loc} give the central result. With exact multipath
 parameters, WiFi reduces the odometry error by 66\,\% beside the single wall and by 79\,\% in both
-street runs; the filter confirms exactly the three and seven VAs present. Beside a single wall
-WiFi also outperforms LiDAR on average (the LiDAR spread across seeds is large), whose scan matching cannot constrain motion along a featureless
-plane, whereas the VAs of three APs observe the wall from different directions. In the street
-canyon LiDAR is four times better again.
+street runs, and the filter confirms exactly three and seven VAs, matching the specular
+AP--reflector pairs in the ray-traced paths. Beside a single wall WiFi also outperforms LiDAR on
+average: scan matching cannot constrain motion along a featureless plane, whereas the VAs of three
+APs observe the wall from different directions. The LiDAR spread across seeds is large there. In
+the street canyon LiDAR is almost four times better than the WiFi oracle.
 
 With the realistic front-end the same filter is worse than dead reckoning in every scenario.
 It confirms 28 VAs beside the wall and 101--116 in the canyon, against three and seven real ones:
@@ -249,8 +249,8 @@ reaches dead-reckoning parity. The trajectory shape makes no material difference
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.75\linewidth]{frontend_decomposition.pdf}
-\caption{Composition of joint-MUSIC detections, as published in our earlier analysis (excess
-delay read as absolute length) and corrected. Only about 15\,\% of detections are facade
+\caption{Composition of joint-MUSIC detections under the reading of our earlier analysis (excess
+delay taken as absolute length) and under the corrected model. Only about 15\,\% of detections are facade
 reflections in every scenario.}
 \label{fig:frontend}
 \end{figure}
@@ -267,8 +267,8 @@ Other real path (LOS, floor, multi-bounce) & 29.2 & 19.0 & 18.2 \\
 Real path, front/back folded  & 19.3 & 30.8 & 34.1 \\
 Unexplained                   & 35.8 & 34.6 & 32.4 \\ \midrule
 Facade range error, corrected (m) & $+0.03$ & $-0.06$ & $-0.06$ \\
-\emph{As published:} unmatched share & 88.8 & 89.7 & 88.5 \\
-\emph{As published:} facade range error (m) & $-6.35$ & $-2.19$ & $-6.62$ \\
+\emph{Earlier reading:} unmatched share & 88.8 & 89.7 & 88.5 \\
+\emph{Earlier reading:} facade range error (m) & $-6.35$ & $-2.19$ & $-6.62$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -286,14 +286,14 @@ precision but the composition of the detection set.
 \begin{figure}[t]\centering
 \includegraphics[width=0.85\linewidth]{maps_controlled.pdf}
 \caption{Maps of the controlled wall triangulated at ground-truth poses (one seed). The
-as-published reading of the realistic detections places almost nothing on the wall; with the
+earlier reading of the realistic detections places almost nothing on the wall; with the
 excess-delay model the wall is recovered, together with clutter near the trajectory.}
 \label{fig:maps}
 \end{figure}
 
 Scoring the map at ground-truth poses isolates the front-end from localization. Beside the wall
 the oracle reaches an IoU of 0.767 and MUSIC 0.349\,$\pm$\,0.017 (Fig.~\ref{fig:maps}); the
-as-published reading scored 0.000. In the canyon the oracle itself reaches only 0.075, because
+earlier reading scored 0.000. In the canyon the oracle itself reaches only 0.075, because
 three APs illuminate a small fraction of the facade footprints, and MUSIC reaches 0.03. Mapping of
 the illuminated facades is therefore possible with commodity CSI in a clean geometry, but it
 carries clutter from the misplaced detections and is bounded by illumination coverage.
@@ -428,6 +428,17 @@ range bias and a phantom rate that are not properties of the sensor.
 \section*{Data and code availability}
 All code, configurations, cached ray-traced channels (regenerable), result files, and ESP32
 firmware are available under AGPL-3.0 at \url{https://github.com/mulhamfetna/wifi-radar-slam}.
+
+\section*{CRediT authorship contribution statement}
+\textbf{Mulham Fetna:} Conceptualization, Methodology, Software, Validation, Formal analysis,
+Investigation, Data curation, Writing -- original draft, Writing -- review \& editing,
+Visualization.
+
+\section*{Declaration of generative AI and AI-assisted technologies in the writing process}
+During the preparation of this work the author used Claude (Anthropic) to assist with code,
+analysis scripts, figure generation, and drafting and editing of the text. After using this tool,
+the author reviewed and edited the content as needed and takes full responsibility for the content
+of the publication.
 
 \section*{Declaration of competing interest}
 The author declares no competing interests.

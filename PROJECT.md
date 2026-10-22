@@ -18,8 +18,16 @@ Publish **one** corrected journal paper:
 > Front-End Limits, and a Delay-Convention Pitfall in Ray-Traced Evaluation*
 > — Mulham Fetna (sole author), target **Pervasive and Mobile Computing** (Elsevier).
 
-**Status (2026-10-22):** manuscript complete and building (`manuscript/main.pdf`, 17 preprint
-pages); highlights and cover letter written. **Not yet submitted.** Author review pending.
+**Status (2026-10-22):** manuscript complete and building cleanly (`manuscript/main.pdf`, 17
+preprint pages); language and accuracy pass done; CRediT statement and Elsevier's generative-AI
+declaration added; highlights and cover letter written. **Not yet submitted.** Author review
+pending.
+
+**Compliance against Elsevier's standard requirements:** abstract 246 words (limit 250, as
+reported by a third-party template site; confirm), 6 keywords (1-7, same caveat), 5 highlights
+of at most 85 characters, numbered references (`elsarticle-num`), declarations of competing
+interest, funding, data availability, CRediT and generative-AI use present. The journal's own
+guide page could not be read automatically (CAPTCHA), so its specific limits are unconfirmed.
 
 ## 2. Repository layout
 
@@ -163,11 +171,14 @@ detection composition (F2) on real silicon. Blocked on access to such a space.
 | 2026-10-21 | Re-verification found D1–D3; plan: fix, re-run everything, retarget Elsevier |
 | 2026-10-22 | Corrected study written; target Pervasive and Mobile Computing; radar ablation dropped (CPU re-run impractical, raw output never committed) |
 | 2026-10-22 | Repository reset to one manuscript and this file; old papers and drafts removed (see section 9) |
+| 2026-10-22 | Language/accuracy pass; "as published" relabelled "earlier reading" (the earlier work was never published); CRediT and generative-AI declarations added |
 
 ## 8. Open tasks
 
-1. Author reads the manuscript and approves the withdrawn-claims list (section 4).
-2. Grammar pass; consider a supervisor co-author if one contributes.
+1. Author reads the manuscript and approves the withdrawn-claims list (section 4), and confirms
+   the wording of the generative-AI declaration (it is the author's declaration to make).
+2. Author confirms the journal's limits on its guide-for-authors page; consider a supervisor
+   co-author if one contributes.
 3. Check the journal's preprint policy; choose the subscription route (no APC).
 4. Cut a Zenodo release of the corrected state and add its DOI to the manuscript.
 5. Optional: corridor reflector measurement (section 6).
